@@ -9,11 +9,11 @@ export default {
   },
   addMember (groupId, userId, role, username) {
     return Api().post('/members', {
-      'creation_date': new Date(),
-      'groupId': groupId,
-      'userId': userId,
-      'role': role,
-      'username': username
+      creation_date: new Date(),
+      groupId: groupId,
+      userId: userId,
+      role: role,
+      username: username
     })
   },
   getMyCreatorGroups (creatorId) {
@@ -28,14 +28,14 @@ export default {
   },
   createGroup (name, genre, departement, commune, level, creatorId) {
     return Api().post('/groups', {
-      'name': name,
-      'genre': genre,
-      'creation_date': new Date(),
-      'country': 'fr',
-      'departement': departement,
-      'commune': commune,
-      'level': level,
-      'creatorId': creatorId
+      name: name,
+      genre: genre,
+      creation_date: new Date(),
+      country: 'fr',
+      departement: departement,
+      commune: commune,
+      level: level,
+      creatorId: creatorId
     })
   }
 }
