@@ -8,12 +8,18 @@ export default {
     return Api().get('/user/' + userId)
   },
   getProfile (userId) {
-    return Api().get('/profiles?filter{"where":{"userId":' + userId + '}}')
+    // return Api().get('/profiles?filter{"where":{"userId":' + userId + '}}')
+    return Api().get('/profiles?user.id=' + userId)
   },
-  createProfile (userId, username) {
+  createProfile (pseudo, userId) {
     return Api().post('/profiles', {
-      userId: userId,
-      username: username
+      pseudo: pseudo,
+      user: userId
+    })
+  },
+  updateProfile (id, pseudo) {
+    return Api().put('/profiles/' + id, {
+      pseudo: pseudo
     })
   },
   register (username, email, password) {

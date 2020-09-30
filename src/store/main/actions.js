@@ -129,7 +129,6 @@ export async function connectUser ({ commit, dispatch }, { email, password }) {
   commit('CHANGE_LOADING_STATE', true)
   const response = await UserService.logIn(email, password)
   if (response) {
-    console.log('connectUSer', response)
     localStorage.setItem('token', response.data.jwt)
     commit('UPDATE_TOKEN', response.data.jwt)
     commit('UPDATE_USER', response.data.user)
@@ -147,6 +146,7 @@ export async function connectUser ({ commit, dispatch }, { email, password }) {
 export async function getUser ({ commit, dispatch }, { userId }) {
   UserService.getUser(userId)
     .then(resp => {
+      console.log('GET USER', resp)
       commit('UPDATE_USER', resp.data)
       localStorage.setItem('userId', resp.data.id)
       localStorage.setItem('userEmail', resp.data.email)
@@ -162,36 +162,24 @@ export async function getUser ({ commit, dispatch }, { userId }) {
     })
 }
 
-export async function createProfile ({ commit, dispatch }, { userId, username }) {
-  const response = await UserService.createProfile(userId, username)
-  if (response) {
-    dispatch('getProfile', {
-      userId: userId,
-      username: username
-    })
-  } else {
-    console.error('error')
-  }
+export async function getProfile ({ commit, dispatch }, { userId }) {
+  const r = await UserService.getProfile(userId)
+  commit('UPDATE_PROFILE', r.data[0])
+  return r
 }
 
-export async function getProfile ({ commit, dispatch }, { userId, username }) {
-  UserService.getProfile(userId)
-    .then(resp => {
-      console.log('getProfile', resp.data)
-      if (!resp.data.length) {
-        console.log('!resp.data.length')
-        dispatch('createProfile', {
-          userId: userId,
-          username: username
-        })
-      } else {
-        console.log('resp.data.length')
-        commit('UPDATE_PROFILE', resp.data[0])
-      }
-    })
-    .catch(error => {
-      console.error('error', error)
-    })
+export async function createProfile ({ state, commit }, { pseudo }) {
+  const userId = state.user.id
+  const r = await UserService.createProfile(pseudo, userId)
+  commit('UPDATE_PROFILE', r.data)
+  return r
+}
+
+export async function updateProfile ({ state, commit }, { pseudo }) {
+  const id = state.profile.id
+  const r = await UserService.updateProfile(id, pseudo)
+  commit('UPDATE_PROFILE', r.data)
+  return r
 }
 
 export async function createGroup ({ commit, dispatch }, { name, genre, departement, commune, level, creatorId, role }) {
