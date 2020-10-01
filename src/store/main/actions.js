@@ -125,18 +125,19 @@ export async function register ({ commit, dispatch }, { username, email, passwor
 }
 
 export async function connectUser ({ commit, dispatch }, { email, password }) {
-  console.log('connect user')
   commit('CHANGE_LOADING_STATE', true)
   const response = await UserService.logIn(email, password)
   if (response) {
     localStorage.setItem('token', response.data.jwt)
     commit('UPDATE_TOKEN', response.data.jwt)
     commit('UPDATE_USER', response.data.user)
-    /* dispatch('getUser', {
-      userId: response.data.user.id
-    }) */
-    // commit('UPDATE_USER', response.data)
     commit('CHANGE_LOADING_STATE', false)
+    if (!response.data.user.profile) {
+      console.log('no profile !')
+      dispatch('createProfile', {
+        pseudo: response.data.user.username
+      })
+    }
     return response
   } else {
     console.error('error')
