@@ -19,7 +19,7 @@
       </q-img>
 
       <q-card-actions>
-        <q-btn flat>Rejoindre</q-btn>
+        <q-btn flat :to="{ name: 'group', params: { groupId: group.id } }">Rejoindre</q-btn>
       </q-card-actions>
     </q-card>
     </div>

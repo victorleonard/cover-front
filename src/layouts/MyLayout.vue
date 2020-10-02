@@ -69,6 +69,7 @@
       <q-tabs inverted color="deep-orange-8" swipeable animated position="top">
         <q-route-tab :to="{ name: 'home' }" icon="home" exact replace label="Home"/>
         <q-route-tab :to="{ name: 'home' }" icon="list" exact replace label="Vote"/>
+        <q-route-tab icon="search" :to="{ name: 'search' }" exact replace label="Proposez"/>
         <!-- <q-route-tab slot="title" icon="how_to_vote" :to="{name:'vote'}" label="Votez">
           <transition
             appear

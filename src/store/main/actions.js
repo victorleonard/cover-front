@@ -49,6 +49,11 @@ export async function getUserNameFromProfile ({ commit, state }, { userId }) {
   }
 }
 
+export async function searchOnSpotify ({ commit, state }, { song }) {
+  const r = await SongService.searchOnSpotify(song)
+  return r
+}
+
 export async function getMyGroups ({ commit, state }) {
   commit('CLEAR_GROUPS')
   const myGroupsId = state.user.groups
