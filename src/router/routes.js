@@ -1,5 +1,12 @@
 const routes = [
   {
+    path: '/group/:groupId',
+    component: () => import('layouts/MyLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/TrackList.vue') }
+    ]
+  },
+  {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [
@@ -23,6 +30,11 @@ const routes = [
         path: 'home',
         name: 'home',
         component: () => import('pages/Home.vue')
+      },
+      {
+        path: 'group-creation',
+        name: 'group-creation',
+        component: () => import('pages/GroupCreation.vue')
       }
     ]
   },
