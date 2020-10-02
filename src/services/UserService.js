@@ -1,6 +1,9 @@
 import Api from './Api.js'
 
 export default {
+  getMe () {
+    return Api().get('users/me')
+  },
   getUsers () {
     return Api().get('/users')
   },
