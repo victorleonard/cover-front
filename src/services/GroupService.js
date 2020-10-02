@@ -16,6 +16,9 @@ export default {
       username: username
     })
   },
+  getGroup (groupId) {
+    return Api().get('/groups/' + groupId)
+  },
   getMyCreatorGroups (creatorId) {
     return Api().get('/groups?filter{"where":{"creatorId":' + creatorId + '}}')
   },
@@ -26,16 +29,18 @@ export default {
   deleteMyGroup (groupId) {
     return Api().delete('/groups/' + groupId)
   },
-  createGroup (name, genre, departement, commune, level, creatorId) {
+  createGroup (userId, name) {
     return Api().post('/groups', {
-      name: name,
-      genre: genre,
-      creation_date: new Date(),
+      users: [
+        userId
+      ],
+      name: name
+      /* genre: genre,
       country: 'fr',
       departement: departement,
       commune: commune,
       level: level,
-      creatorId: creatorId
+      creatorId: creatorId */
     })
   }
 }

@@ -26,6 +26,18 @@ export function UPDATE_MY_CREATOR_GROUPS (state, payload) {
   state.myCreatorGroups = payload
 }
 
+export function CLEAR_GROUPS (state, payload) {
+  state.myGroups = []
+}
+
+export function ADD_GROUP (state, payload) {
+  state.myGroups.push(payload)
+}
+
+export function UPDATE_CURRENT_GROUP (state, payload) {
+  state.currentGroup = payload
+}
+
 export function UPDATE_MY_GROUP (state, payload) {
   console.log('UPDATE_MY_GROUP paylod', payload)
   state.myGroups.push(payload)

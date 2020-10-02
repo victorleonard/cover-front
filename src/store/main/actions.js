@@ -49,6 +49,20 @@ export async function getUserNameFromProfile ({ commit, state }, { userId }) {
   }
 }
 
+export async function getMyGroups ({ commit, state }) {
+  commit('CLEAR_GROUPS')
+  const myGroupsId = state.user.groups
+  myGroupsId.forEach(async groupId => {
+    const r = await GroupService.getGroup(groupId)
+    commit('ADD_GROUP', r.data)
+  })
+}
+
+export async function getGroup ({ commit, state }, { groupId }) {
+  const r = await GroupService.getGroup(groupId)
+  return r
+}
+
 export async function loadMyGroups ({ commit, state, dispatch }) {
   console.log('LOAD MY GROUPS')
   commit('CLEAR_MY_GROUP')
@@ -137,11 +151,19 @@ export async function connectUser ({ commit, dispatch }, { email, password }) {
       dispatch('createProfile', {
         pseudo: response.data.user.username
       })
+    } else {
+      dispatch('getProfile')
     }
     return response
   } else {
     console.error('error')
   }
+}
+
+export async function getMe ({ commit }) {
+  const r = await UserService.getMe()
+  console.log('getMe ====>', r.data)
+  commit('UPDATE_USER', r.data)
 }
 
 export async function getUser ({ commit, dispatch }, { userId }) {
@@ -169,6 +191,13 @@ export async function getProfile ({ commit, dispatch }, { userId }) {
   return r
 }
 
+export async function getMyProfile ({ state, commit }) {
+  const userId = state.user.id
+  const r = await UserService.getProfile(userId)
+  commit('UPDATE_PROFILE', r.data[0])
+  return r
+}
+
 export async function createProfile ({ state, commit }, { pseudo }) {
   const userId = state.user.id
   const r = await UserService.createProfile(pseudo, userId)
@@ -183,27 +212,12 @@ export async function updateProfile ({ state, commit }, { pseudo }) {
   return r
 }
 
-export async function createGroup ({ commit, dispatch }, { name, genre, departement, commune, level, creatorId, role }) {
+export async function createGroup ({ state, commit }, { name }) {
   commit('CHANGE_LOADING_STATE', true)
-  const profile = await UserService.getProfile(creatorId)
-  if (profile) {
-    const profileData = profile.data[0]
-    const response = await GroupService.createGroup(name, genre, departement, commune, level, creatorId)
-    if (response) {
-      console.log('profileData', profileData)
-      dispatch('addMember', {
-        userId: creatorId,
-        groupId: response.data.id,
-        role: role,
-        username: profileData.username
-      })
-      dispatch('loadMyGroups')
-      commit('CHANGE_LOADING_STATE', false)
-      // return response.data
-    } else {
-      console.error('error')
-    }
-  }
+  const userId = state.user.id
+  const r = await GroupService.createGroup(userId, name)
+  commit('CHANGE_LOADING_STATE', false)
+  return r.data
 }
 
 export async function deleteMyCreatorGroup ({ commit, dispatch }, { groupId }) {

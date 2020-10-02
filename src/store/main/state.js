@@ -4,6 +4,12 @@ export default {
   user: undefined,
   profile: undefined,
   myCreatorGroups: undefined,
+  currentGroup: undefined,
   myGroups: [],
-  token: undefined
+  token: undefined,
+  error: {
+    display: false,
+    type: '',
+    message: ''
+  }
 }
