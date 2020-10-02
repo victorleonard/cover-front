@@ -31,12 +31,6 @@ export default function (/* { store, ssrContext } */) {
   Router.afterEach((to, from) => {
     if (!publicRouter.find(el => el === to.name)) {
       if (localStorage.getItem('token')) {
-        const vuexStrorage = JSON.parse(localStorage.vuex)
-        if (!vuexStrorage.main.profile) {
-          Router.push({
-            name: 'profile'
-          })
-        }
         console.log('ok all localstorage !!!!!!!!!!!!!!!!!!!')
       } else {
         Router.push({
