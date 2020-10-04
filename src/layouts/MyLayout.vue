@@ -13,8 +13,7 @@
           @click="leftDrawerOpen = !leftDrawerOpen"
         />
         <q-toolbar-title>
-          Cover Choice
-          <div slot="subtitle">Bêta</div>
+          {{ currentGroup.name }}
         </q-toolbar-title>
       </q-toolbar>
     </q-header>
@@ -67,8 +66,8 @@
 
     <q-footer>
       <q-tabs inverted color="deep-orange-8" swipeable animated position="top">
-        <q-route-tab :to="{ name: 'home' }" icon="home" exact replace label="Home"/>
-        <q-route-tab :to="{ name: 'home' }" icon="list" exact replace label="Vote"/>
+        <q-route-tab :to="{ name: 'group' }" icon="home" exact replace label="Résultat"/>
+        <q-route-tab :to="{ name: 'vote' }" icon="how_to_vote" exact replace label="Votez"/>
         <q-route-tab icon="search" :to="{ name: 'search' }" exact replace label="Proposez"/>
         <!-- <q-route-tab slot="title" icon="how_to_vote" :to="{name:'vote'}" label="Votez">
           <transition
@@ -89,7 +88,7 @@
 
 <script>
 import { QHeader, QFooter, QTabs, QRouteTab } from 'quasar'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 
 export default {
   components: { QHeader, QFooter, QTabs, QRouteTab },
@@ -100,7 +99,8 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('main', ['awaitingVote'])
+    ...mapGetters('main', ['awaitingVote']),
+    ...mapState('main', ['currentGroup'])
   },
   beforeCreate () {
     console.log('====>>', this.$route.params.groupId)
