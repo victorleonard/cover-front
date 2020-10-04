@@ -32,8 +32,6 @@
 
 <script>
 
-import Api from '../services/Api'
-
 export default {
   name: 'search',
   data () {
@@ -84,7 +82,16 @@ export default {
       audioToPlay.pause()
     },
     select (t) {
-      const userId = localStorage.getItem('userId')
+      this.$store.dispatch('main/selectSong', {
+        song: t
+      }).then(r => {
+        this.$q.notify({
+          type: 'positive',
+          message: 'Morceau séléctioné !',
+          position: 'top'
+        })
+      })
+      /* const userId = localStorage.getItem('userId')
       Api().post('/add_track', {
         track: t,
         userId: userId
@@ -96,7 +103,7 @@ export default {
             message: 'Morceau séléctioné !',
             position: 'top'
           })
-        })
+        }) */
     },
     searchSpotify () {
       this.searchResult = []

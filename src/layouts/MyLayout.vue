@@ -104,7 +104,7 @@ export default {
   },
   beforeCreate () {
     console.log('====>>', this.$route.params.groupId)
-    this.$store.dispatch('main/getGroup', {
+    this.$store.dispatch('main/getCurrentGroup', {
       groupId: this.$route.params.groupId
     })
   }

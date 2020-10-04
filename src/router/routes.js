@@ -1,11 +1,10 @@
 const routes = [
   {
     path: '/group/:groupId/',
-    name: 'group',
     component: () => import('layouts/MyLayout.vue'),
     children: [
-      { path: '/', name: 'trackList', component: () => import('pages/TrackList.vue') },
-      { path: '/search', name: 'search', component: () => import('pages/Search.vue') }
+      { path: '/', name: 'group', component: () => import('pages/TrackList.vue') },
+      { path: '/group/:groupId/search', name: 'search', component: () => import('pages/Search.vue') }
     ]
   },
   {

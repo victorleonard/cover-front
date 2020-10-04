@@ -54,6 +54,18 @@ export async function searchOnSpotify ({ commit, state }, { song }) {
   return r
 }
 
+export async function selectSong ({ commit, state }, { song }) {
+  console.log('select song store', song)
+  const r = await SongService.selectSong(song, state.currentGroup.id, state.user.id)
+  return r
+}
+
+export async function getCurrentGroup ({ commit, state }, { groupId }) {
+  const r = await GroupService.getGroup(groupId)
+  commit('UPDATE_CURRENT_GROUP', r.data)
+  return r
+}
+
 export async function getMyGroups ({ commit, state }) {
   commit('CLEAR_GROUPS')
   const myGroupsId = state.user.groups
