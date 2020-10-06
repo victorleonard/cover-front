@@ -5,7 +5,9 @@ export default {
   profile: undefined,
   myCreatorGroups: undefined,
   currentGroup: undefined,
+  currentGroupVotes: undefined,
   myGroups: [],
+  groups: undefined,
   token: undefined,
   error: {
     display: false,

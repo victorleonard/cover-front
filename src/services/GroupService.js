@@ -19,6 +19,9 @@ export default {
   getGroup (groupId) {
     return Api().get('/groups/' + groupId)
   },
+  getGroups () {
+    return Api().get('/groups/')
+  },
   getMyCreatorGroups (creatorId) {
     return Api().get('/groups?filter{"where":{"creatorId":' + creatorId + '}}')
   },
@@ -28,6 +31,11 @@ export default {
   },
   deleteMyGroup (groupId) {
     return Api().delete('/groups/' + groupId)
+  },
+  updateGroup (groupId, name) {
+    return Api().put('/groups/' + groupId, {
+      name: name
+    })
   },
   createGroup (userId, name) {
     return Api().post('/groups', {

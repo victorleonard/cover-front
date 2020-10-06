@@ -38,6 +38,10 @@ export function UPDATE_CURRENT_GROUP (state, payload) {
   state.currentGroup = payload
 }
 
+export function UPDATE_GROUPS (state, payload) {
+  state.groups = payload
+}
+
 export function UPDATE_MY_GROUP (state, payload) {
   console.log('UPDATE_MY_GROUP paylod', payload)
   state.myGroups.push(payload)

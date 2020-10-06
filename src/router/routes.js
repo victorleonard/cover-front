@@ -4,6 +4,7 @@ const routes = [
     component: () => import('layouts/MyLayout.vue'),
     children: [
       { path: '/', name: 'group', component: () => import('pages/TrackList.vue') },
+      { path: '/group/:groupId/vote', name: 'vote', component: () => import('pages/Vote.vue') },
       { path: '/group/:groupId/search', name: 'search', component: () => import('pages/Search.vue') }
     ]
   },
@@ -36,6 +37,16 @@ const routes = [
         path: 'group-creation',
         name: 'group-creation',
         component: () => import('pages/GroupCreation.vue')
+      },
+      {
+        path: 'group-join',
+        name: 'group-join',
+        component: () => import('pages/GroupJoin.vue')
+      },
+      {
+        path: '/group-edit/:groupId',
+        name: 'group-edit',
+        component: () => import('pages/GroupEdit.vue')
       }
     ]
   },
