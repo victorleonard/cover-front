@@ -1,13 +1,14 @@
 <template>
   <q-page padding>
     <div class="row">
-      <div>Bonjour {{ profile.pseudo }} </div>
+      <div v-if="profile">Bonjour {{ profile.pseudo }} </div>
     </div>
     <div class="row">
       <p class="text-body1">Joindre ou créer un groupe</p>
     </div>
     <div class="row">
       <q-btn class="q-mr-xl" to="group-creation" label="Créer"  />
+      <q-btn class="q-mr-xl" to="group-join" label="Joindre"  />
     </div>
     <div class="row q-pt-md">
       <q-card v-for="group in myGroups" :key="group.id" class="my-card" style="width: 100%">
@@ -20,6 +21,7 @@
 
       <q-card-actions>
         <q-btn flat :to="{ name: 'group', params: { groupId: group.id } }">Rejoindre</q-btn>
+        <q-btn flat :to="{ name: 'group-edit', params: { groupId: group.id } }">Edit</q-btn>
       </q-card-actions>
     </q-card>
     </div>
