@@ -1,4 +1,5 @@
 import Api from './Api.js'
+import Connect from './ConnectApi.js'
 
 export default {
   getMe () {
@@ -26,7 +27,7 @@ export default {
     })
   },
   register (username, email, password) {
-    return Api().post('/auth/local/register', {
+    return Connect().post('/auth/local/register', {
       username: username,
       email: email,
       password: password

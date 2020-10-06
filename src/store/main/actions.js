@@ -80,6 +80,11 @@ export async function getGroup ({ commit, state }, { groupId }) {
   return r
 }
 
+export async function getGroups ({ commit }) {
+  const r = await GroupService.getGroups()
+  commit('UPDATE_GROUPS', r.data)
+}
+
 export async function loadMyGroups ({ commit, state, dispatch }) {
   console.log('LOAD MY GROUPS')
   commit('CLEAR_MY_GROUP')
@@ -164,7 +169,6 @@ export async function connectUser ({ commit, dispatch }, { email, password }) {
     commit('UPDATE_USER', response.data.user)
     commit('CHANGE_LOADING_STATE', false)
     if (!response.data.user.profile) {
-      console.log('no profile !')
       dispatch('createProfile', {
         pseudo: response.data.user.username
       })
@@ -202,7 +206,8 @@ export async function getUser ({ commit, dispatch }, { userId }) {
     })
 }
 
-export async function getProfile ({ commit, dispatch }, { userId }) {
+export async function getProfile ({ commit, state }) {
+  const userId = state.user.id
   const r = await UserService.getProfile(userId)
   commit('UPDATE_PROFILE', r.data[0])
   return r
@@ -233,6 +238,13 @@ export async function createGroup ({ state, commit }, { name }) {
   commit('CHANGE_LOADING_STATE', true)
   const userId = state.user.id
   const r = await GroupService.createGroup(userId, name)
+  commit('CHANGE_LOADING_STATE', false)
+  return r.data
+}
+
+export async function updateGroup ({ state, commit }, { groupId, name }) {
+  commit('CHANGE_LOADING_STATE', true)
+  const r = await GroupService.updateGroup(groupId, name)
   commit('CHANGE_LOADING_STATE', false)
   return r.data
 }
