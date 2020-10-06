@@ -150,6 +150,7 @@ import Api from '../services/Api'
 import { QDialog } from 'quasar'
 import { mapState, mapGetters } from 'vuex'
 import moment from 'moment'
+// import orderBy from 'lodash/orderBy'
 
 export default {
   components: { QDialog },
@@ -166,42 +167,45 @@ export default {
     }
   },
   computed: {
-    ...mapState('main', ['songsList', 'users']),
-    ...mapGetters('main', ['average', 'vetoVote', 'awaitingVote', 'allVote']),
+    ...mapState('main', ['songsList', 'users', 'currentGroup']),
+    ...mapGetters('main', ['vetoVote', 'awaitingVote', 'allVote']),
+    average () {
+      return parseInt((this.currentGroup.users.length * 5) / 1.2)
+    },
     allVoteOk () {
-      return ''
-      /* if (this.allVote) {
-        const els = []
-        this.allVote.forEach(el => {
-          if (!el.vote.find(v => v.value === 0)) {
-            let total = 0
-            el.vote.forEach(v => {
-              total += v.value
-            })
-            el.total = total
-            if (total >= this.average) {
-              els.push(el)
-            }
+      // const els = []
+      return this.currentGroup.songs.map(el => {
+        if (el.votes.length === this.currentGroup.users.length) {
+          return el
+        }
+      })
+      /* this.currentGroup.songs.forEach(el => {
+        if (!el.votes.find(v => v.vote === 0)) {
+          let total = 0
+          el.votes.forEach(v => {
+            total += v.vote
+          })
+          el.total = total
+          if (total >= this.average) {
+            els.push(el)
           }
-        })
-        return orderBy(els, ['total'], ['desc'])
-      } */
+        }
+      })
+      return orderBy(els, ['total'], ['desc']) */
     },
     allVoteKo () {
       return ''
-      /* if (this.allVote) {
-        const els = []
-        this.allVote.forEach(el => {
-          let total = 0
-          el.vote.forEach(v => {
-            total += v.value
-          })
-          if (total < this.average) {
-            els.push(el)
-          }
+      /* const els = []
+      this.allVote.forEach(el => {
+        let total = 0
+        el.votes.forEach(v => {
+          total += v.vote
         })
-        return orderBy(els, ['total'], ['desc'])
-      } */
+        if (total < this.average) {
+          els.push(el)
+        }
+      })
+      return orderBy(els, ['total'], ['desc']) */
     }
   },
   methods: {
