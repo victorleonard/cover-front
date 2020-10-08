@@ -82,6 +82,11 @@ export async function getGroup ({ commit, state }, { groupId }) {
   return r
 }
 
+export async function getInstruments ({ commit, state }) {
+  const r = await InstrumentService.getInstruments()
+  return r
+}
+
 export async function getGroups ({ commit }) {
   const r = await GroupService.getGroups()
   commit('UPDATE_GROUPS', r.data)
@@ -212,6 +217,11 @@ export async function getProfile ({ commit, state }) {
   const userId = state.user.id
   const r = await UserService.getProfile(userId)
   commit('UPDATE_PROFILE', r.data[0])
+  return r
+}
+
+export async function getProfiles ({ commit, state }) {
+  const r = await UserService.getProfiles()
   return r
 }
 
