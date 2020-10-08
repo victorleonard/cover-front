@@ -7,8 +7,6 @@
     <q-btn to="register" label="Register" flat />
   </div>
 </q-page>
-    </q-page-container>
-  </q-layout>
 </template>
 
 <script>
