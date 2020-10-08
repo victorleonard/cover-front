@@ -15,6 +15,9 @@ export default {
     // return Api().get('/profiles?filter{"where":{"userId":' + userId + '}}')
     return Api().get('/profiles?user.id=' + userId)
   },
+  getProfiles () {
+    return Api().get('/profiles')
+  },
   createProfile (pseudo, userId) {
     return Api().post('/profiles', {
       pseudo: pseudo,
