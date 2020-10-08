@@ -32,9 +32,10 @@ export default {
   deleteMyGroup (groupId) {
     return Api().delete('/groups/' + groupId)
   },
-  updateGroup (groupId, name) {
+  updateGroup (groupId, name, image) {
     return Api().put('/groups/' + groupId, {
-      name: name
+      name: name,
+      image: image
     })
   },
   createGroup (userId, name) {

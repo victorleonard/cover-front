@@ -1,6 +1,8 @@
 import SongService from './../../services/SongService'
 import UserService from './../../services/UserService'
 import GroupService from './../../services/GroupService'
+import FileService from './../../services/FileService'
+import InstrumentService from './../../services/InstrumentService'
 
 export function changeLoadingState ({ commit }, state) {
   commit('CHANGE_LOADING_STATE', state)
@@ -242,9 +244,16 @@ export async function createGroup ({ state, commit }, { name }) {
   return r.data
 }
 
-export async function updateGroup ({ state, commit }, { groupId, name }) {
+export async function updateGroup ({ state, commit }, { groupId, name, image }) {
   commit('CHANGE_LOADING_STATE', true)
-  const r = await GroupService.updateGroup(groupId, name)
+  const r = await GroupService.updateGroup(groupId, name, image)
+  commit('CHANGE_LOADING_STATE', false)
+  return r.data
+}
+
+export async function upload ({ state, commit }, { file }) {
+  commit('CHANGE_LOADING_STATE', true)
+  const r = await FileService.uploadFile(file)
   commit('CHANGE_LOADING_STATE', false)
   return r.data
 }
