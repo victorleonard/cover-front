@@ -85,6 +85,9 @@ export default {
       this.$store.dispatch('main/selectSong', {
         song: t
       }).then(r => {
+        this.$store.dispatch('main/getCurrentGroup', {
+          groupId: this.$route.params.groupId
+        })
         this.$q.notify({
           type: 'positive',
           message: 'Morceau séléctioné !',

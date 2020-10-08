@@ -7,6 +7,14 @@ export default {
   searchOnSpotify (song) {
     return Api().get('/searches?song=' + song)
   },
+  vote (value, songId, groupId, userId) {
+    return Api().post('/votes', {
+      vote: value,
+      song: songId,
+      group: groupId,
+      user: userId
+    })
+  },
   selectSong (song, groupId, userId) {
     return Api().post('/songs', {
       spotify_data: song,

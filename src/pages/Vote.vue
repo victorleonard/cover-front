@@ -352,6 +352,17 @@ export default {
       return vote.vote
     },
     vote () {
+      this.$store.dispatch('main/vote', {
+        value: this.ratingModel,
+        songId: this.trackSelected.id
+      })
+        .then((r) => {
+          console.log('r', r)
+          this.$store.dispatch('main/getCurrentGroup', {
+            groupId: this.$route.params.groupId
+          })
+            .then(() => { this.opened = false })
+        })
       /* const userId = localStorage.getItem('userId')
       if (userId) {
         Api().put('vote/' + this.trackSelected._id, {
