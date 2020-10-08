@@ -21,7 +21,7 @@
           label="Instruments"
           style="width: 250px"
         />
-        <q-btn @click="manageProfile" :disable="profile && pseudo === profile.pseudo" color="white" text-color="black" label="Save" />
+        <q-btn type="submit" :disable="profile && pseudo === profile.pseudo" color="white" text-color="black" label="Save" />
         </q-form>
       </div>
     </div>
@@ -39,15 +39,14 @@ export default {
     pseudo: '',
     commune: '',
     instrumentsList: [],
+    instrumentFullList: undefined,
     instruments: []
   }),
   computed: {
     ...mapState('main', ['profile'])
   },
   methods: {
-    onSubmit () {},
-    onReset () {},
-    manageProfile () {
+    onSubmit () {
       if (this.profile) {
         this.$store.dispatch('main/updateProfile', {
           pseudo: this.pseudo
@@ -57,7 +56,8 @@ export default {
           pseudo: this.pseudo
         })
       }
-    }
+    },
+    onReset () {}
   },
   mounted () {
     if (this.profile) {
@@ -68,6 +68,7 @@ export default {
       })
       this.$store.dispatch('main/getInstruments')
         .then(r => {
+          this.instrumentFullList = r.data
           r.data.map(el => {
             this.instrumentsList.push(el.nom)
           })
