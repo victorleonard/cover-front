@@ -1,14 +1,12 @@
 <template>
-  <q-layout>
-    <q-page-container>
-      <q-page padding class="docs-input row justify-center">
-        <div class="q-gutter-md" style="width: 500px; max-width: 90vw;">
-          <q-input v-model="form.email" type="email" label="Email" />
-          <q-input v-model="form.password" type="password" label="Password" />
-          <q-btn @click="connect" label="Connect" />
-          <q-btn to="register" label="Register" flat />
-        </div>
-      </q-page>
+<q-page class="flex flex-center">
+  <div class="q-gutter-md" style="width: 500px; max-width: 90vw;">
+    <q-input v-model="form.email" type="email" label="Email" />
+    <q-input v-model="form.password" type="password" label="Password" />
+    <q-btn @click="connect" label="Connect" />
+    <q-btn to="register" label="Register" flat />
+  </div>
+</q-page>
     </q-page-container>
   </q-layout>
 </template>
@@ -41,16 +39,20 @@ export default {
           let er2 = JSON.parse(er)
           console.log(error['message'], er2.response.data.error.message)
         }) */
+      this.$store.dispatch('main/changeLoadingState', true)
+      localStorage.removeItem('token')
       this.$store
         .dispatch('main/connectUser', {
           email: this.form.email,
           password: this.form.password
         })
         .then(resp => {
-          setTimeout(() => {
-            this.$router.push({
-              name: 'home'
-            })
+          this.$store.dispatch('main/getMe')
+            .then(() => {
+              this.$store.dispatch('main/changeLoadingState', false)
+              this.$router.push({
+                name: 'home'
+              })
           }, 500)
         })
         .catch(error => {
