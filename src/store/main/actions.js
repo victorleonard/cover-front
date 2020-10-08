@@ -62,6 +62,11 @@ export async function selectSong ({ commit, state }, { song }) {
   return r
 }
 
+export async function vote ({ commit, state }, { value, songId }) {
+  const r = await SongService.vote(value, songId, state.currentGroup.id, state.user.id)
+  return r
+}
+
 export async function getCurrentGroup ({ commit, state }, { groupId }) {
   const r = await GroupService.getGroup(groupId)
   commit('UPDATE_CURRENT_GROUP', r.data)
