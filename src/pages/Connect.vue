@@ -53,7 +53,7 @@ export default {
               this.$router.push({
                 name: 'home'
               })
-          }, 500)
+            })
         })
         .catch(error => {
           this.$store.dispatch('main/changeLoadingState', false)
