@@ -1,6 +1,7 @@
 <template>
   <q-page v-if="currentGroup && currentGroup.songs.length" padding>
     <q-pull-to-refresh :handler="refresh">
+
     <q-dialog class="modal" minimized v-model="opened">
       <q-card class="q-px-sm q-pb-md">
     <div class="modal-rate">
@@ -92,17 +93,20 @@
               <div class="col text-grey-9">{{ user.name }}</div>
               <!-- <div class="col col-auto" style="margin: 0 auto"><q-rating slot="subtitle" :value="getVote(s._id, user._id)" readonly :max="5" /></div> -->
             </div>
-            <div class="text-grey-6 q-caption q-ml-xs q-mt-sm">Proposé le {{ formatDate(s.creationDate) }} par {{ user.username }}</div>
+            <div class="text-grey-6 q-caption q-ml-xs q-mt-sm">Proposé le {{ formatDate(s.createdAt) }} par {{ user.username }}</div>
+            <div class="text-grey-6 q-caption q-ml-xs q-mt-sm" v-if="s.comment">Commentaire :
+              <div v-html="s.comment" syle="word-break: break-word;"></div>
+            </div>
           </q-item-label>
         </q-item>
       </q-list>
       <q-separator />
       <q-card-actions align="around">
-        <!-- <div v-if="s.track.preview_url">
-          <audio :id="'audio-'+s._id" :src="s.track.preview_url"></audio>
-          <q-btn class="play" :id="'play-'+s._id" @click="playMusic(s.track.preview_url, s._id)" flat color="primary" size="md" icon="ion-md-play" />
-          <q-btn class="pause hide" :id="'pause-'+s._id" @click="pauseMusic(s.track.preview_url, s._id)" color="primary" flat size="md" icon="ion-md-pause" />
-        </div> -->
+        <div v-if="s.spotify_preview_url">
+          <audio :id="'audio-'+s._id" :src="s.spotify_preview_url"></audio>
+          <q-btn class="play" :id="'play-'+s._id" @click="playMusic(s.spotify_preview_url, s._id)" flat color="primary" size="md" icon="ion-md-play" />
+          <q-btn class="pause hide" :id="'pause-'+s._id" @click="pauseMusic(s.spotify_preview_url, s._id)" color="primary" flat size="md" icon="ion-md-pause" />
+        </div>
         <div>
           <q-btn @click="launchSpotify(s.spotify_uri)" flat icon="fab fa-spotify" size="md" color="positive"></q-btn>
         </div>
@@ -148,16 +152,19 @@
               <div class="col col-auto" style="margin: 0 auto"><q-rating slot="subtitle" :value="getVote(s)" readonly :max="5" /></div>
             </div>
             <div class="text-grey-6 q-caption q-ml-xs q-mt-sm">Proposé le {{ formatDate(s.createdAt) }} par {{ user.username }}</div>
+            <div class="text-grey-6 q-caption q-ml-xs q-mt-sm" v-if="s.comment">Commentaire :
+              <div v-html="s.comment" syle="word-break: break-word;"></div>
+            </div>
           </q-item-label>
         </q-item>
       </q-list>
       <q-separator />
       <q-card-actions align="around">
-        <!-- <div v-if="s.track.preview_url">
-          <audio :id="'audio-'+s._id" :src="s.track.preview_url"></audio>
-          <q-btn class="play" :id="'play-'+s._id" @click="playMusic(s.track.preview_url, s._id)" flat color="primary" size="md" icon="ion-md-play" />
-          <q-btn class="pause hide" :id="'pause-'+s._id" @click="pauseMusic(s.track.preview_url, s._id)" color="primary" flat size="md" icon="ion-md-pause" />
-        </div> -->
+       <div v-if="s.spotify_preview_url">
+          <audio :id="'audio-'+s._id" :src="s.spotify_preview_url"></audio>
+          <q-btn class="play" :id="'play-'+s._id" @click="playMusic(s.spotify_preview_url, s._id)" flat color="primary" size="md" icon="ion-md-play" />
+          <q-btn class="pause hide" :id="'pause-'+s._id" @click="pauseMusic(s.spotify_preview_url, s._id)" color="primary" flat size="md" icon="ion-md-pause" />
+        </div>
         <div>
           <q-btn @click="launchSpotify(s.spotify_uri)" flat icon="fab fa-spotify" size="md" color="positive"></q-btn>
         </div>
@@ -189,6 +196,7 @@ export default {
   name: 'vote',
   data () {
     return {
+      songSelect: false,
       ratingModel: 0,
       trackSelected: undefined,
       opened: false,
