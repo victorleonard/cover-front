@@ -1,6 +1,6 @@
 <template>
   <q-page padding class="search-page q-pl-md q-pr-md">
-    <!-- selection -->
+    <!-- DIALOG selection -->
     <q-dialog v-model="songSelectDialog">
       <q-card class="my-card" v-if="songSelected">
         <q-img :src="songSelected.album.images[0].url" />
@@ -17,18 +17,15 @@
         </q-card-section>
 
         <q-card-section class="q-pt-none">
-          <q-input
-            label="Commentaire"
-            type="textarea"
-            v-model="comment"
-            autogrow
-          />
+          <q-editor v-model="comment" :toolbar="[
+        ['bold', 'italic', 'underline']
+      ]" min-height="5rem" />
         </q-card-section>
 
         <q-separator />
 
         <q-card-actions align="right">
-          <q-btn v-close-popup flat color="primary" label="Choisir" @click="select" />
+          <q-btn flat color="primary" label="Choisir" @click="select" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -73,7 +70,7 @@ export default {
       songSelectDialog: false,
       songSelected: undefined,
       search: '',
-      ratingModel: 0,
+      ratingModel: 1,
       searchResult: [],
       token: '',
       loading: false
@@ -122,7 +119,8 @@ export default {
       this.songSelected = t
       this.songSelectDialog = true
     },
-    select (t) {
+    select () {
+      this.$store.dispatch('main/changeLoadingState', true)
       this.$store.dispatch('main/selectSong', {
         song: this.songSelected,
         comment: this.comment
@@ -132,9 +130,13 @@ export default {
           songId: song.data.id
         })
           .then(() => {
+            this.$store.dispatch('main/changeLoadingState', false)
             this.$store.dispatch('main/getCurrentGroup', {
               groupId: this.$route.params.groupId
             })
+            this.songSelectDialog = false
+            this.comment = ''
+            this.ratingModel = 1
             this.$q.notify({
               type: 'positive',
               message: 'Morceau séléctioné !',
