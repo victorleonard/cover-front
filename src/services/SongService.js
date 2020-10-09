@@ -26,7 +26,8 @@ export default {
       group: groupId,
       user: userId,
       images: song.album.images,
-      comment: comment
+      comment: comment,
+      spotify_preview_url: song.preview_url
     })
   }
 }
