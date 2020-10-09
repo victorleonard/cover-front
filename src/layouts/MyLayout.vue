@@ -19,39 +19,46 @@
     </q-header>
 
     <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      bordered
-      content-class="bg-grey-1"
-    >
-    <q-list>
-        <q-item-label
-          header
-          class="text-grey-8"
-        >
-          Essential Links
-        </q-item-label>
-        <q-item
-    clickable
-    tag="a"
-    target="_blank"
-    href="link"
-  >
-    <q-item-section
-      avatar
-    >
-      <q-icon name="icon" />
-    </q-item-section>
+        v-model="leftDrawerOpen"
+        show-if-above
+        :width="200"
+        :breakpoint="500"
+      >
+        <q-scroll-area class="fit">
+          <q-list padding class="menu-list">
+            <q-item clickable v-ripple :to="{ name: 'home' }">
+              <q-item-section avatar>
+                <q-icon name="home" />
+              </q-item-section>
 
-    <q-item-section>
-      <q-item-label>title</q-item-label>
-      <q-item-label caption>
-        caption
-      </q-item-label>
-    </q-item-section>
-  </q-item>
-      </q-list>
-    </q-drawer>
+              <q-item-section>
+                Home
+              </q-item-section>
+            </q-item>
+
+            <q-item clickable v-ripple :to="{ name: 'profile' }">
+              <q-item-section avatar>
+                <q-icon name="account_circle" />
+              </q-item-section>
+
+              <q-item-section>
+                Profile
+              </q-item-section>
+            </q-item>
+
+            <q-item clickable v-ripple
+            :to="{ name: 'group-edit', params: { groupId: $route.params.groupId } }">
+              <q-item-section avatar>
+                <q-icon name="group_work" />
+              </q-item-section>
+
+              <q-item-section>
+                Group Edition
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-scroll-area>
+      </q-drawer>
 
     <q-page-container>
       <transition
