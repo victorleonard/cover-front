@@ -15,7 +15,7 @@ export default {
       user: userId
     })
   },
-  selectSong (song, groupId, userId) {
+  selectSong (song, comment, groupId, userId) {
     return Api().post('/songs', {
       spotify_data: song,
       name: song.name,
@@ -25,7 +25,8 @@ export default {
       album: song.album.name,
       group: groupId,
       user: userId,
-      images: song.album.images
+      images: song.album.images,
+      comment: comment
     })
   }
 }

@@ -56,9 +56,9 @@ export async function searchOnSpotify ({ commit, state }, { song }) {
   return r
 }
 
-export async function selectSong ({ commit, state }, { song }) {
+export async function selectSong ({ commit, state }, { song, comment }) {
   console.log('select song store', song)
-  const r = await SongService.selectSong(song, state.currentGroup.id, state.user.id)
+  const r = await SongService.selectSong(song, comment, state.currentGroup.id, state.user.id)
   return r
 }
 

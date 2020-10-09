@@ -1,5 +1,38 @@
 <template>
   <q-page padding class="search-page q-pl-md q-pr-md">
+    <!-- selection -->
+    <q-dialog v-model="songSelectDialog">
+      <q-card class="my-card" v-if="songSelected">
+        <q-img :src="songSelected.album.images[0].url" />
+
+        <q-card-section>
+          <div class="row no-wrap items-center">
+            <div class="text-h6">
+              {{ songSelected.name }}
+            </div>
+          </div>
+          <div class="text-caption text-grey q-mb-sm">{{ songSelected.artists[0].name }}</div>
+
+          <q-rating v-model="ratingModel" :max="5" size="32px" />
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <q-input
+            label="Commentaire"
+            type="textarea"
+            v-model="comment"
+            autogrow
+          />
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-actions align="right">
+          <q-btn v-close-popup flat color="primary" label="Choisir" @click="select" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
     <q-input v-model="search" :debounce="600" placeholder="Recherche par artiste, album, titre..." @input="searchSpotify" />
     <div class="q-mt-md">
       <q-spinner-puff class="spinner" v-if="search.length && loading" color="secondary" :size="50" />
@@ -21,7 +54,7 @@
             <q-btn flat icon="fab fa-spotify" @click="launchSpotify(res.uri)" size="md" color="positive"></q-btn>
             <q-btn class="btn-audio btn-audio-play" :id="'btn-audio-play-'+res.id" v-if="res.preview_url" flat color="primary" label="" icon="ion-md-play" size="md" @click="play(res.id)" />
             <q-btn class="btn-audio btn-audio-pause" :id="'btn-audio-pause-'+res.id" v-if="res.preview_url" flat color="primary" label="" icon="ion-md-pause" size="md" @click="pause(res.id)" />
-            <q-btn flat color="primary" label="Choisir" icon="ion-md-add-circle" size="md" @click="select(res)" />
+            <q-btn flat color="primary" label="Choisir" icon="ion-md-add-circle" size="md" @click="displaySelectDialog(res)" />
             <audio :src="res.preview_url" :id="'audio-' + res.id" type="audio/mpeg"></audio>
           </q-card-actions>
         </q-expansion-item>
@@ -36,7 +69,11 @@ export default {
   name: 'search',
   data () {
     return {
+      comment: '',
+      songSelectDialog: false,
+      songSelected: undefined,
       search: '',
+      ratingModel: 0,
       searchResult: [],
       token: '',
       loading: false
@@ -81,18 +118,29 @@ export default {
       btnActionPlay.style.display = 'inline-block'
       audioToPlay.pause()
     },
+    displaySelectDialog (t) {
+      this.songSelected = t
+      this.songSelectDialog = true
+    },
     select (t) {
       this.$store.dispatch('main/selectSong', {
-        song: t
-      }).then(r => {
-        this.$store.dispatch('main/getCurrentGroup', {
-          groupId: this.$route.params.groupId
+        song: this.songSelected,
+        comment: this.comment
+      }).then(song => {
+        this.$store.dispatch('main/vote', {
+          value: this.ratingModel,
+          songId: song.data.id
         })
-        this.$q.notify({
-          type: 'positive',
-          message: 'Morceau séléctioné !',
-          position: 'top'
-        })
+          .then(() => {
+            this.$store.dispatch('main/getCurrentGroup', {
+              groupId: this.$route.params.groupId
+            })
+            this.$q.notify({
+              type: 'positive',
+              message: 'Morceau séléctioné !',
+              position: 'top'
+            })
+          })
       })
       /* const userId = localStorage.getItem('userId')
       Api().post('/add_track', {
