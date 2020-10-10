@@ -1,42 +1,27 @@
 <template>
   <q-page v-if="currentGroup && currentGroup.songs.length" padding>
     <q-pull-to-refresh :handler="refresh">
-
-    <q-dialog class="modal" minimized v-model="opened">
-      <q-card class="q-px-sm q-pb-md">
-    <div class="modal-rate">
-      <q-rating
-        v-model="ratingModel"
-        size="30px"
-        :max="5"
-      />
-    </div>
-    <div class="modal-rate">
-      <q-btn
-        :disable='!ratingModel'
-        color="primary"
-        @click="vote"
-        label="Vote"
-      />
-      </div>
-      </q-card>
-    </q-dialog>
-
-    <q-dialog class="modal" minimized v-model="openedVeto">
-      <q-card class="q-px-sm q-pb-md">
-    <div class="modal-rate">
-      Tu n'aimes pas, mais pas du tout ce titre ?<br>
-      C'est ton droit !<br>
-      Si tu cliques sur le bouton, il sera retirer de suite de la liste !
-    </div>
-    <div class="modal-rate">
-      <q-btn
-        color="primary"
-        @click="veto"
-        label="Retire moi ce titre"
-      />
-      </div>
-      </q-card>
+      <q-dialog class="modal" minimized v-model="opened">
+      <q-card>
+        <q-card-section>
+          <p class="text-center q-mb-none">Vote</p>
+        </q-card-section>
+        <q-card-section>
+            <q-rating
+              v-model="ratingModel"
+              size="30px"
+              :max="5"
+            />
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn
+          :disable='!ratingModel'
+          color="primary"
+          @click="vote"
+          label="Vote"
+        />
+        </q-card-actions>
+        </q-card>
     </q-dialog>
 
     <!-- update vote -->
@@ -90,8 +75,8 @@
         <q-item>
           <q-item-label>
             <div class="row row items-center q-ma-xs" v-for="user in currentGroup.users" :key="user._id">
-              <div class="col text-grey-9">{{ user.name }}</div>
-              <!-- <div class="col col-auto" style="margin: 0 auto"><q-rating slot="subtitle" :value="getVote(s._id, user._id)" readonly :max="5" /></div> -->
+              <div class="col text-grey-9">{{ user.username }}</div>
+              <div class="col col-auto" style="margin: 0 auto"><q-rating slot="subtitle" :value="getVote(s.votes, user.id)" readonly :max="5" /></div>
             </div>
             <div class="text-grey-6 q-caption q-ml-xs q-mt-sm">Proposé le {{ formatDate(s.createdAt) }} par {{ user.username }}</div>
             <div class="text-grey-6 q-caption q-ml-xs q-mt-sm" v-if="s.comment">Commentaire :
@@ -112,9 +97,6 @@
         </div>
         <div>
           <q-btn label="Votez" @click="showModal(s)" flat color="yellow-10" size="md" icon="how_to_vote" />
-        </div>
-        <div>
-          <q-btn v-if="showVoteBtn(s)" label="Veto" @click="showVetoModal(s)" flat color="red" size="md" icon="ion-md-thumbs-down" />
         </div>
         <div>
           <q-btn @click="remove(s)" label="" flat color="negative" size="md" icon="ion-md-trash" />
@@ -145,18 +127,18 @@
           </div>
         </q-card-section>
       <q-list class="q-pt-none">
-        <q-item>
-          <q-item-label>
-            <div class="row row items-center q-ma-xs" v-for="user in currentGroup.users" :key="user._id">
+          <q-item-label class="q-pa-md" style="width: 100%">
+            <div class="row q-ma-xs justify-between" v-for="user in currentGroup.users" :key="user._id">
               <div class="col text-grey-9">{{ user.username }}</div>
-              <div class="col col-auto" style="margin: 0 auto"><q-rating slot="subtitle" :value="getVote(s)" readonly :max="5" /></div>
+              <div class="col col-auto">
+                <q-rating slot="subtitle" :value="getVote(s.votes, user.id)" readonly :max="5" />
+              </div>
             </div>
-            <div class="text-grey-6 q-caption q-ml-xs q-mt-sm">Proposé le {{ formatDate(s.createdAt) }} par {{ user.username }}</div>
             <div class="text-grey-6 q-caption q-ml-xs q-mt-sm" v-if="s.comment">Commentaire :
               <div v-html="s.comment" syle="word-break: break-word;"></div>
             </div>
+            <div class="text-grey-6 q-caption q-ml-xs q-mt-md" style="font-size: 12px">Proposé le {{ formatDate(s.createdAt) }} par {{ user.username }}</div>
           </q-item-label>
-        </q-item>
       </q-list>
       <q-separator />
       <q-card-actions align="around">
@@ -190,7 +172,6 @@
 import Api from '../services/Api'
 import { mapState } from 'vuex'
 import moment from 'moment'
-import orderBy from 'lodash/orderBy'
 
 export default {
   name: 'vote',
@@ -201,7 +182,6 @@ export default {
       trackSelected: undefined,
       opened: false,
       updateOpened: false,
-      openedVeto: false,
       rating: {}
     }
   },
@@ -209,27 +189,17 @@ export default {
     ...mapState('main', ['currentGroup', 'user']),
     noSelection () {
       const result = []
-      this.selectionWithoutVeto.forEach(selection => {
+      this.currentGroup.songs.forEach(selection => {
         if (selection.votes.length < this.currentGroup.users.length) {
           result.push(selection)
         }
       })
       return result
     },
-    selectionWithoutVeto () {
-      // let scenesOrder = orderBy(resp.body.scenes, ['createdAt'], ['asc'])
-      const result = []
-      this.currentGroup.songs.forEach(selection => {
-        if (!selection.votes.find(vote => vote.vote === 0)) {
-          result.push(selection)
-        }
-      })
-      return orderBy(result, ['creationDate'], ['desc'])
-    },
     alreadyVote () {
       const result = []
-      this.selectionWithoutVeto.forEach(selection => {
-        if (selection.votes.find(vote => vote.profile === this.user.profile)) {
+      this.currentGroup.songs.forEach(selection => {
+        if (selection.votes.find(vote => vote.created_by_id === this.user.id)) {
           result.push(selection)
         }
       })
@@ -237,8 +207,8 @@ export default {
     },
     awaitingVote () {
       const result = []
-      this.selectionWithoutVeto.forEach(selection => {
-        if (!selection.votes.find(vote => vote.profile === this.user.profile)) {
+      this.currentGroup.songs.forEach(selection => {
+        if (!selection.votes.find(vote => vote.created_by_id === this.user.id)) {
           result.push(selection)
         }
       })
@@ -355,9 +325,13 @@ export default {
         return userName.name
       }
     },
-    getVote (song) {
-      const vote = song.votes.find(v => v.profile === this.user.profile)
-      return vote.vote
+    getVote (votes, userId) {
+      const vote = votes.find(v => v.created_by_id === userId)
+      if (vote) {
+        return vote.vote
+      } else {
+        return 0
+      }
     },
     vote () {
       this.$store.dispatch('main/vote', {
