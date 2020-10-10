@@ -2,22 +2,26 @@
   <q-page style="bg-grey-3" padding class="search-page q-pl-md q-pr-md">
     <!-- update vote -->
     <q-dialog class="modal" minimized v-model="updateOpened">
-      <p class="text-center" style="margin-top: 20px">Modifier le vote</p>
-    <div class="modal-rate">
-      <q-rating
-        v-model="ratingModel"
-        size="30px"
-        :max="5"
-      />
-    </div>
-    <div class="modal-rate">
-      <q-btn
-        :disable='!ratingModel'
-        color="primary"
-        @click="updateVote"
-        label="Vote"
-      />
-      </div>
+      <q-card>
+        <q-card-section>
+          <p class="text-center q-mb-none">Modifier le vote</p>
+        </q-card-section>
+        <q-card-section>
+            <q-rating
+              v-model="ratingModel"
+              size="30px"
+              :max="5"
+            />
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn
+          :disable='!ratingModel'
+          color="primary"
+          @click="updateVote"
+          label="Vote"
+        />
+        </q-card-actions>
+        </q-card>
     </q-dialog>
 
     <!-- Morceaux selectionnés -->
@@ -26,31 +30,70 @@
       <div class="q-caption text-grey-10">( > {{ average }} points )</div>
       <hr>
     </div>
-    <q-list v-if="allVoteOk && allVoteOk.length">
-        <q-collapsible class="shadow-1"
+    <q-expansion-item v-for="s in allVoteOk" :key="s.id" class="shadow-1 q-mb-md">
+        <template v-slot:header style="padding: 0">
+          <q-item-section avatar>
+            <q-avatar square size="80px">
+              <img :src="s.images[0].url">
+            </q-avatar>
+            <div class="absolute q-item-letter">{{getTotal(s.votes)}} pts</div>
+          </q-item-section>
+
+          <q-item-section>
+            <q-item-label overline>{{s.name}}</q-item-label>
+            <q-item-label>{{s.artist}}</q-item-label>
+          </q-item-section>
+        </template>
+
+        <q-card>
+          <q-card-section>
+            <q-list>
+                <q-item-label v-if="s.votes.length" style="width: 100%">
+                  <div class="row q-ma-xs justify-between" v-for="vote in s.votes" :key="vote._id">
+                    <div class="col text-grey-9">{{ vote.created_by }}</div>
+                    <div class="col col-auto" >
+                      <q-rating slot="subtitle" :value="vote.vote" readonly :max="5" />
+                    </div>
+                  </div>
+                  <div class="text-grey-6 q-caption q-ml-xs q-mt-sm">Proposé le {{ formatDate(s.createdAt) }} par {{ s.created_by }}</div>
+                  <div class="text-grey-6 q-caption q-ml-xs q-mt-sm" v-if="s.comment">Commentaire :
+              <div v-html="s.comment" syle="word-break: break-word;"></div>
+            </div>
+                </q-item-label>
+            </q-list>
+            <q-separator class="q-mt-sm"/>
+            <q-card-actions align="around" class="q-mb-none q-pb-none">
+              <q-btn @click="launchSpotify(s.track.uri)" flat icon="fab fa-spotify" size="md" color="positive"></q-btn>
+              <q-btn @click="showUpdateModal(s)" flat icon="star_border" label="Voter" size="md" color="yellow-10"></q-btn>
+            </q-card-actions>
+          </q-card-section>
+        </q-card>
+      </q-expansion-item>
+    <!-- <q-list v-if="allVoteOk && allVoteOk.length">
+        <q-expansion-item class="shadow-1"
         v-for="s in allVoteOk" :key="s._id"
-        :image="s.track.album.images[0].url"
-        :label="s.track.name"
-        :sublabel="s.track.artists[0].name"
+        :image="s.images[0].url"
+        :label="s.name"
+        :sublabel="s.artist"
         :right-letter="getTotal(s.total)">
         <q-list>
           <q-item>
-            <q-item-main v-if="s.vote.length">
-              <div class="row row items-center q-ma-xs" v-for="vote in s.vote" :key="vote.userId">
-                <div class="col text-grey-9">{{ getUserName(vote.userId) }}</div>
-                <div class="col col-auto" style="margin: 0 auto"><q-rating slot="subtitle" :value="vote.value" readonly :max="5" /></div>
-              </div>
-              <div class="text-grey-6 q-caption q-ml-xs q-mt-sm">Proposé le {{ formatDate(s.creationDate) }} par {{ getUserName(s.userId) }}</div>
-            </q-item-main>
+            <q-item-label v-if="s.votes.length">
+              <div class="row row items-center q-ma-xs" v-for="user in currentGroup.users" :key="user._id">
+              <div class="col text-grey-9">{{ user.username }}</div>
+              <div class="col col-auto" style="margin: 0 auto"><q-rating slot="subtitle" :value="getVote(s)" readonly :max="5" /></div>
+            </div>
+              <div class="text-grey-6 q-caption q-ml-xs q-mt-sm">Proposé le {{ formatDate(s.createdAt) }} par {{ getUserName(s.profile) }}</div>
+            </q-item-label>
           </q-item>
         </q-list>
-        <q-card-separator />
+        <q-separator />
           <q-card-actions align="around">
             <q-btn @click="launchSpotify(s.track.uri)" flat icon="fab fa-spotify" size="md" color="positive"></q-btn>
             <q-btn @click="showUpdateModal(s)" flat icon="star_border" label="Voter" size="md" color="yellow-10"></q-btn>
           </q-card-actions>
-        </q-collapsible>
-      </q-list>
+        </q-expansion-item>
+      </q-list> -->
 
     <!-- Morceaux refusés -->
     <div class="q-mt-lg q-pb-md q-pt-lg">
@@ -58,102 +101,51 @@
       <hr>
     </div>
 
-    <q-list v-if="allVoteKo && allVoteKo.length">
-        <q-collapsible class="shadow-1"
-        v-for="s in allVoteKo" :key="s._id"
-        :image="s.track.album.images[0].url"
-        :label="s.track.name"
-        :sublabel="s.track.artists[0].name"
-        :right-letter="getTotal(s.total)">
-        <q-list>
-          <q-item>
-            <q-item-main v-if="s.vote.length">
-              <div class="row row items-center q-ma-xs" v-for="vote in s.vote" :key="vote.userId">
-                <div class="col text-grey-9">{{ getUserName(vote.userId) }}</div>
-                <div class="col col-auto" style="margin: 0 auto"><q-rating slot="subtitle" :value="vote.value" readonly :max="5" /></div>
-              </div>
-              <div class="text-grey-6 q-caption q-ml-xs q-mt-sm">Proposé le {{ formatDate(s.creationDate) }} par {{ getUserName(s.userId) }}</div>
-            </q-item-main>
-          </q-item>
-        </q-list>
-        <q-card-separator />
-          <q-card-actions align="around">
-            <q-btn @click="launchSpotify(s.track.uri)" flat icon="fab fa-spotify" size="md" color="positive"></q-btn>
-            <q-btn @click="showUpdateModal(s)" flat icon="ion-md-star" label="Voter" size="md" color="yellow-10"></q-btn>
-          </q-card-actions>
-        </q-collapsible>
-      </q-list>
+    <q-expansion-item v-for="s in allVoteKo" :key="s.id" class="shadow-1 q-mb-md">
+        <template v-slot:header style="padding: 0">
+          <q-item-section avatar>
+            <q-avatar square size="64px">
+              <img :src="s.images[0].url">
+            </q-avatar>
+          </q-item-section>
 
-    <!-- Morceaux refusés direct -->
-    <div class="q-mt-lg q-pb-md q-pt-lg" >
-      <div class="q-subheading text-weight-bold text-grey-10 text-weight-regular" style="    text-transform: uppercase;">Titres refusés direct</div>
-      <hr>
-    </div>
-    <q-list v-if="vetoVote && vetoVote.length">
-        <q-collapsible class="shadow-1"
-        v-for="s in vetoVote" :key="s._id"
-        :image="s.track.album.images[0].url"
-        :label="s.track.name"
-        :sublabel="s.track.artists[0].name">
-        <q-chip floating color="grey-8" style="top: -0px; right: -0em;border-radius: 0; border-top-right-radius: 3px;">{{s.total}} pts</q-chip>
-        <q-list>
-          <q-item>
-            <q-item-main v-if="s.vote.length">
-              <div class="row row items-center q-ma-xs" v-for="vote in s.vote" :key="vote.userId">
-                <div class="col text-grey-9">{{ getUserName(vote.userId) }}</div>
-                <div class="col col-auto" style="margin: 0 auto"><q-rating slot="subtitle" :value="vote.value" readonly :max="5" /></div>
-              </div>
-              <div class="text-grey-6 q-caption q-ml-xs q-mt-sm">Proposé le {{ formatDate(s.creationDate) }} par {{ getUserName(s.userId) }}</div>
-            </q-item-main>
-          </q-item>
-        </q-list>
-        <q-card-separator />
-          <q-card-actions align="around">
-            <q-btn @click="launchSpotify(s.track.uri)" flat icon="fab fa-spotify" size="md" color="positive"></q-btn>
-            <q-btn @click="showUpdateModal(s)" flat icon="ion-md-star" label="Voter" size="md" color="yellow-10"></q-btn>
-          </q-card-actions>
-        </q-collapsible>
-      </q-list>
-    <!--<q-list highlight style="margin-top: 40px">
-      <q-list-header><span class="emoticone" style="font-size: 1.5em; vertical-align:middle">🖕</span>
-      <span style="font-size: 1.2em"> Titres refusés direct !</span></q-list-header>
-      <q-collapsible v-for="s in vetoVote" :key="s._id" :avatar="s.track.album.images[2].url" :label="s.track.artists[0].name + ' - ' + s.track.name">
-        <div class="row items-center">
-          <div v-if="s.track.preview_url" class="col col-auto" style="margin: 0 auto">
-            <audio :id="'audio-'+s._id" :src="s.track.preview_url"></audio>
-            <q-btn class="play" :id="'play-'+s._id" @click="playMusic(s.track.preview_url, s._id)" push rounded color="primary" label="Play" icon="ion-md-play" />
-            <q-btn class="pause hide" :id="'pause-'+s._id" @click="pauseMusic(s.track.preview_url, s._id)" push rounded color="primary" label="Pause" icon="ion-md-pause" />
-            <br><br>
-          </div>
-          <div class="col col-auto" style="margin: 0 auto">
-            <small>Album: <span>{{ s.track.album.name }}</span></small><br>
-            <small>Ajouté le {{ formatDate(s.creationDate) }} par {{ getUserName(s.userId) }}</small><br>
-            <q-rating slot="subtitle" :value="getAverage(s.vote)" readonly :max="5" />
-            <br><br>
-          </div>
-        </div>
+          <q-item-section>
+            <q-item-label overline>{{s.name}}</q-item-label>
+            <q-item-label>{{s.artist}}</q-item-label>
+          </q-item-section>
+        </template>
 
-        <div class="row" v-if="s.vote.length">
-          <div class="col q-pa-sm" v-for="vote in s.vote" :key="vote.userId">
-          <div>{{ getUserName(vote.userId) }}</div>
-            <q-rating slot="subtitle" :value="vote.value" readonly :max="5" />
-          </div>
-        </div>
-      </q-collapsible>
-    </q-list>-->
+        <q-card>
+          <q-card-section>
+            <q-list>
+                <q-item-label v-if="s.votes && s.votes.length" style="width: 100%">
+                  <div class="row q-ma-xs justify-between" v-for="vote in s.votes" :key="vote._id">
+                    <div class="col text-grey-9">{{ vote.created_by }}</div>
+                    <div class="col col-auto" >
+                      <q-rating slot="subtitle" :value="vote.vote" readonly :max="5" />
+                    </div>
+                  </div>
+                  <div class="text-grey-6 q-caption q-ml-xs q-mt-sm">Proposé le {{ formatDate(s.createdAt) }} par {{ s.created_by }}</div>
+                </q-item-label>
+            </q-list>
+            <q-separator class="q-mt-sm"/>
+            <q-card-actions align="around" class="q-mb-none q-pb-none">
+              <q-btn @click="launchSpotify(s.track.uri)" flat icon="fab fa-spotify" size="md" color="positive"></q-btn>
+              <q-btn @click="showUpdateModal(s)" flat icon="star_border" label="Voter" size="md" color="yellow-10"></q-btn>
+            </q-card-actions>
+          </q-card-section>
+        </q-card>
+      </q-expansion-item>
   </q-page>
 </template>
 
 <script>
 
-import Api from '../services/Api'
-import { QDialog } from 'quasar'
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import moment from 'moment'
-// import orderBy from 'lodash/orderBy'
+import orderBy from 'lodash/orderBy'
 
 export default {
-  components: { QDialog },
   name: 'playlist',
   data () {
     return {
@@ -167,64 +159,77 @@ export default {
     }
   },
   computed: {
-    ...mapState('main', ['songsList', 'users', 'currentGroup']),
-    ...mapGetters('main', ['vetoVote', 'awaitingVote', 'allVote']),
+    ...mapState('main', ['user', 'currentGroup']),
     average () {
       return parseInt((this.currentGroup.users.length * 5) / 1.2)
     },
     allVoteOk () {
-      // const els = []
-      return this.currentGroup.songs.map(el => {
-        if (el.votes.length === this.currentGroup.users.length) {
-          return el
-        }
-      })
-      /* this.currentGroup.songs.forEach(el => {
-        if (!el.votes.find(v => v.vote === 0)) {
-          let total = 0
-          el.votes.forEach(v => {
-            total += v.vote
-          })
+      const result = []
+      this.currentGroup.songs.forEach(el => {
+        const total = el.votes.reduce((tot, num) => {
+          return tot.vote + num.vote
+        })
+        if (total > this.average) {
           el.total = total
-          if (total >= this.average) {
-            els.push(el)
-          }
+          result.push(el)
         }
       })
-      return orderBy(els, ['total'], ['desc']) */
+      return orderBy(result, ['total'], ['desc'])
     },
     allVoteKo () {
-      return ''
-      /* const els = []
-      this.allVote.forEach(el => {
-        let total = 0
-        el.votes.forEach(v => {
-          total += v.vote
+      const result = []
+      this.currentGroup.songs.forEach(el => {
+        const total = el.votes.reduce((tot, num) => {
+          return tot.vote + num.vote
         })
         if (total < this.average) {
-          els.push(el)
+          el.total = total
+          result.push(el)
         }
       })
-      return orderBy(els, ['total'], ['desc']) */
+      return orderBy(result, ['total'], ['desc'])
     }
   },
   methods: {
-    getTotal (total) {
-      console.log('total', total)
-      if (total && total > 1) {
-        return total.toString() + ' pts'
-      }
+    getVote (song) {
+      const vote = song.votes.find(v => v.profile === this.user.profile)
+      return vote.vote
+    },
+    getTotal (votes) {
+      return votes.reduce((tot, num) => {
+        return tot.vote + num.vote
+      })
     },
     launchSpotify (id) {
       location.href = id
     },
     showUpdateModal (track) {
       this.updateOpened = true
-      this.ratingModel = undefined
+      this.ratingModel = 1
       this.trackSelected = track
     },
     updateVote () {
-      const userId = localStorage.getItem('userId')
+      this.$store.dispatch('main/changeLoadingState', true)
+      const vote = this.trackSelected.votes.find(v => v.created_by_id === this.user.id)
+      this.$store.dispatch('main/updateVote', {
+        voteId: vote.id,
+        value: this.ratingModel
+      })
+        .then(r => {
+          this.$store.dispatch('main/getCurrentGroup', {
+            groupId: this.$route.params.groupId
+          })
+            .then(() => {
+              this.$store.dispatch('main/changeLoadingState', false)
+              this.updateOpened = false
+              this.$q.notify({
+                type: 'positive',
+                message: 'Le vote a bien été mise à jour',
+                position: 'top'
+              })
+            })
+        })
+      /* const userId = localStorage.getItem('userId')
       const selection = this.songsList.find(sel => sel._id === this.trackSelected._id)
       const vote = selection.vote.find(v => v.userId === userId)
       vote.value = this.ratingModel
@@ -245,7 +250,7 @@ export default {
           message: 'Vous n\'êtes pas connecté. Veuillez relancer l\'application',
           position: 'top'
         })
-      }
+      } */
     },
     checkIfUserIsLogged () {
       if (!localStorage.getItem('userId')) {
