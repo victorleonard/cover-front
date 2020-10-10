@@ -16,8 +16,8 @@ export default {
   data () {
     return {
       form: {
-        email: '',
-        password: ''
+        email: 'anthony@anthony.fr',
+        password: 'azerty'
       },
       tempUser: undefined,
       modal: false,
