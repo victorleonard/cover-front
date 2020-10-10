@@ -15,6 +15,11 @@ export default {
       user: userId
     })
   },
+  updateVote (voteId, value) {
+    return Api().put('/votes/' + voteId, {
+      vote: value
+    })
+  },
   selectSong (song, comment, groupId, userId) {
     return Api().post('/songs', {
       spotify_data: song,
