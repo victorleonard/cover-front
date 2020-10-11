@@ -56,6 +56,16 @@
                 Group Edition
               </q-item-section>
             </q-item>
+
+            <q-item clickable v-ripple
+            @click="logout">
+            <q-item-section avatar>
+                <q-icon name="login" />
+              </q-item-section>
+              <q-item-section>
+                Log out
+              </q-item-section>
+            </q-item>
           </q-list>
         </q-scroll-area>
       </q-drawer>
@@ -109,7 +119,17 @@ export default {
     ...mapGetters('main', ['awaitingVote']),
     ...mapState('main', ['currentGroup'])
   },
+  methods: {
+    logout () {
+      this.$store.dispatch('main/logout')
+        .then(() => {
+          this.$router.push({ name: 'home' })
+        })
+    }
+  },
   beforeCreate () {
+    this.$store.dispatch('main/getMe')
+    this.$store.dispatch('main/getMyProfile')
     console.log('====>>', this.$route.params.groupId)
     this.$store.dispatch('main/getCurrentGroup', {
       groupId: this.$route.params.groupId

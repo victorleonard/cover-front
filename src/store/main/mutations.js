@@ -2,6 +2,15 @@ export function CHANGE_LOADING_STATE (state, payload) {
   state.loading = payload
 }
 
+export function LOG_OUT (state) {
+  state.profile = undefined
+  state.user = undefined
+  state.currentGroup = undefined
+  state.token = undefined
+  state.myGroups = undefined
+  localStorage.removeItem('token')
+}
+
 export function UPDATE_SONG_LIST (state, payload) {
   state.songsList = payload
 }

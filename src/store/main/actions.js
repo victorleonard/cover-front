@@ -8,6 +8,10 @@ export function changeLoadingState ({ commit }, state) {
   commit('CHANGE_LOADING_STATE', state)
 }
 
+export function logout ({ commit }) {
+  commit('LOG_OUT')
+}
+
 export async function loadSongs ({ commit }, silent) {
   if (!silent) {
     commit('CHANGE_LOADING_STATE', true)

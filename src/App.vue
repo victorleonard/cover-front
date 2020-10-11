@@ -41,11 +41,6 @@ export default {
         Loading.hide()
       }
     }
-  },
-  beforeCreate () {
-    this.$store.dispatch('main/getMe')
-    this.$store.dispatch('main/getMyProfile')
-    this.$store.dispatch('main/changeLoadingState', false)
   }
 }
 </script>

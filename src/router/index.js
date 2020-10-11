@@ -26,15 +26,13 @@ export default function (/* { store, ssrContext } */) {
     base: process.env.VUE_ROUTER_BASE
   })
 
-  const publicRouter = ['connect', 'register']
+  const publicRouter = ['welcome', 'connect', 'register']
 
   Router.afterEach((to, from) => {
     if (!publicRouter.find(el => el === to.name)) {
-      if (localStorage.getItem('token')) {
-        console.log('ok all localstorage !!!!!!!!!!!!!!!!!!!')
-      } else {
+      if (!localStorage.getItem('token')) {
         Router.push({
-          name: 'connect'
+          name: 'welcome'
         })
       }
     }

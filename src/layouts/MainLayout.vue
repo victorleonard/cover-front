@@ -1,8 +1,9 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
-      <q-toolbar>
+      <q-toolbar v-if="$route.name !== 'welcome' && $route.name !== 'connect' && $route.name !== 'register'">
         <q-btn
+          v-if="user"
           flat
           dense
           round
@@ -18,6 +19,7 @@
     </q-header>
 
     <q-drawer
+        v-if="user"
         v-model="leftDrawerOpen"
         show-if-above
         :width="200"
@@ -42,6 +44,15 @@
 
               <q-item-section>
                 Profile
+              </q-item-section>
+            </q-item>
+            <q-item clickable v-ripple
+            @click="logout">
+            <q-item-section avatar>
+                <q-icon name="login" />
+              </q-item-section>
+              <q-item-section>
+                Log out
               </q-item-section>
             </q-item>
           </q-list>
@@ -75,6 +86,14 @@ export default {
   },
   computed: {
     ...mapState('main', ['user'])
+  },
+  methods: {
+    logout () {
+      this.$store.dispatch('main/logout')
+        .then(() => {
+          this.$router.push({ name: 'welcome' })
+        })
+    }
   }
 }
 </script>
