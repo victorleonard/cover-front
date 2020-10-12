@@ -3,6 +3,7 @@ import UserService from './../../services/UserService'
 import GroupService from './../../services/GroupService'
 import FileService from './../../services/FileService'
 import InstrumentService from './../../services/InstrumentService'
+import InvitationService from './../../services/InvitationService'
 
 export function changeLoadingState ({ commit }, state) {
   commit('CHANGE_LOADING_STATE', state)
@@ -93,6 +94,19 @@ export async function getMyGroups ({ commit, state }) {
 
 export async function getGroup ({ commit, state }, { groupId }) {
   const r = await GroupService.getGroup(groupId)
+  return r
+}
+
+export async function askInvitation ({ state }, { group, to }) {
+  const from = state.user.id
+  const r = await InvitationService.askInvitation(group, to, from)
+  return r
+}
+
+export async function getMyAskingInvitation ({ commit, state }) {
+  const from = state.user.id
+  const r = await InvitationService.getMyAskingInvitation(from)
+  commit('UPDATE_MY_ASKING_INVITATIONS', r.data)
   return r
 }
 

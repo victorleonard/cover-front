@@ -15,6 +15,10 @@ export function UPDATE_SONG_LIST (state, payload) {
   state.songsList = payload
 }
 
+export function UPDATE_MY_ASKING_INVITATIONS (state, payload) {
+  state.myAskingInvitations = payload
+}
+
 export function UPDATE_USERS (state, payload) {
   state.users = payload
 }

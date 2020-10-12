@@ -9,6 +9,7 @@ export default {
   myGroups: [],
   groups: undefined,
   token: undefined,
+  myAskingInvitations: undefined,
   error: {
     display: false,
     type: '',
