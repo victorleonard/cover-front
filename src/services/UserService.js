@@ -36,6 +36,11 @@ export default {
       password: password
     })
   },
+  sendEmailConfirmation (email) {
+    return Connect().post('/auth/send-email-confirmation', {
+      email: email
+    })
+  },
   logIn (email, password) {
     return Api().post('/auth/local', {
       identifier: email,

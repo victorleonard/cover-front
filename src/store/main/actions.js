@@ -212,6 +212,11 @@ export async function register ({ commit, dispatch }, { username, email, passwor
   }
 }
 
+export async function sendEmailConfirmation ({ commit }, { email }) {
+  const r = await UserService.sendEmailConfirmation(email)
+  return r
+}
+
 export async function connectUser ({ commit, dispatch }, { email, password }) {
   commit('CHANGE_LOADING_STATE', true)
   const response = await UserService.logIn(email, password)
