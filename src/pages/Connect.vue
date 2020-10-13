@@ -1,5 +1,8 @@
 <template>
-<q-page class="flex flex-center">
+<q-page class="welcome fit column wrap justify-center items-center content-center" style="background-color: #FAFAFA;">
+  <div class="row">
+    <img class="logo" src="/cover.png" alt="">
+  </div>
   <div class="q-gutter-md" style="width: 500px; max-width: 90vw;">
     <q-input v-model="form.email" type="email" label="Email" />
     <q-input v-model="form.password" type="password" label="Password" />
@@ -54,15 +57,20 @@ export default {
             })
         })
         .catch(error => {
+          console.log(error.response)
           this.$store.dispatch('main/changeLoadingState', false)
-          const er = JSON.stringify(error)
+          this.$q.dialog({
+            title: 'Error',
+            message: error.response.data.data[0].messages[0].message
+          })
+          /* const er = JSON.stringify(error)
           const er2 = JSON.parse(er)
           const messageError = er2.response.data.error.message
           console.log(error.message, er2.response.data.error.message)
           this.$q.dialog({
             title: 'Error',
             message: messageError
-          })
+          }) */
         })
       /* Api().post('/user', {
         'logemail': this.form.logemail,
@@ -82,6 +90,7 @@ export default {
     }
   },
   mounted () {
+    console.log('REFERRER ==> ', document.referrer)
     /* Api().get('users')
       .then(resp => {
         this.users = resp.data.users
