@@ -73,7 +73,7 @@
     </q-page-container>
     <q-footer bordered class="bg-white text-primary" v-if="$route.name !== 'welcome' && $route.name !== 'connect' && $route.name !== 'register'">
         <q-tabs no-caps active-color="primary" indicator-color="transparent" class="text-grey">
-          <q-route-tab :to="{ name: 'home' }" name="images" label="Mes Groupes" />
+          <q-route-tab v-if="myGroups.length" :to="{ name: 'home' }" name="images" label="Mes Groupes" />
           <q-route-tab :to="{ name: 'create-or-join' }" name="videos" label="Nouveau groupe" />
           <q-route-tab :to="{ name: 'profile' }" name="articles" label="Profile" />
         </q-tabs>
@@ -92,7 +92,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('main', ['user'])
+    ...mapState('main', ['user', 'myGroups'])
   },
   methods: {
     logout () {

@@ -47,8 +47,8 @@
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn round :to="{ name: 'group', params: { groupId: group.id } }" color="primary" icon="east" />
         <q-btn v-if="isAdmin(group.admin)" flat :to="{ name: 'group-edit', params: { groupId: group.id } }">Edit</q-btn>
+        <q-btn round :to="{ name: 'group', params: { groupId: group.id } }" color="primary" icon="east" />
       </q-card-actions>
     </q-card>
     </div>
@@ -99,6 +99,11 @@ export default {
                 })
             })
         })
+    }
+  },
+  mounted () {
+    if (!this.myGroups.length) {
+      this.$router.push({ name: 'create-or-join' })
     }
   },
   beforeCreate () {
