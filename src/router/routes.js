@@ -34,6 +34,11 @@ const routes = [
         component: () => import('pages/Home.vue')
       },
       {
+        path: 'create-or-join',
+        name: 'create-or-join',
+        component: () => import('pages/CreateOrJoin.vue')
+      },
+      {
         path: 'group-creation',
         name: 'group-creation',
         component: () => import('pages/GroupCreation.vue')

@@ -110,6 +110,18 @@ export async function getMyAskingInvitation ({ commit, state }) {
   return r
 }
 
+export async function getMyDemandInvitation ({ commit, state }) {
+  const to = state.user.id
+  const r = await InvitationService.getMyDemandInvitation(to)
+  commit('UPDATE_MY_DEMAND_INVITATIONS', r.data)
+  return r
+}
+
+export async function acceptInvitation ({ commit, state }, demand) {
+  const r = await InvitationService.acceptInvitation(demand)
+  return r
+}
+
 export async function getInstruments ({ commit, state }) {
   const r = await InstrumentService.getInstruments()
   return r
@@ -158,6 +170,11 @@ export async function loadMyGroups ({ commit, state, dispatch }) {
     .catch(error => {
       console.error('error', error)
     })
+}
+
+export async function addGroupMember ({ commit, state }, { groupId, userId }) {
+  const r = await GroupService.addGroupMember(groupId, userId)
+  return r
 }
 
 /* export async function loadMembersGroup ({commit, state}, {groupId}) {

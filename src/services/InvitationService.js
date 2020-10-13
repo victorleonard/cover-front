@@ -10,5 +10,13 @@ export default {
   },
   getMyAskingInvitation (from) {
     return Api().get('/invitations?from=' + from)
+  },
+  getMyDemandInvitation (to) {
+    return Api().get('/invitations?to=' + to)
+  },
+  acceptInvitation (demand) {
+    return Api().put('/invitations/' + demand.id, {
+      status: 'accept'
+    })
   }
 }

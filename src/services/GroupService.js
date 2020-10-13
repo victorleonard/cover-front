@@ -51,5 +51,10 @@ export default {
       level: level,
       creatorId: creatorId */
     })
+  },
+  addGroupMember (groupId, users) {
+    return Api().put('/groups/' + groupId, {
+      users: users
+    })
   }
 }

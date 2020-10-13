@@ -10,6 +10,7 @@ export default {
   groups: undefined,
   token: undefined,
   myAskingInvitations: undefined,
+  myDemandInvitations: undefined,
   error: {
     display: false,
     type: '',
