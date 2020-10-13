@@ -55,10 +55,10 @@
                       <q-rating slot="subtitle" :value="vote.vote" readonly :max="5" />
                     </div>
                   </div>
-                  <div class="text-grey-6 q-caption q-ml-xs q-mt-sm">Proposé le {{ formatDate(s.createdAt) }} par {{ s.created_by }}</div>
                   <div class="text-grey-6 q-caption q-ml-xs q-mt-sm" v-if="s.comment">Commentaire :
               <div v-html="s.comment" syle="word-break: break-word;"></div>
             </div>
+            <div class="text-grey-6 q-caption q-ml-xs q-mt-md" style="font-size: 12px">Proposé le {{ formatDate(s.createdAt) }} par {{ s.created_by }}</div>
                 </q-item-label>
             </q-list>
             <q-separator class="q-mt-sm"/>
@@ -125,7 +125,10 @@
                       <q-rating slot="subtitle" :value="vote.vote" readonly :max="5" />
                     </div>
                   </div>
-                  <div class="text-grey-6 q-caption q-ml-xs q-mt-sm">Proposé le {{ formatDate(s.createdAt) }} par {{ s.created_by }}</div>
+                  <div class="text-grey-6 q-caption q-ml-xs q-mt-sm" v-if="s.comment">Commentaire :
+              <div v-html="s.comment" syle="word-break: break-word;"></div>
+            </div>
+            <div class="text-grey-6 q-caption q-ml-xs q-mt-md" style="font-size: 12px">Proposé le {{ formatDate(s.createdAt) }} par {{ s.created_by }}</div>
                 </q-item-label>
             </q-list>
             <q-separator class="q-mt-sm"/>
@@ -167,7 +170,7 @@ export default {
       const result = []
       this.currentGroup.songs.forEach(el => {
         const total = el.votes.reduce((tot, num) => {
-          return tot.vote + num.vote
+          return (tot.vote || tot) + num.vote
         })
         if (total > this.average) {
           el.total = total
@@ -179,12 +182,17 @@ export default {
     allVoteKo () {
       const result = []
       this.currentGroup.songs.forEach(el => {
-        const total = el.votes.reduce((tot, num) => {
-          return tot.vote + num.vote
-        })
-        if (total < this.average) {
-          el.total = total
-          result.push(el)
+        console.log(el.votes.length, this.currentGroup.users.length)
+        if (el.votes.length === this.currentGroup.users.length) {
+          const total = el.votes.reduce((tot, num) => {
+            console.log(tot, num)
+            return (tot.vote || tot) + num.vote
+          })
+          console.log('total =>', total)
+          if (total <= this.average) {
+            el.total = total
+            result.push(el)
+          }
         }
       })
       return orderBy(result, ['total'], ['desc'])
@@ -197,7 +205,7 @@ export default {
     },
     getTotal (votes) {
       return votes.reduce((tot, num) => {
-        return tot.vote + num.vote
+        return (tot.vote || tot) + num.vote
       })
     },
     launchSpotify (id) {

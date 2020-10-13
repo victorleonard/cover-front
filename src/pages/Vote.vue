@@ -67,23 +67,23 @@
             </div>
             <div class="col" style="line-height: 1.2rem">
                 <div class="text-grey-9 q-title q-ml-sm">{{ s.name }}</div>
-                <div class="text-grey-7 q-subheading q-ml-sm q-mt-sm">{{s.arstist}}</div>
+                <div class="text-grey-7 q-subheading q-ml-sm q-mt-sm">{{s.artist}}</div>
             </div>
           </div>
         </q-card-section>
       <q-list class="q-pt-none">
-        <q-item>
-          <q-item-label>
-            <div class="row row items-center q-ma-xs" v-for="user in currentGroup.users" :key="user._id">
+          <q-item-label class="q-pa-md" style="width: 100%">
+            <div class="row q-ma-xs justify-between" v-for="user in currentGroup.users" :key="user._id">
               <div class="col text-grey-9">{{ user.username }}</div>
-              <div class="col col-auto" style="margin: 0 auto"><q-rating slot="subtitle" :value="getVote(s.votes, user.id)" readonly :max="5" /></div>
+              <div class="col col-auto">
+                <q-rating slot="subtitle" :value="getVote(s.votes, user.id)" readonly :max="5" />
+              </div>
             </div>
-            <div class="text-grey-6 q-caption q-ml-xs q-mt-sm">Proposé le {{ formatDate(s.createdAt) }} par {{ user.username }}</div>
             <div class="text-grey-6 q-caption q-ml-xs q-mt-sm" v-if="s.comment">Commentaire :
               <div v-html="s.comment" syle="word-break: break-word;"></div>
             </div>
+            <div class="text-grey-6 q-caption q-ml-xs q-mt-md" style="font-size: 12px">Proposé le {{ formatDate(s.createdAt) }} par {{ s.created_by }}</div>
           </q-item-label>
-        </q-item>
       </q-list>
       <q-separator />
       <q-card-actions align="around">
@@ -110,7 +110,7 @@
     <!-- alreadyVote -->
     <!--/////////////-->
     <div v-if="alreadyVote.length">
-    <div class="q-ml-sm q-mr-sm q-mb-lg">
+    <div class="q-mt-xl q-ml-sm q-mr-sm q-mb-lg">
       <div class="q-subheading text-grey-10 text-weight-regular">Tu as déjà voté pour les titres suivants :</div>
       <hr>
     </div>
@@ -137,7 +137,7 @@
             <div class="text-grey-6 q-caption q-ml-xs q-mt-sm" v-if="s.comment">Commentaire :
               <div v-html="s.comment" syle="word-break: break-word;"></div>
             </div>
-            <div class="text-grey-6 q-caption q-ml-xs q-mt-md" style="font-size: 12px">Proposé le {{ formatDate(s.createdAt) }} par {{ user.username }}</div>
+            <div class="text-grey-6 q-caption q-ml-xs q-mt-md" style="font-size: 12px">Proposé le {{ formatDate(s.createdAt) }} par {{ s.created_by }}</div>
           </q-item-label>
       </q-list>
       <q-separator />
