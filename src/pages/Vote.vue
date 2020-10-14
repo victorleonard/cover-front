@@ -1,5 +1,5 @@
 <template>
-  <q-page v-if="currentGroup && currentGroup.songs.length" padding>
+  <q-page class="bg-grey-3" v-if="currentGroup && currentGroup.songs.length" padding>
     <q-pull-to-refresh :handler="refresh">
       <q-dialog class="modal" minimized v-model="opened">
       <q-card>
@@ -334,16 +334,24 @@ export default {
       }
     },
     vote () {
+      this.$store.dispatch('main/changeLoadingState', true)
       this.$store.dispatch('main/vote', {
         value: this.ratingModel,
         songId: this.trackSelected.id
       })
         .then((r) => {
-          console.log('r', r)
           this.$store.dispatch('main/getCurrentGroup', {
             groupId: this.$route.params.groupId
           })
-            .then(() => { this.opened = false })
+            .then(() => {
+              this.$store.dispatch('main/changeLoadingState', false)
+              this.opened = false
+              this.$q.notify({
+                type: 'positive',
+                message: 'Le vote a bien été pris en compte',
+                position: 'top'
+              })
+            })
         })
       /* const userId = localStorage.getItem('userId')
       if (userId) {
