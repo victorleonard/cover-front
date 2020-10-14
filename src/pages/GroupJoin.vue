@@ -1,5 +1,33 @@
 <template>
 <q-page padding>
+  <q-dialog v-model="askInvitationDialog">
+      <q-card v-if="groupSelected" class="my-card" style="width: 70vw">
+        <!-- <q-img :src="songSelected.album.images[0].url" /> -->
+
+        <q-card-section>
+          <div class="row no-wrap items-center">
+            <div class="text-h6">
+              Rejoindre le groupe <em>{{ groupSelected.name }}</em>
+            </div>
+          </div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <p>Votre message :</p>
+          <q-input
+            v-model="message"
+            filled
+            type="textarea"
+          />
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-actions align="right">
+          <q-btn flat color="primary" label="Envoyer ma demande" @click="askInvitation" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   <div class="row">
     <div class="col">
     <h4 class="q-mt-md q-mb-md">Liste des groupes</h4>
@@ -19,9 +47,9 @@
           {{ user.username }}
         </q-chip>
       </q-card-section>
-      <q-card-actions>
-        <q-btn v-if="!alreadyAsk(group.id)"  @click="askInvitation(group)">Rejoindre</q-btn>
-        <div v-else>En Attente...</div>
+      <q-card-actions align="right">
+        <q-btn v-if="!alreadyAsk(group.id)" @click="askInvitationDialog = true, groupSelected = group" round color="primary" icon="east" />
+        <div v-else>Demande en Attente...</div>
       </q-card-actions>
     </q-card>
     </div>
@@ -35,7 +63,10 @@ import { mapState } from 'vuex'
 export default {
   name: 'group-join',
   data: () => ({
-    pseudo: ''
+    pseudo: '',
+    askInvitationDialog: false,
+    groupSelected: undefined,
+    message: ''
   }),
   computed: {
     ...mapState('main', ['groups', 'user', 'myAskingInvitations'])
@@ -44,15 +75,24 @@ export default {
     alreadyAsk (groupId) {
       return this.myAskingInvitations.find(a => a.group.id === groupId)
     },
-    askInvitation (group) {
+    askInvitation () {
       this.$store.dispatch('main/changeLoadingState', true)
       this.$store.dispatch('main/askInvitation', {
-        group: group.id,
-        to: group.admin.id
+        group: this.groupSelected.id,
+        to: this.groupSelected.admin.id,
+        message: this.message
       })
         .then(() => {
+          this.$q.notify({
+            type: 'positive',
+            message: 'Votre demande a été envoyé',
+            position: 'top'
+          })
           this.$store.dispatch('main/getMyAskingInvitation')
-          this.$store.dispatch('main/changeLoadingState', false)
+            .then(() => {
+              this.askInvitationDialog = false
+              this.$store.dispatch('main/changeLoadingState', false)
+            })
         })
     }
   },
