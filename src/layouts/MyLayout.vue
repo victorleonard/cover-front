@@ -12,7 +12,7 @@
           aria-label="Menu"
           @click="leftDrawerOpen = !leftDrawerOpen"
         />
-        <q-toolbar-title>
+        <q-toolbar-title v-if="currentGroup">
           {{ currentGroup.name }}
         </q-toolbar-title>
       </q-toolbar>
