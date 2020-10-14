@@ -6,7 +6,7 @@ export default {
   myCreatorGroups: undefined,
   currentGroup: undefined,
   currentGroupVotes: undefined,
-  myGroups: [],
+  myGroups: undefined,
   groups: undefined,
   token: undefined,
   myAskingInvitations: undefined,

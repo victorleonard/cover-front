@@ -33,7 +33,7 @@
               <q-item-section>
                 <q-item-label>{{ demand.from.username }}</q-item-label>
                 <q-item-label caption lines="1">Guitariste</q-item-label>
-                <q-item-label caption>Lorem ipsum dolor sit amet consectetur adipisicing elit. Maiores fugit inventore delectus impedit dignissimos dolor quisquam esse facere suscipit in error, harum culpa sed quo cumque numquam aspernatur quos vitae.</q-item-label>
+                <q-item-label caption>{{ demand.message }}</q-item-label>
               </q-item-section>
 
               <q-item-section top side>
@@ -101,13 +101,13 @@ export default {
         })
     }
   },
-  mounted () {
-    if (!this.myGroups.length) {
-      this.$router.push({ name: 'create-or-join' })
-    }
-  },
   beforeCreate () {
     this.$store.dispatch('main/getMyGroups')
+      .then(r => {
+        if (!r.data.length) {
+          this.$router.push({ name: 'create-or-join' })
+        }
+      })
     this.$store.dispatch('main/getMyDemandInvitation')
   }
 }

@@ -26,9 +26,12 @@ export default {
     return Api().get('/groups?filter{"where":{"creatorId":' + creatorId + '}}')
   },
   getMyGroups (userId) {
+    return Api().get('/groups?users.id=' + userId)
+  },
+  /* getMyGroups (userId) {
     return Api().get('/groups?filter{"where":{"member":[' + userId + ']}}')
     // {"where": { "member": ["5c2a3585e6618deca5f37c39"]}}
-  },
+  }, */
   deleteMyGroup (groupId) {
     return Api().delete('/groups/' + groupId)
   },

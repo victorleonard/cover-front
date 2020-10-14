@@ -51,6 +51,10 @@ export function ADD_GROUP (state, payload) {
   state.myGroups.push(payload)
 }
 
+export function UPDATE_MY_GROUPS (state, payload) {
+  state.myGroups = payload
+}
+
 export function UPDATE_CURRENT_GROUP (state, payload) {
   state.currentGroup = payload
 }

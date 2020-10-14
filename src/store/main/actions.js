@@ -83,13 +83,19 @@ export async function getCurrentGroup ({ commit, state }, { groupId }) {
   return r
 }
 
-export async function getMyGroups ({ commit, state }) {
+/* export async function getMyGroups ({ commit, state }) {
   commit('CLEAR_GROUPS')
   const myGroupsId = state.user.groups
   myGroupsId.forEach(async groupId => {
     const r = await GroupService.getGroup(groupId)
     commit('ADD_GROUP', r.data)
   })
+} */
+
+export async function getMyGroups ({ commit, state }) {
+  const r = await GroupService.getMyGroups(state.user.id)
+  commit('UPDATE_MY_GROUPS', r.data)
+  return r
 }
 
 export async function getGroup ({ commit, state }, { groupId }) {
@@ -97,9 +103,9 @@ export async function getGroup ({ commit, state }, { groupId }) {
   return r
 }
 
-export async function askInvitation ({ state }, { group, to }) {
+export async function askInvitation ({ state }, { group, to, message }) {
   const from = state.user.id
-  const r = await InvitationService.askInvitation(group, to, from)
+  const r = await InvitationService.askInvitation(group, to, from, message)
   return r
 }
 
