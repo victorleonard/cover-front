@@ -1,5 +1,5 @@
 <template>
-  <q-page style="bg-grey-3" padding class="search-page q-pl-md q-pr-md">
+  <q-page v-if="currentGroup" padding class="search-page q-pl-md q-pr-md">
     <!-- update vote -->
     <q-dialog class="modal" minimized v-model="updateOpened">
       <q-card>
@@ -149,7 +149,7 @@ import moment from 'moment'
 import orderBy from 'lodash/orderBy'
 
 export default {
-  name: 'playlist',
+  name: 'TrackList',
   data () {
     return {
       ratingModel: undefined,
