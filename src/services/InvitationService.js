@@ -1,11 +1,12 @@
 import Api from './Api.js'
 
 export default {
-  askInvitation (group, to, from) {
+  askInvitation (group, to, from, message) {
     return Api().post('/invitations', {
       group: group,
       to: to,
-      from: from
+      from: from,
+      message: message
     })
   },
   getMyAskingInvitation (from) {
