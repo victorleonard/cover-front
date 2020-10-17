@@ -110,7 +110,7 @@
     <!-- alreadyVote -->
     <!--/////////////-->
     <div v-if="alreadyVote.length">
-    <div class="q-mt-xl q-ml-sm q-mr-sm q-mb-lg">
+    <div class="q-mt-sm q-ml-sm q-mr-sm q-mb-lg">
       <div class="q-subheading text-grey-10 text-weight-regular">Tu as déjà voté pour les titres suivants :</div>
       <hr>
     </div>

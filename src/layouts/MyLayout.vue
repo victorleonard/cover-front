@@ -2,7 +2,7 @@
   <q-layout view="lHh Lpr lFf">
     <q-header reveal>
       <q-toolbar
-        color="deep-orange-5"
+        class="bg-deep-orange-5"
       >
       <q-btn
           flat
@@ -24,7 +24,7 @@
         :width="200"
         :breakpoint="500"
       >
-        <q-scroll-area class="fit">
+        <q-scroll-area class="fit" style="height: calc(100% - 150px); margin-top: 150px; border-right: 1px solid #ddd">
           <q-list padding class="menu-list">
             <q-item clickable v-ripple :to="{ name: 'home' }">
               <q-item-section avatar>
@@ -68,6 +68,15 @@
             </q-item>
           </q-list>
         </q-scroll-area>
+        <q-img class="absolute-top" src="https://cdn.quasar.dev/img/material.png" style="height: 150px">
+          <div class="absolute-bottom bg-transparent">
+            <q-avatar size="56px" class="q-mb-sm">
+              <img src="https://cdn.quasar.dev/img/boy-avatar.png">
+            </q-avatar>
+            <div class="text-weight-bold">{{ user.username }}</div>
+            <div>{{ user.email }}</div>
+          </div>
+        </q-img>
       </q-drawer>
 
     <q-page-container>
@@ -82,22 +91,10 @@
     </q-page-container>
 
     <q-footer>
-      <q-tabs inverted color="deep-orange-8" swipeable animated position="top">
-        <q-route-tab :to="{ name: 'group' }" icon="home" exact replace label="Résultat"/>
+      <q-tabs narrow-indicator dense inverted swipeable animated position="top">
+        <q-route-tab  :to="{ name: 'group' }" icon="list" exact replace label="Résultat"/>
         <q-route-tab :to="{ name: 'vote' }" icon="how_to_vote" exact replace label="Votez"/>
         <q-route-tab :to="{ name: 'search' }" icon="search" exact replace label="Proposez"/>
-        <!-- <q-route-tab slot="title" icon="how_to_vote" :to="{name:'vote'}" label="Votez">
-          <transition
-            appear
-            enter-active-class="animated fadeIn"
-            leave-active-class="animated fadeOut"
-            duration="500"
-          >
-            <q-chip v-if="awaitingVote && awaitingVote.length" square floating color="positive" style="right: 25%; top: 3px">{{ awaitingVote.length }}</q-chip>
-          </transition>
-        </q-route-tab>
-        <q-route-tab slot="title" icon="search" :to="{name:'search'}" label="Proposez"/>
-        <q-route-tab slot="title" icon="ion-md-calendar" :to="{name:'repet'}" label="Calendrier"/> -->
       </q-tabs>
     </q-footer>
   </q-layout>
@@ -117,7 +114,7 @@ export default {
   },
   computed: {
     ...mapGetters('main', ['awaitingVote']),
-    ...mapState('main', ['currentGroup'])
+    ...mapState('main', ['user', 'currentGroup'])
   },
   methods: {
     logout () {

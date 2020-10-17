@@ -46,6 +46,12 @@ export default {
 </script>
 
 <style>
+.text-brand {
+  color: #FF5722;
+}
+.bg-brand {
+  background: #FF5722;
+}
 @media only screen and (min-device-width : 375px) and (max-device-width : 812px) and (-webkit-device-pixel-ratio : 3) {
     .q-tabs-head {
       padding-bottom: 10px !important;
@@ -57,10 +63,16 @@ export default {
   .q-rating i {
     text-shadow: none;
   }
-  .q-tabs-inverted .q-tabs-head{
-    background-color: rgba(255, 255, 255, 0.95)
+  .q-layout__section--marginal {
+    background-color: rgba(255, 255, 255, 0.95);
   }
-  .q-tabs-scroller {
+  .q-tabs-row {
+    color: #444;
+  }
+  .q-tab--active {
+    color: #e64a19 !important;
+  }
+  .q-tabs {
     color: #444
   }
   hr {
