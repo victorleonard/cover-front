@@ -52,6 +52,11 @@ const routes = [
         path: '/group-edit/:groupId',
         name: 'group-edit',
         component: () => import('pages/GroupEdit.vue')
+      },
+      {
+        path: 'email-confirmation',
+        name: 'email-confirmation',
+        component: () => import('pages/EmailConfirmation.vue')
       }
     ]
   },

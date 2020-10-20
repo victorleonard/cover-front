@@ -26,7 +26,7 @@ export default function (/* { store, ssrContext } */) {
     base: process.env.VUE_ROUTER_BASE
   })
 
-  const publicRouter = ['welcome', 'connect', 'register']
+  const publicRouter = ['welcome', 'connect', 'register', 'email-confirmation']
 
   Router.afterEach((to, from) => {
     if (!publicRouter.find(el => el === to.name)) {
