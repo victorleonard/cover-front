@@ -4,21 +4,38 @@
       <q-toolbar
         class="bg-deep-orange-5"
       >
-      <q-btn
+      <!-- <q-btn
           flat
           dense
           round
           icon="menu"
           aria-label="Menu"
           @click="leftDrawerOpen = !leftDrawerOpen"
-        />
+        /> -->
         <q-toolbar-title v-if="currentGroup">
           {{ currentGroup.name }}
         </q-toolbar-title>
+        <q-btn flat round dense icon="more_vert">
+          <q-menu>
+          <q-list style="min-width: 150px">
+            <q-item clickable v-close-popup :to="{ name: 'home' }">
+              <q-item-section>Accueil</q-item-section>
+            </q-item>
+            <q-separator />
+            <q-item clickable v-close-popup :to="{ name: 'profile' }">
+              <q-item-section>Mon compte</q-item-section>
+            </q-item>
+            <q-separator />
+             <q-item @click="logout" clickable v-close-popup>
+              <q-item-section>Se déconnecter</q-item-section>
+            </q-item>
+          </q-list>
+        </q-menu>
+        </q-btn>
       </q-toolbar>
     </q-header>
 
-    <q-drawer
+    <!-- <q-drawer
         v-model="leftDrawerOpen"
         show-if-above
         :width="200"
@@ -77,24 +94,27 @@
             <div>{{ user.email }}</div>
           </div>
         </q-img>
-      </q-drawer>
+      </q-drawer> -->
 
     <q-page-container>
       <transition
+        mode="out-in"
         appear
         enter-active-class="animated fadeIn"
         leave-active-class="animated fadeOut"
         duration="200"
       >
+        <keep-alive>
         <router-view />
+        </keep-alive>
       </transition>
     </q-page-container>
 
-    <q-footer>
-      <q-tabs narrow-indicator dense inverted swipeable animated position="top">
-        <q-route-tab  :to="{ name: 'group' }" icon="list" exact replace label="Résultat"/>
+    <q-footer bordered>
+      <q-tabs no-caps indicator-color="transparent" dense >
+        <q-route-tab  :to="{ name: 'group' }" icon="fas fa-star-half-alt " exact replace label="Résultats"/>
         <q-route-tab :to="{ name: 'vote' }" icon="how_to_vote" exact replace label="Votez"/>
-        <q-route-tab :to="{ name: 'search' }" icon="search" exact replace label="Proposez"/>
+        <q-route-tab :to="{ name: 'search' }" icon="add" exact replace label="Proposez"/>
       </q-tabs>
     </q-footer>
   </q-layout>
@@ -134,6 +154,3 @@ export default {
   }
 }
 </script>
-
-<style>
-</style>

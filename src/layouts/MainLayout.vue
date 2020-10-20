@@ -1,8 +1,8 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
-      <q-toolbar class="bg-deep-orange-5" v-if="$route.name !== 'welcome' && $route.name !== 'connect' && $route.name !== 'register'">
-        <q-btn
+      <q-toolbar class="bg-deep-orange-5" v-if="$route.name !== 'welcome' && $route.name !== 'connect' && $route.name !== 'register' && $route.name !== 'email-confirmation'">
+        <!-- <q-btn
           v-if="user"
           flat
           dense
@@ -11,10 +11,12 @@
           aria-label="Menu"
           @click="leftDrawerOpen = !leftDrawerOpen"
         />
-
+ -->
         <q-toolbar-title>
-          Cover
+          Mes groupes
         </q-toolbar-title>
+        <q-btn @click="logout" flat round dense icon="fas fa-power-off">
+        </q-btn>
       </q-toolbar>
     </q-header>
 
@@ -69,18 +71,21 @@
       </q-drawer>
 
     <q-page-container>
-      <router-view />
+      <transition
+        mode="out-in"
+        appear
+        enter-active-class="animated fadeIn"
+        leave-active-class="animated fadeOut"
+        duration="200"
+      >
+        <router-view />
+      </transition>
     </q-page-container>
-    <q-footer bordered class="bg-white text-primary" v-if="$route.name !== 'welcome' && $route.name !== 'connect' && $route.name !== 'register'">
-        <!-- <q-tabs no-caps active-color="primary" indicator-color="transparent" class="text-grey">
-          <q-route-tab v-if="myGroups && myGroups.length" :to="{ name: 'home' }" name="images" label="Mes Groupes" />
-          <q-route-tab :to="{ name: 'create-or-join' }" name="videos" label="Nouveau groupe" />
-          <q-route-tab :to="{ name: 'profile' }" name="articles" label="Profile" />
-        </q-tabs> -->
-        <q-tabs narrow-indicator dense inverted swipeable animated position="top">
-        <q-route-tab v-if="myGroups && myGroups.length" :to="{ name: 'home' }" icon="list_alt" exact replace label="Mes Groupes"/>
-        <q-route-tab :to="{ name: 'create-or-join' }" icon="add" exact replace label="Nouveau Groupe"/>
-        <q-route-tab :to="{ name: 'profile' }" icon="account_circle" exact replace label="Profile"/>
+    <q-footer bordered class="bg-white text-primary" v-if="$route.name !== 'welcome' && $route.name !== 'connect' && $route.name !== 'register' && $route.name !== 'email-confirmation'">
+        <q-tabs indicator-color="transparent" dense>
+        <q-route-tab v-if="myGroups && myGroups.length" :to="{ name: 'home' }" no-caps icon="list_alt" exact replace label="Mes Groupes"/>
+        <q-route-tab :to="{ name: 'create-or-join' }" icon="add" exact replace no-caps label="Nouveau Groupe"/>
+        <q-route-tab :to="{ name: 'profile' }" icon="account_circle" exact replace no-caps label="Profile"/>
       </q-tabs>
       </q-footer>
   </q-layout>
