@@ -45,7 +45,24 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
+#q-app {
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #2c3e50;
+  background-color: #F5F5F5;
+}
+footer{
+    padding-bottom: constant(safe-area-inset-bottom);
+    padding-bottom: env(safe-area-inset-bottom);
+}
+/* .search-page .q-field--standout.q-field--focused .q-field__control {
+  background-color: red !important;
+} */
+.go-back {
+  top: 30px;
+}
 .text-brand {
   color: #FF5722;
 }
@@ -80,9 +97,6 @@ export default {
     padding: 0;
     background-color: #aaa;
     border: 0;
-  }
-  .search-page {
-    background-color: #F5F5F5;
   }
   .search-page .q-card {
     background-color: #fafafa;
