@@ -63,6 +63,7 @@
             </q-list>
             <q-separator class="q-mt-sm"/>
             <q-card-actions align="around" class="q-mb-none q-pb-none">
+              <q-btn @click="launchDeezer(s)" flat icon="fab fa-deezer" size="md"></q-btn>
               <q-btn @click="launchSpotify(s.track.uri)" flat icon="fab fa-spotify" size="md" color="positive"></q-btn>
               <q-btn @click="showUpdateModal(s)" flat icon="star_border" label="Voter" size="md" color="yellow-10"></q-btn>
             </q-card-actions>
@@ -133,6 +134,7 @@
             </q-list>
             <q-separator class="q-mt-sm"/>
             <q-card-actions align="around" class="q-mb-none q-pb-none">
+              <q-btn @click="launchDeezer(s)" flat icon="fab fa-deezer" size="md"></q-btn>
               <q-btn @click="launchSpotify(s.track.uri)" flat icon="fab fa-spotify" size="md" color="positive"></q-btn>
               <q-btn @click="showUpdateModal(s)" flat icon="star_border" label="Voter" size="md" color="yellow-10"></q-btn>
             </q-card-actions>
@@ -144,6 +146,7 @@
 
 <script>
 
+import axios from 'axios'
 import { mapState } from 'vuex'
 import moment from 'moment'
 import orderBy from 'lodash/orderBy'
@@ -210,6 +213,12 @@ export default {
     },
     launchSpotify (id) {
       location.href = id
+    },
+    launchDeezer (s) {
+      axios.get('https://api.deezer.com/search?q=' + s.name + ' ' + s.artist)
+        .then(r => {
+          location.href = r[0].link
+        })
     },
     showUpdateModal (track) {
       this.updateOpened = true

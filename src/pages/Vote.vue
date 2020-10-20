@@ -55,7 +55,7 @@
     <!--//////////// -->
     <div v-if="awaitingVote && awaitingVote.length">
     <div class="q-ml-sm q-mr-sm q-mb-lg">
-      <div class="q-subheading text-grey-10 text-weight-regular">Titres en attente de ton vote :</div>
+      <div class="q-subheading text-weight-bold text-grey-10 text-weight-regular" style="    text-transform: uppercase;">Votes en attente</div>
       <hr>
     </div>
     <div>
@@ -86,7 +86,21 @@
           </q-item-label>
       </q-list>
       <q-separator />
+      <q-card-section>
+        <q-icon class="text-grey-5" name="fas fa-quote-right" style="float: left; margin-right: 4px" />
+        <div v-html="s.comment" class="text-grey-8" syle="font-style: italic; word-break: break-word;"></div>
+      </q-card-section>
+      <q-separator />
       <q-card-actions align="around">
+        <q-item-section avatar style="margin-right: -8px;">
+          <q-avatar color="grey-7" text-color="white" icon="fas fa-user-astronaut">
+            <!-- <img src="https://cdn.quasar.dev/img/avatar2.jpg"> -->
+          </q-avatar>
+        </q-item-section>
+
+        <q-item-section>
+          <q-item-label>Anthony</q-item-label>
+        </q-item-section>
         <div v-if="s.spotify_preview_url">
           <audio :id="'audio-'+s._id" :src="s.spotify_preview_url"></audio>
           <q-btn class="play" :id="'play-'+s._id" @click="playMusic(s.spotify_preview_url, s._id)" flat color="primary" size="md" icon="ion-md-play" />
@@ -111,7 +125,7 @@
     <!--/////////////-->
     <div v-if="alreadyVote.length">
     <div class="q-mt-sm q-ml-sm q-mr-sm q-mb-lg">
-      <div class="q-subheading text-grey-10 text-weight-regular">Tu as déjà voté pour les titres suivants :</div>
+      <div class="q-subheading text-weight-bold text-grey-10 text-weight-regular" style="    text-transform: uppercase;">Votes effectués</div>
       <hr>
     </div>
     <q-card v-for="s in alreadyVote" :key="s._id" class="q-ml-sm q-mr-sm q-mb-lg">
@@ -134,14 +148,24 @@
                 <q-rating slot="subtitle" :value="getVote(s.votes, user.id)" readonly :max="5" />
               </div>
             </div>
-            <div class="text-grey-6 q-caption q-ml-xs q-mt-sm" v-if="s.comment">Commentaire :
-              <div v-html="s.comment" syle="word-break: break-word;"></div>
-            </div>
-            <div class="text-grey-6 q-caption q-ml-xs q-mt-md" style="font-size: 12px">Proposé le {{ formatDate(s.createdAt) }} par {{ s.created_by }}</div>
           </q-item-label>
       </q-list>
       <q-separator />
+      <q-card-section>
+        <q-icon class="text-grey-5" name="fas fa-quote-right" style="float: left; margin-right: 4px" />
+        <div v-html="s.comment" class="text-grey-8" syle="font-style: italic; word-break: break-word;"></div>
+      </q-card-section>
+      <q-separator />
       <q-card-actions align="around">
+        <q-item-section avatar style="margin-right: -8px;">
+          <q-avatar color="grey-7" text-color="white" icon="fas fa-user-astronaut">
+            <!-- <img src="https://cdn.quasar.dev/img/avatar2.jpg"> -->
+          </q-avatar>
+        </q-item-section>
+
+        <q-item-section>
+          <q-item-label>Anthony</q-item-label>
+        </q-item-section>
        <div v-if="s.spotify_preview_url">
           <audio :id="'audio-'+s._id" :src="s.spotify_preview_url"></audio>
           <q-btn class="play" :id="'play-'+s._id" @click="playMusic(s.spotify_preview_url, s._id)" flat color="primary" size="md" icon="ion-md-play" />
@@ -151,7 +175,7 @@
           <q-btn @click="launchSpotify(s.spotify_uri)" flat icon="fab fa-spotify" size="md" color="positive"></q-btn>
         </div>
         <div>
-          <q-btn  label="Votez" @click="showUpdateModal(s)" flat color="yellow-10" size="md" icon="how_to_vote" />
+          <q-btn @click="showUpdateModal(s)" flat color="yellow-10" size="md" icon="how_to_vote" />
         </div>
         <div>
           <q-btn @click="remove(s)" label="" flat color="negative" size="md" icon="ion-md-trash" />
