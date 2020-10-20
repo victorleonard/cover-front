@@ -30,7 +30,15 @@
       </q-card>
     </q-dialog>
 
-    <q-input v-model="search" :debounce="600" placeholder="Recherche par artiste, album, titre..." @input="searchSpotify" />
+    <!-- <q-input v-model="search" :debounce="600" placeholder="Recherche par artiste, album, titre..." @input="searchSpotify" /> -->
+    <q-input class="search" :debounce="600" @input="searchSpotify" v-model="search" placeholder="Recherche par artiste, album, titre...">
+        <template v-slot:prepend>
+          <q-icon name="search" />
+        </template>
+        <template v-slot:append>
+          <q-icon v-if="search.length" name="close" @click="search = ''" class="cursor-pointer" />
+        </template>
+      </q-input>
     <div class="q-mt-md">
       <q-spinner-puff class="spinner" v-if="search.length && loading" color="secondary" :size="50" />
       <q-list v-if="searchResult.length">
