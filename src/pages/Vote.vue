@@ -79,27 +79,29 @@
                 <q-rating slot="subtitle" :value="getVote(s.votes, user.id)" readonly :max="5" />
               </div>
             </div>
-            <div class="text-grey-6 q-caption q-ml-xs q-mt-sm" v-if="s.comment">Commentaire :
+            <!-- <div class="text-grey-6 q-caption q-ml-xs q-mt-sm" v-if="s.comment">Commentaire :
               <div v-html="s.comment" syle="word-break: break-word;"></div>
-            </div>
-            <div class="text-grey-6 q-caption q-ml-xs q-mt-md" style="font-size: 12px">Proposé le {{ formatDate(s.createdAt) }} par {{ s.created_by }}</div>
+            </div> -->
+            <!-- <div class="text-grey-6 q-caption q-ml-xs q-mt-md" style="font-size: 12px">Proposé le {{ formatDate(s.createdAt) }} par {{ s.created_by }}</div> -->
           </q-item-label>
       </q-list>
       <q-separator />
-      <q-card-section>
+      <q-card-section v-if="s.comment">
         <q-icon class="text-grey-5" name="fas fa-quote-right" style="float: left; margin-right: 4px" />
         <div v-html="s.comment" class="text-grey-8" syle="font-style: italic; word-break: break-word;"></div>
       </q-card-section>
       <q-separator />
       <q-card-actions align="around">
         <q-item-section avatar style="margin-right: -8px;">
-          <q-avatar color="grey-7" text-color="white" icon="fas fa-user-astronaut">
-            <!-- <img src="https://cdn.quasar.dev/img/avatar2.jpg"> -->
+          <q-avatar v-if="s.created_by_avatar" color="grey-7" text-color="white">
+            <img :src="s.created_by_avatar" alt="">
+          </q-avatar>
+          <q-avatar v-else color="grey-7" text-color="white" icon="fas fa-user-astronaut">
           </q-avatar>
         </q-item-section>
 
         <q-item-section>
-          <q-item-label>Anthony</q-item-label>
+          <q-item-label>{{ s.created_by }}</q-item-label>
         </q-item-section>
         <div v-if="s.spotify_preview_url">
           <audio :id="'audio-'+s._id" :src="s.spotify_preview_url"></audio>
@@ -151,20 +153,22 @@
           </q-item-label>
       </q-list>
       <q-separator />
-      <q-card-section>
+      <q-card-section v-if="s.comment">
         <q-icon class="text-grey-5" name="fas fa-quote-right" style="float: left; margin-right: 4px" />
         <div v-html="s.comment" class="text-grey-8" syle="font-style: italic; word-break: break-word;"></div>
       </q-card-section>
       <q-separator />
       <q-card-actions align="around">
         <q-item-section avatar style="margin-right: -8px;">
-          <q-avatar color="grey-7" text-color="white" icon="fas fa-user-astronaut">
-            <!-- <img src="https://cdn.quasar.dev/img/avatar2.jpg"> -->
+          <q-avatar v-if="s.created_by_avatar" color="grey-7" text-color="white">
+            <img :src="s.created_by_avatar" alt="">
+          </q-avatar>
+          <q-avatar v-else color="grey-7" text-color="white" icon="fas fa-user-astronaut">
           </q-avatar>
         </q-item-section>
 
         <q-item-section>
-          <q-item-label>Anthony</q-item-label>
+          <q-item-label>{{ s.created_by }}</q-item-label>
         </q-item-section>
        <div v-if="s.spotify_preview_url">
           <audio :id="'audio-'+s._id" :src="s.spotify_preview_url"></audio>
