@@ -1,18 +1,18 @@
 <template>
   <q-page padding>
     <div class="row q-pt-md q-pl-sm q-pr-sm">
-      <q-card v-for="group in myGroups" :key="group.id" class="my-card" style="width: 100%">
-        <q-img :src="group.image.url">
+      <q-card v-for="group in myGroups" :key="group.id" class="my-card q-mb-lg" style="width: 100%">
+        <q-img :src="group.image.url" :ratio="4/3" style="min-height: 240px">
           <div class="text-h6 absolute-top text-left">
             {{ group.name }}
           </div>
         </q-img>
-        <q-card-section>
-        <q-chip :icon="!user.avatar ? 'account_circle' : null" v-for="user in group.users" :key="user.id">
-          <q-avatar v-if="user.avatar">
-            <img :src="user.avatar.url" alt="avatar">
+        <q-card-section class="q-pr-lg">
+        <q-chip v-for="user in group.users" :key="user.id">
+          <q-avatar v-if="user.profile.avatar">
+            <img :src="user.profile.avatar.url" alt="avatar">
           </q-avatar>
-          {{ user.username }}
+          {{ user.profile.pseudo }}
         </q-chip>
       </q-card-section>
 
@@ -47,8 +47,8 @@
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn v-if="isAdmin(group.admin)" flat :to="{ name: 'group-edit', params: { groupId: group.id } }">Edit</q-btn>
-        <q-btn round :to="{ name: 'group', params: { groupId: group.id } }" color="primary" icon="east" />
+        <q-btn color="white" style="position: absolute; top: 12px; right: 0; border-radius: 0" v-if="isAdmin(group.admin)" no-caps icon="edit" flat :to="{ name: 'group-edit', params: { groupId: group.id } }"></q-btn>
+        <q-btn size="lg" style="position: absolute; bottom: 0; right: 0; border-radius: 0" unelevated :to="{ name: 'group', params: { groupId: group.id } }" color="brand" icon="east" />
       </q-card-actions>
     </q-card>
     </div>
@@ -57,6 +57,8 @@
 
 <script>
 import { mapState } from 'vuex'
+import { Plugins } from '@capacitor/core'
+const { PushNotifications } = Plugins
 
 export default {
   name: 'home',
@@ -67,6 +69,47 @@ export default {
     }
   },
   methods: {
+    pushRequestPermission () {
+      PushNotifications.requestPermission().then(result => {
+        if (result.granted) {
+          // Register with Apple / Google to receive push via APNS/FCM
+          PushNotifications.register()
+        } else {
+        // Show some error
+        }
+      })
+
+      // On success, we should be able to receive notifications
+      PushNotifications.addListener('registration',
+        (token) => {
+          this.$store.dispatch('main/setIosDeviceToken', {
+            token: token.value
+          })
+          // alert('Push registration success, token: ' + token.value)
+        }
+      )
+
+      // Some issue with our setup and push will not work
+      PushNotifications.addListener('registrationError',
+        (error) => {
+          alert('Error on registration: ' + JSON.stringify(error))
+        }
+      )
+
+      // Show us the notification payload if the app is open on our device
+      PushNotifications.addListener('pushNotificationReceived',
+        (notification) => {
+          // alert('Push received: ' + JSON.stringify(notification))
+        }
+      )
+
+      // Method called when tapping on a notification
+      PushNotifications.addListener('pushNotificationActionPerformed',
+        (notification) => {
+          // alert('Push action performed: ' + JSON.stringify(notification))
+        }
+      )
+    },
     isAdmin (admin) {
       return admin.id === this.user.id
     },
@@ -101,9 +144,14 @@ export default {
         })
     }
   },
+  mounted () {
+    // this.pushRequestPermission()
+  },
   beforeCreate () {
+    this.$store.dispatch('main/changeLoadingState', true)
     this.$store.dispatch('main/getMyGroups')
       .then(r => {
+        this.$store.dispatch('main/changeLoadingState', false)
         if (!r.data.length) {
           this.$router.push({ name: 'create-or-join' })
         }
