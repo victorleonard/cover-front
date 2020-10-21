@@ -94,6 +94,12 @@ export default {
               this.$store.dispatch('main/changeLoadingState', false)
             })
         })
+        .catch(error => {
+          this.$q.dialog({
+            title: 'Error',
+            message: error.response.data.data[0].messages[0].message
+          })
+        })
     }
   },
   beforeCreate () {
