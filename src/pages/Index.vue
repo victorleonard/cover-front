@@ -4,8 +4,8 @@
       <img class="logo" src="/cover.png" alt="">
     </div>
     <div class="q-mt-xl">
-      <q-btn :to="{ name: 'connect' }" unelevated color="primary" text-color="white" label="Connexion" />
-      <q-btn class="q-ml-sm" :to="{ name: 'register' }" unelevated color="white" text-color="black" label="Inscripition" />
+      <q-btn :to="{ name: 'connect' }" icon="fas fa-door-open" outline no-caps unelevated color="brand" text-color="white" label="Enter" />
+      <!-- <q-btn class="q-ml-sm" :to="{ name: 'register' }" unelevated color="white" text-color="white" flat no-caps label="Inscription" /> -->
     </div>
   </q-page>
 </template>
