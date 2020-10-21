@@ -1,13 +1,34 @@
 <template>
 <q-page class="welcome fit column wrap justify-center items-center content-center" style="background-color: #FAFAFA;">
+<q-btn v-go-back=" '/' " align="right" class="go-back absolute-top-left" icon="fas fa-chevron-left" no-caps flat label="Back" />
   <div class="row">
     <img class="logo" src="/cover.png" alt="">
   </div>
   <div class="q-gutter-md" style="width: 500px; max-width: 90vw;">
+    <form @submit.prevent="connect" class="q-pa-md">
     <q-input v-model="form.email" type="email" label="Email" />
-    <q-input v-model="form.password" type="password" label="Password" />
-    <q-btn @click="connect" label="Connect" />
-    <q-btn to="register" label="Register" flat />
+    <q-input v-model="form.password" type="password" label="Mot de passe" />
+    <div class="row justify-start" style="align-items: baseline">
+      <q-btn
+        type="submit"
+        :loading="submitting"
+        label="Connexion"
+        class="q-mt-md"
+        color="brand"
+      >
+        <template v-slot:loading>
+          <q-spinner-puff
+        />
+        </template>
+      </q-btn>
+      <q-btn to="register" no-caps label="Inscription" flat />
+    </div>
+    <div class="q-mt-xl row">
+      <router-link to="forgot-password" class="forgot-password-link">
+        Mot de passe oublié ?
+      </router-link>
+    </div>
+    </form>
   </div>
 </q-page>
 </template>
@@ -18,6 +39,7 @@ export default {
   name: 'connect',
   data () {
     return {
+      submitting: false,
       form: {
         email: 'anthony@anthony.fr',
         password: 'azerty'
@@ -31,15 +53,7 @@ export default {
   },
   methods: {
     connect () {
-      /* UserService.logIn(this.form.email, this.form.password)
-        .then(resp => {
-          console.log('resp, resp')
-        })
-        .catch(error => {
-          let er = JSON.stringify(error)
-          let er2 = JSON.parse(er)
-          console.log(error['message'], er2.response.data.error.message)
-        }) */
+      this.submitting = true
       this.$store.dispatch('main/changeLoadingState', true)
       localStorage.removeItem('token')
       this.$store
@@ -48,6 +62,7 @@ export default {
           password: this.form.password
         })
         .then(resp => {
+          this.submitting = false
           this.$store.dispatch('main/getMe')
             .then(() => {
               this.$store.dispatch('main/changeLoadingState', false)
@@ -57,6 +72,7 @@ export default {
             })
         })
         .catch(error => {
+          this.submitting = false
           console.log(error.response)
           this.$store.dispatch('main/changeLoadingState', false)
           this.$q.dialog({
@@ -98,3 +114,11 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+  .forgot-password-link {
+    color: rgb(44, 62, 80);
+    text-decoration: none;
+    font-weight: 500;
+  }
+</style>
