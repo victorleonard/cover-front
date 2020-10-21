@@ -1,6 +1,6 @@
 <template>
   <q-page class="welcome fit column wrap justify-center items-center content-center" style="background-color: #FAFAFA;">
-    <q-btn v-go-back=" '/' " align="right" class="go-back absolute-top-left" icon="fas fa-chevron-left" no-caps flat label="Back" />
+    <q-btn v-go-back=" '/connect' " align="right" class="go-back absolute-top-left" icon="fas fa-chevron-left" no-caps flat label="Back" />
     <q-btn @click="sendEmailConfirmation" color="brand" no-caps unelevated label="Valider" />
       <q-form
       @submit="register"
