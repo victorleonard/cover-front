@@ -172,24 +172,25 @@ export default {
     allVoteOk () {
       const result = []
       this.currentGroup.songs.forEach(el => {
-        const total = el.votes.reduce((tot, num) => {
-          return (tot.vote || tot) + num.vote
-        })
-        if (total > this.average) {
-          el.total = total
-          result.push(el)
-        }
+        if (el.votes.length && el.votes.length === this.currentGroup.users.length) {
+          let total = 0
+          el.votes.forEach(vote => {
+            total += vote.vote
+          })
+          if (total > this.average) {
+            el.total = total
+            result.push(el)
+          }
       })
       return orderBy(result, ['total'], ['desc'])
     },
     allVoteKo () {
       const result = []
       this.currentGroup.songs.forEach(el => {
-        console.log(el.votes.length, this.currentGroup.users.length)
-        if (el.votes.length === this.currentGroup.users.length) {
-          const total = el.votes.reduce((tot, num) => {
-            console.log(tot, num)
-            return (tot.vote || tot) + num.vote
+        if (el.votes.length && el.votes.length === this.currentGroup.users.length) {
+          let total = 0
+          el.votes.forEach(vote => {
+            total += vote.vote
           })
           console.log('total =>', total)
           if (total <= this.average) {
