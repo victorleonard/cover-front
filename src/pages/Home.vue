@@ -2,7 +2,7 @@
   <q-page padding>
     <div class="row q-pt-md q-pl-sm q-pr-sm">
       <q-card v-for="group in myGroups" :key="group.id" class="my-card q-mb-lg" style="width: 100%">
-        <q-img :src="group.image.url" :ratio="4/3" style="min-height: 240px">
+        <q-img :src="getBestFormatImage(group.image.formats)" :ratio="4/3" style="min-height: 240px">
           <div class="text-h6 absolute-top text-left">
             {{ group.name }}
           </div>
@@ -16,11 +16,11 @@
         </q-chip>
       </q-card-section>
 
-      <q-separator inset v-if="myPendingDemandInvitations && myPendingDemandInvitations.length" />
+      <q-separator inset v-if="hasInvitation(group.id)"/>
 
-        <q-card-section v-if="myPendingDemandInvitations && myPendingDemandInvitations.length">
+        <q-card-section v-if="hasInvitation(group.id)">
           <q-item>
-            <q-item-section>Ces personnes souhaitent rejoindre ce groupe</q-item-section>
+            <q-item-section>Des musiciens souhaitent rejoindre ton groupe 😃</q-item-section>
           </q-item>
           <q-list bordered separator v-for="demand in myPendingDemandInvitations" :key="demand.id">
             <q-item>
@@ -69,6 +69,18 @@ export default {
     }
   },
   methods: {
+    getBestFormatImage (formats) {
+      if (formats.medium) {
+        return formats.medium.url
+      } else if (formats.small) {
+        return formats.small.url
+      } else {
+        return formats.thumbnail.url
+      }
+    },
+    hasInvitation (groupId) {
+      return this.myPendingDemandInvitations.find(el => el.group.id === groupId)
+    },
     pushRequestPermission () {
       PushNotifications.requestPermission().then(result => {
         if (result.granted) {
@@ -140,6 +152,10 @@ export default {
                     position: 'top'
                   })
                 })
+                .catch(error => {
+                  console.log('getMyGroups error', error)
+                  this.$store.dispatch('main/changeLoadingState', false)
+                })
             })
         })
     }
@@ -155,6 +171,10 @@ export default {
         if (!r.data.length) {
           this.$router.push({ name: 'create-or-join' })
         }
+      })
+      .catch(error => {
+        console.error('error', error)
+        this.$store.dispatch('main/changeLoadingState', false)
       })
     this.$store.dispatch('main/getMyDemandInvitation')
   }
