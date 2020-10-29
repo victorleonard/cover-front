@@ -74,6 +74,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 
 export default {
   name: 'search',
@@ -88,6 +89,9 @@ export default {
       token: '',
       loading: false
     }
+  },
+  computed: {
+    ...mapState('main', ['currentGroupSongs'])
   },
   methods: {
     launchSpotify (id) {
@@ -129,34 +133,62 @@ export default {
       audioToPlay.pause()
     },
     displaySelectDialog (t) {
-      this.songSelected = t
-      this.songSelectDialog = true
+      if (this.currentGroupSongs.find(s => s.spotify_id === t.id)) {
+        this.$q.notify({
+          type: 'negative',
+          message: 'Ce titre a déjà été séléctioné',
+          position: 'top'
+        })
+      } else {
+        this.songSelected = t
+        this.songSelectDialog = true
+      }
     },
     select () {
       this.$store.dispatch('main/changeLoadingState', true)
       this.$store.dispatch('main/selectSong', {
         song: this.songSelected,
         comment: this.comment
-      }).then(song => {
-        this.$store.dispatch('main/vote', {
-          value: this.ratingModel,
-          songId: song.data.id
-        })
-          .then(() => {
-            this.$store.dispatch('main/changeLoadingState', false)
-            this.$store.dispatch('main/getCurrentGroup', {
-              groupId: this.$route.params.groupId
-            })
-            this.songSelectDialog = false
-            this.comment = ''
-            this.ratingModel = 1
-            this.$q.notify({
-              type: 'positive',
-              message: 'Morceau séléctioné !',
-              position: 'top'
-            })
-          })
       })
+        .then(song => {
+          console.log('song', song)
+          this.$store.dispatch('main/vote', {
+            value: this.ratingModel,
+            songId: song.data.id
+          })
+            .then(() => {
+              this.$store.dispatch('main/changeLoadingState', false)
+              this.$store.dispatch('main/getCurrentGroupSongs', {
+                groupId: this.$route.params.groupId
+              })
+              this.songSelectDialog = false
+              this.comment = ''
+              this.ratingModel = 1
+              this.$q.notify({
+                type: 'positive',
+                message: 'Titre séléctioné !',
+                position: 'top'
+              })
+            })
+            .catch(error => {
+              console.error('error =>', error)
+              this.$store.dispatch('main/changeLoadingState', false)
+              this.$q.notify({
+                type: 'negative',
+                message: 'Titre selectionné mais vote non pris en compte.',
+                position: 'top'
+              })
+            })
+        })
+        .catch(error => {
+          console.error('error =>', error)
+          this.$store.dispatch('main/changeLoadingState', false)
+          this.$q.notify({
+            type: 'negative',
+            message: 'Une erreur est survenue. Veuillez ressayer plus tard',
+            position: 'top'
+          })
+        })
       /* const userId = localStorage.getItem('userId')
       Api().post('/add_track', {
         track: t,
@@ -176,7 +208,8 @@ export default {
       this.loading = true
       if (this.search.length) {
         this.$store.dispatch('main/searchOnSpotify', {
-          song: this.search
+          song: this.search,
+          plateform: 'spotify'
         })
           .then(r => {
             this.loading = false
