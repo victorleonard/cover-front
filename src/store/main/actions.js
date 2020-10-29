@@ -5,6 +5,15 @@ import FileService from './../../services/FileService'
 import InstrumentService from './../../services/InstrumentService'
 import InvitationService from './../../services/InvitationService'
 
+export async function getVersion () {
+  const r = await UserService.getVersion()
+  return r
+}
+
+export function setLocalVersion ({ commit }, { version }) {
+  commit('CHANGE_VERSION', version)
+}
+
 export function changeLoadingState ({ commit }, state) {
   commit('CHANGE_LOADING_STATE', state)
 }
@@ -41,7 +50,6 @@ export async function loadUsers ({ commit }) {
 export async function addMember ({ commit, state }, { groupId, userId, role, username }) {
   GroupService.addMember(groupId, userId, role, username)
     .then(resp => {
-      console.log('addmember', resp)
       // commit('UPDATE_MY_GROUPS', resp.data)
     })
     .catch(error => {
@@ -56,33 +64,56 @@ export async function getUserNameFromProfile ({ commit, state }, { userId }) {
   }
 }
 
-export async function searchOnSpotify ({ commit, state }, { song }) {
-  const r = await SongService.searchOnSpotify(song)
+export async function setIosDeviceToken ({ commit, state }, { token }) {
+  const userId = state.user.id
+  const r = await UserService.setIosDeviceToken(userId, token)
+  return r
+}
+
+export async function searchOnSpotify ({ commit, state }, { song, plateform }) {
+  const r = await SongService.searchOnSpotify(song, plateform)
   return r
 }
 
 export async function selectSong ({ commit, state }, { song, comment }) {
-  console.log('select song store', song)
   const r = await SongService.selectSong(song, comment, state.currentGroup.id, state.user.id)
   return r
 }
 
-export async function vote ({ commit, state }, { value, songId }) {
-  const r = await SongService.vote(value, songId, state.currentGroup.id, state.user.id)
+export async function vote ({ commit, state }, { value, songId, comment }) {
+  const r = await SongService.vote(value, songId, state.currentGroup.id, state.user.id, comment)
   return r
 }
 
-export async function updateVote ({ commit, state }, { voteId, value }) {
-  const r = await SongService.updateVote(voteId, value)
+export async function updateVote ({ commit, state }, { voteId, value, comment }) {
+  const r = await SongService.updateVote(voteId, value, comment)
   return r
 }
 
-export async function getCurrentGroup ({ commit, state }, { groupId }) {
+export async function getCurrentGroup ({ commit, dispatch }, { groupId }) {
   const r = await GroupService.getGroup(groupId)
+  const groupProfilesTemp = []
+  const res = r.data.users.map(async (u) => {
+    const p = await dispatch('getProfile', {
+      profileId: u.profile
+    })
+    groupProfilesTemp.push(p.data)
+  })
+  await Promise.all(res)
+  r.data.profiles = groupProfilesTemp
   commit('UPDATE_CURRENT_GROUP', r.data)
   return r
 }
 
+export async function getCurrentGroupSongs ({ commit, state }, { groupId }) {
+  const r = await SongService.getGroupSongs(groupId)
+  commit('UPDATE_CURRENT_GROUP_SONGS', r.data)
+  return r
+}
+
+export async function resetCurrentGroup ({ commit }) {
+  commit('RESET_CURRENT_GROUP')
+}
 /* export async function getMyGroups ({ commit, state }) {
   commit('CLEAR_GROUPS')
   const myGroupsId = state.user.groups
@@ -92,9 +123,45 @@ export async function getCurrentGroup ({ commit, state }, { groupId }) {
   })
 } */
 
-export async function getMyGroups ({ commit, state }) {
+export async function getMyGroups ({ commit, state, dispatch }) {
   const r = await GroupService.getMyGroups(state.user.id)
-  commit('UPDATE_MY_GROUPS', r.data)
+  const groups = [...r.data]
+  commit('UPDATE_MY_GROUPS', groups)
+  groups.forEach(group => {
+    group.users.map(user => {
+      dispatch('getProfile', {
+        profileId: user.profile
+      })
+        .then(p => {
+          commit('UPDATE_MY_GROUPS_USER', {
+            groupId: group.id,
+            userId: user.id,
+            profile: p.data
+          })
+        })
+    })
+  })
+  return r
+}
+
+export async function getGroups ({ dispatch, commit }) {
+  const r = await GroupService.getGroups()
+  const groups = [...r.data]
+  commit('UPDATE_GROUPS', r.data)
+  groups.forEach(group => {
+    group.users.map(user => {
+      dispatch('getProfile', {
+        profileId: user.profile
+      })
+        .then(p => {
+          commit('UPDATE_GROUPS_USER', {
+            groupId: group.id,
+            userId: user.id,
+            profile: p.data
+          })
+        })
+    })
+  })
   return r
 }
 
@@ -133,51 +200,6 @@ export async function getInstruments ({ commit, state }) {
   return r
 }
 
-export async function getGroups ({ commit }) {
-  const r = await GroupService.getGroups()
-  commit('UPDATE_GROUPS', r.data)
-}
-
-export async function loadMyGroups ({ commit, state, dispatch }) {
-  console.log('LOAD MY GROUPS')
-  commit('CLEAR_MY_GROUP')
-  GroupService.getMyGroups(state.user.id)
-    .then(el => {
-      // let groups = [...new Set(el.data)]
-      const groups = el.data
-      console.log('GOUPS', groups)
-      groups.forEach(el => {
-        const group = el
-        GroupService.getMembers(el.id)
-          .then(resp => {
-            console.log('GET MEMBERS', resp)
-            const members = []
-            resp.data.forEach(el => {
-              const member = el
-              dispatch('getUserNameFromProfile', {
-                userId: el.userId
-              })
-                .then(resp => {
-                  member.profile = resp[0]
-                })
-              /* UserService.getProfile(el.userId)
-                .then(resp => {
-                  console.log('get progile resp', resp)
-                  member.profile = resp.data[0]
-                }) */
-              members.push(member)
-            })
-            group.members = members
-            console.log('sdfojsdlfkjslk', group)
-            commit('UPDATE_MY_GROUP', group)
-          })
-      })
-    })
-    .catch(error => {
-      console.error('error', error)
-    })
-}
-
 export async function addGroupMember ({ commit, state }, { groupId, userId }) {
   const r = await GroupService.addGroupMember(groupId, userId)
   return r
@@ -197,7 +219,6 @@ export async function addGroupMember ({ commit, state }, { groupId, userId }) {
 } */
 
 export async function loadMyCreatorGroups ({ commit, state }) {
-  console.log('state.user.id', state.user.id)
   GroupService.getMyCreatorGroups(state.user.id)
     .then(resp => {
       commit('UPDATE_MY_CREATOR_GROUPS', resp.data)
@@ -208,10 +229,8 @@ export async function loadMyCreatorGroups ({ commit, state }) {
 }
 
 export async function register ({ commit, dispatch }, { username, email, password }) {
-  commit('CHANGE_LOADING_STATE', true)
   const response = await UserService.register(username, email, password)
   if (response) {
-    commit('CHANGE_LOADING_STATE', false)
     return response.data
   } else {
     console.error('error')
@@ -220,6 +239,16 @@ export async function register ({ commit, dispatch }, { username, email, passwor
 
 export async function sendEmailConfirmation ({ commit }, { email }) {
   const r = await UserService.sendEmailConfirmation(email)
+  return r
+}
+
+export async function forgotPassword ({ commit }, { email }) {
+  const r = await UserService.forgotPassword(email)
+  return r
+}
+
+export async function resetPassword ({ commit }, { code, password, passwordConfirmation }) {
+  const r = await UserService.resetPassword(code, password, passwordConfirmation)
   return r
 }
 
@@ -236,21 +265,23 @@ export async function connectUser ({ commit, dispatch }, { email, password }) {
         pseudo: response.data.user.username
       })
     } else {
-      dispatch('getProfile')
+      dispatch('getProfile', {
+        profileId: response.data.user.profile.id
+      })
     }
     return response
   } else {
+    alert('error')
     console.error('error')
   }
 }
 
 export async function getMe ({ commit }) {
   const r = await UserService.getMe()
-  console.log('getMe ====>', r.data)
   commit('UPDATE_USER', r.data)
 }
 
-export async function getUser ({ commit, dispatch }, { userId }) {
+/* export async function getUser ({ commit, dispatch }, { userId }) {
   UserService.getUser(userId)
     .then(resp => {
       console.log('GET USER', resp)
@@ -267,12 +298,11 @@ export async function getUser ({ commit, dispatch }, { userId }) {
     .catch(error => {
       console.error('error', error)
     })
-}
+} */
 
-export async function getProfile ({ commit, state }) {
-  const userId = state.user.id
-  const r = await UserService.getProfile(userId)
-  commit('UPDATE_PROFILE', r.data[0])
+export async function getProfile ({ commit, state }, { profileId }) {
+  const r = await UserService.getProfile(profileId)
+  // commit('UPDATE_PROFILE', r.data[0])
   return r
 }
 
@@ -282,7 +312,7 @@ export async function getProfiles ({ commit, state }) {
 }
 
 export async function getMyProfile ({ state, commit }) {
-  const userId = state.user.id
+  const userId = state.user.profile
   const r = await UserService.getProfile(userId)
   commit('UPDATE_PROFILE', r.data[0])
   return r
@@ -295,17 +325,17 @@ export async function createProfile ({ state, commit }, { pseudo }) {
   return r
 }
 
-export async function updateProfile ({ state, commit }, { pseudo }) {
-  const id = state.profile.id
-  const r = await UserService.updateProfile(id, pseudo)
+export async function updateProfile ({ state, commit }, { pseudo, instruments, avatar, commune, codeDepartement, codeRegion }) {
+  const id = state.user.profile
+  const r = await UserService.updateProfile(id, pseudo, instruments, avatar, commune, codeDepartement, codeRegion)
   commit('UPDATE_PROFILE', r.data)
   return r
 }
 
-export async function createGroup ({ state, commit }, { name }) {
+export async function createGroup ({ state, commit }, { name, commune, codeDepartement, codeRegion, image, country }) {
   commit('CHANGE_LOADING_STATE', true)
   const userId = state.user.id
-  const r = await GroupService.createGroup(userId, name)
+  const r = await GroupService.createGroup(userId, name, commune, codeDepartement, codeRegion, image, country)
   commit('CHANGE_LOADING_STATE', false)
   return r.data
 }

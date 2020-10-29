@@ -1,3 +1,8 @@
+export function CHANGE_VERSION (state, payload) {
+  console.log(payload)
+  state.version = payload
+}
+
 export function CHANGE_LOADING_STATE (state, payload) {
   state.loading = payload
 }
@@ -55,8 +60,32 @@ export function UPDATE_MY_GROUPS (state, payload) {
   state.myGroups = payload
 }
 
+export function UPDATE_MY_GROUPS_USER (state, { groupId, userId, profile }) {
+  const group = state.myGroups.find(g => g.id === groupId)
+  const user = group.users.find(u => u.id === userId)
+  user.profile = profile
+}
+
+export function UPDATE_GROUPS_USER (state, { groupId, userId, profile }) {
+  const group = state.groups.find(g => g.id === groupId)
+  const user = group.users.find(u => u.id === userId)
+  user.profile = profile
+}
+
 export function UPDATE_CURRENT_GROUP (state, payload) {
   state.currentGroup = payload
+}
+
+export function RESET_CURRENT_GROUP (state, payload) {
+  state.currentGroup = undefined
+}
+
+export function UPDATE_CURRENT_GROUP_PROFILE (state, payload) {
+  state.currentGroupProfile = payload
+}
+
+export function UPDATE_CURRENT_GROUP_SONGS (state, payload) {
+  state.currentGroupSongs = payload
 }
 
 export function UPDATE_GROUPS (state, payload) {
