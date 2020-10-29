@@ -26,7 +26,7 @@ export default {
   data: () => ({
     dialog: true
   }),
-  computed: mapState('main', ['loading', 'user', 'error']),
+  computed: mapState('main', ['version', 'loading', 'user', 'error']),
   watch: {
     error: (val) => {
       if (val.type === true) {
@@ -34,13 +34,26 @@ export default {
       }
     },
     loading: function (val) {
-      console.log('loading', val)
       if (val) {
         Loading.show()
       } else {
         Loading.hide()
       }
     }
+  },
+  mounted () {
+    this.$store.dispatch('main/getVersion')
+      .then(r => {
+        const serverVersion = r.data.num_version
+        if (!this.version || (this.version !== serverVersion)) {
+          this.$store.dispatch('main/setLocalVersion', {
+            version: serverVersion
+          })
+            .then(() => {
+              location.reload()
+            })
+        }
+      })
   }
 }
 </script>
@@ -64,10 +77,10 @@ footer{
   top: 30px;
 }
 .text-brand {
-  color: #FF5722;
+  color:rgb(255, 112, 67);
 }
 .bg-brand {
-  background: #FF5722;
+  background: rgb(255, 112, 67);
 }
 @media only screen and (min-device-width : 375px) and (max-device-width : 812px) and (-webkit-device-pixel-ratio : 3) {
     .q-tabs-head {
