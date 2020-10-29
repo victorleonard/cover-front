@@ -1,7 +1,7 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
-      <q-toolbar class="bg-deep-orange-5" v-if="$route.name !== 'welcome' && $route.name !== 'connect' && $route.name !== 'register' && $route.name !== 'email-confirmation' && $route.name !== 'reset-password' && $route.name !== 'forgot-password'">
+      <q-toolbar class="bg-brand" v-if="$route.name !== 'welcome' && $route.name !== 'connect' && $route.name !== 'register' && $route.name !== 'email-confirmation' && $route.name !== 'reset-password' && $route.name !== 'forgot-password'">
         <!-- <q-btn
           v-if="user"
           flat
@@ -15,12 +15,27 @@
         <q-toolbar-title>
           Mes groupes
         </q-toolbar-title>
-        <q-btn @click="logout" flat round dense icon="fas fa-power-off">
+        <q-btn flat round dense icon="account_circle">
+          <q-menu>
+          <q-list style="min-width: 150px">
+            <q-item clickable v-close-popup :to="{ name: 'profile' }">
+              <q-item-section>Mon compte</q-item-section>
+            </q-item>
+            <q-separator />
+            <q-item @click="refresh" clickable v-close-popup>
+              <q-item-section>Actualiser</q-item-section>
+            </q-item>
+            <q-separator />
+             <q-item @click="logout" clickable v-close-popup>
+              <q-item-section>Se déconnecter</q-item-section>
+            </q-item>
+          </q-list>
+        </q-menu>
         </q-btn>
       </q-toolbar>
     </q-header>
 
-    <q-drawer
+    <!-- <q-drawer
         v-if="user"
         v-model="leftDrawerOpen"
         show-if-above
@@ -68,7 +83,7 @@
             <div>{{ user.email }}</div>
           </div>
         </q-img>
-      </q-drawer>
+      </q-drawer> -->
 
     <q-page-container>
       <transition
@@ -85,7 +100,6 @@
         <q-tabs indicator-color="transparent" dense>
         <q-route-tab v-if="myGroups && myGroups.length" :to="{ name: 'home' }" no-caps icon="list_alt" exact replace label="Mes Groupes"/>
         <q-route-tab :to="{ name: 'create-or-join' }" icon="add" exact replace no-caps label="Nouveau Groupe"/>
-        <q-route-tab :to="{ name: 'profile' }" icon="account_circle" exact replace no-caps label="Profile"/>
       </q-tabs>
       </q-footer>
   </q-layout>
@@ -105,6 +119,9 @@ export default {
     ...mapState('main', ['user', 'myGroups'])
   },
   methods: {
+    refresh () {
+      location.reload()
+    },
     logout () {
       this.$store.dispatch('main/logout')
         .then(() => {

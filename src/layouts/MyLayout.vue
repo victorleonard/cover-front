@@ -2,7 +2,7 @@
   <q-layout view="lHh Lpr lFf">
     <q-header reveal>
       <q-toolbar
-        class="bg-deep-orange-5"
+        class="bg-brand"
       >
       <!-- <q-btn
           flat
@@ -13,25 +13,11 @@
           @click="leftDrawerOpen = !leftDrawerOpen"
         /> -->
         <q-toolbar-title v-if="currentGroup">
-          {{ currentGroup.name }}
+          <q-btn v-go-back=" '/home' " flat round dense>
+            <q-icon name="fas fa-caret-left" />
+          </q-btn>
+          <span> {{ currentGroup.name }}</span>
         </q-toolbar-title>
-        <q-btn flat round dense icon="more_vert">
-          <q-menu>
-          <q-list style="min-width: 150px">
-            <q-item clickable v-close-popup :to="{ name: 'home' }">
-              <q-item-section>Accueil</q-item-section>
-            </q-item>
-            <q-separator />
-            <q-item clickable v-close-popup :to="{ name: 'profile' }">
-              <q-item-section>Mon compte</q-item-section>
-            </q-item>
-            <q-separator />
-             <q-item @click="logout" clickable v-close-popup>
-              <q-item-section>Se déconnecter</q-item-section>
-            </q-item>
-          </q-list>
-        </q-menu>
-        </q-btn>
       </q-toolbar>
     </q-header>
 
@@ -112,9 +98,13 @@
 
     <q-footer bordered>
       <q-tabs no-caps indicator-color="transparent" dense >
+        <q-route-tab :to="{ name: 'search' }" icon="add" exact replace label="Proposer"/>
+        <q-route-tab :to="{ name: 'vote' }" icon="how_to_vote" exact replace label="Voter">
+          <q-badge color="red" floating transparent v-if="awaitingVote && awaitingVote.length">
+            {{ awaitingVote.length }}
+          </q-badge>
+        </q-route-tab>
         <q-route-tab  :to="{ name: 'group' }" icon="fas fa-star-half-alt " exact replace label="Résultats"/>
-        <q-route-tab :to="{ name: 'vote' }" icon="how_to_vote" exact replace label="Votez"/>
-        <q-route-tab :to="{ name: 'search' }" icon="add" exact replace label="Proposez"/>
       </q-tabs>
     </q-footer>
   </q-layout>
@@ -127,6 +117,13 @@ import { mapGetters, mapState } from 'vuex'
 export default {
   components: { QHeader, QFooter, QTabs, QRouteTab },
   name: 'MyLayout',
+  watch: {
+    '$route' (to, from) {
+      this.$store.dispatch('main/getCurrentGroupSongs', {
+        groupId: this.$route.params.groupId
+      })
+    }
+  },
   data () {
     return {
       leftDrawerOpen: false
@@ -134,9 +131,12 @@ export default {
   },
   computed: {
     ...mapGetters('main', ['awaitingVote']),
-    ...mapState('main', ['user', 'currentGroup'])
+    ...mapState('main', ['user', 'currentGroup', 'currentGroupProfile', 'version'])
   },
   methods: {
+    refresh () {
+      location.reload()
+    },
     logout () {
       this.$store.dispatch('main/logout')
         .then(() => {
@@ -145,12 +145,23 @@ export default {
     }
   },
   beforeCreate () {
-    this.$store.dispatch('main/getMe')
-    this.$store.dispatch('main/getMyProfile')
-    console.log('====>>', this.$route.params.groupId)
-    this.$store.dispatch('main/getCurrentGroup', {
-      groupId: this.$route.params.groupId
-    })
+    this.$store.dispatch('main/changeLoadingState', true)
+    this.$store.dispatch('main/resetCurrentGroup')
+      .then(() => {
+        this.$store.dispatch('main/getCurrentGroup', {
+          groupId: this.$route.params.groupId
+        })
+          .then(() => {
+            this.$store.dispatch('main/getCurrentGroupSongs', {
+              groupId: this.$route.params.groupId
+            })
+              .then(() => {
+                this.$store.dispatch('main/changeLoadingState', false)
+              })
+          })
+      })
+    // this.$store.dispatch('main/getMe')
+    // this.$store.dispatch('main/getMyProfile')
   }
 }
 </script>
