@@ -1,7 +1,7 @@
 <template>
   <q-page class="welcome fit column wrap justify-center items-center content-center">
     <div class="row">
-      <img class="logo" src="/cover.png" alt="">
+      <img class="logo" src="https://cover.s3.eu-west-3.amazonaws.com/cover_28108a73e4.png" alt="">
     </div>
     <div class="q-pa-md row items-start q-gutter-md">
       <q-card class="my-card">

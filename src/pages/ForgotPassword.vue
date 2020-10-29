@@ -2,7 +2,7 @@
 <q-page class="welcome fit column wrap justify-center items-center content-center" style="background-color: #FAFAFA;">
 <q-btn v-go-back=" '/connect' " align="right" class="go-back absolute-top-left" icon="fas fa-chevron-left" no-caps flat label="Back" />
   <div class="row">
-    <img class="logo" src="/cover.png" alt="">
+    <img class="logo" src="https://cover.s3.eu-west-3.amazonaws.com/cover_28108a73e4.png" alt="">
   </div>
   <div class="q-gutter-md" style="width: 500px; max-width: 90vw;">
     <form @submit.prevent="resetPassword" class="q-pa-md">
