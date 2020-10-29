@@ -4,20 +4,26 @@ export default {
   getSongs () {
     return Api().get('/selection')
   },
-  searchOnSpotify (song) {
-    return Api().get('/searches?song=' + song)
+  getGroupSongs (groupId) {
+    return Api().get('/songs?group=' + groupId)
   },
-  vote (value, songId, groupId, userId) {
+  searchOnSpotify (song, plateform) {
+    return Api().get('/searches?song=' + song + '&plateform=' + plateform)
+  },
+  vote (value, songId, groupId, userId, comment) {
     return Api().post('/votes', {
       vote: value,
       song: songId,
       group: groupId,
-      user: userId
+      user: userId,
+      comment: comment
     })
   },
-  updateVote (voteId, value) {
+  updateVote (voteId, value, comment) {
+    console.log('update vote !')
     return Api().put('/votes/' + voteId, {
-      vote: value
+      vote: value,
+      comment: comment
     })
   },
   selectSong (song, comment, groupId, userId) {
