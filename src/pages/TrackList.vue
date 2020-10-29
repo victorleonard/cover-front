@@ -1,5 +1,19 @@
 <template>
   <q-page v-if="currentGroup" padding class="search-page q-pl-md q-pr-md">
+    <q-dialog
+        v-model="commentDialog"
+      >
+      <q-card style="width: 60vw">
+        <q-card-section class="row items-center q-pb-none">
+          <div class="text-h6">{{ commentTempUser }}</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+
+        <q-card-section v-html="commentTemp">
+        </q-card-section>
+      </q-card>
+    </q-dialog>
     <!-- update vote -->
     <q-dialog class="modal" minimized v-model="updateOpened">
       <q-card>
@@ -26,7 +40,7 @@
 
     <!-- Morceaux selectionnés -->
     <div class="q-ml-sm q-mr-sm q-pb-md">
-      <div class="q-subheading text-weight-bold text-grey-10 text-weight-regular" style="    text-transform: uppercase;">Titres selectionnés</div>
+      <div class="q-subheading text-weight-bold text-grey-10 text-weight-regular" style="text-transform: uppercase;">Titres selectionnés</div>
       <div class="q-caption text-grey-10">( > {{ average }} points )</div>
       <hr>
     </div>
@@ -50,51 +64,48 @@
             <q-list>
                 <q-item-label v-if="s.votes.length" style="width: 100%">
                   <div class="row q-ma-xs justify-between" v-for="vote in s.votes" :key="vote._id">
-                    <div class="col text-grey-9">{{ vote.created_by }}</div>
+                    <div class="col text-grey-9">{{ getUserPseudo(vote.created_by_id) }}</div>
                     <div class="col col-auto" >
                       <q-rating slot="subtitle" :value="vote.vote" readonly :max="5" />
+                      <q-btn @click="displayComment(vote)" v-if="vote.comment" style="position: absolute; margin-top: -2.1px" size="xs" flat round color="primary" icon="fas fa-info-circle" />
                     </div>
                   </div>
-                  <div class="text-grey-6 q-caption q-ml-xs q-mt-sm" v-if="s.comment">Commentaire :
-              <div v-html="s.comment" syle="word-break: break-word;"></div>
-            </div>
-            <div class="text-grey-6 q-caption q-ml-xs q-mt-md" style="font-size: 12px">Proposé le {{ formatDate(s.createdAt) }} par {{ s.created_by }}</div>
                 </q-item-label>
             </q-list>
-            <q-separator class="q-mt-sm"/>
-            <q-card-actions align="around" class="q-mb-none q-pb-none">
-              <q-btn @click="launchDeezer(s)" flat icon="fab fa-deezer" size="md"></q-btn>
-              <q-btn @click="launchSpotify(s.track.uri)" flat icon="fab fa-spotify" size="md" color="positive"></q-btn>
-              <q-btn @click="showUpdateModal(s)" flat icon="star_border" label="Voter" size="md" color="yellow-10"></q-btn>
-            </q-card-actions>
           </q-card-section>
+          <q-separator />
+          <q-card-section v-if="s.comment">
+        <q-icon class="text-grey-5" name="fas fa-quote-right" style="float: left; margin-right: 4px" />
+        <div v-html="s.comment" class="text-grey-8" syle="font-style: italic; word-break: break-word;"></div>
+      </q-card-section>
+      <q-separator />
+          <q-card-actions align="around">
+            <q-item-section avatar style="margin-right: -8px;">
+              <q-avatar v-if="getUserAvatar(s.created_by_id)" color="grey-7" text-color="white">
+                <img :src="getUserAvatar(s.created_by_id)" alt="">
+              </q-avatar>
+              <q-avatar v-else color="grey-7" text-color="white" icon="fas fa-user-astronaut">
+              </q-avatar>
+            </q-item-section>
+
+            <q-item-section>
+              <q-item-label>{{ getUserPseudo(s.created_by_id) }}</q-item-label>
+            </q-item-section>
+            <div v-if="s.spotify_preview_url">
+              <audio :id="'audio-'+s._id" :src="s.spotify_preview_url"></audio>
+              <q-btn class="play" :id="'play-'+s._id" @click="playMusic(s.spotify_preview_url, s._id)" flat color="primary" size="md" icon="ion-md-play" />
+              <q-btn class="pause hide" :id="'pause-'+s._id" @click="pauseMusic(s.spotify_preview_url, s._id)" color="primary" flat size="md" icon="ion-md-pause" />
+            </div>
+            <div>
+              <q-btn @click="launchDeezer(s)" flat icon="fab fa-deezer" size="md"></q-btn>
+              <q-btn @click="launchSpotify(s.spotify_uri)" flat icon="fab fa-spotify" size="md" color="positive"></q-btn>
+            </div>
+            <div>
+              <q-btn @click="showUpdateModal(s)" flat color="yellow-10" size="md" icon="how_to_vote" />
+            </div>
+          </q-card-actions>
         </q-card>
       </q-expansion-item>
-    <!-- <q-list v-if="allVoteOk && allVoteOk.length">
-        <q-expansion-item class="shadow-1"
-        v-for="s in allVoteOk" :key="s._id"
-        :image="s.images[0].url"
-        :label="s.name"
-        :sublabel="s.artist"
-        :right-letter="getTotal(s.total)">
-        <q-list>
-          <q-item>
-            <q-item-label v-if="s.votes.length">
-              <div class="row row items-center q-ma-xs" v-for="user in currentGroup.users" :key="user._id">
-              <div class="col text-grey-9">{{ user.username }}</div>
-              <div class="col col-auto" style="margin: 0 auto"><q-rating slot="subtitle" :value="getVote(s)" readonly :max="5" /></div>
-            </div>
-              <div class="text-grey-6 q-caption q-ml-xs q-mt-sm">Proposé le {{ formatDate(s.createdAt) }} par {{ getUserName(s.profile) }}</div>
-            </q-item-label>
-          </q-item>
-        </q-list>
-        <q-separator />
-          <q-card-actions align="around">
-            <q-btn @click="launchSpotify(s.track.uri)" flat icon="fab fa-spotify" size="md" color="positive"></q-btn>
-            <q-btn @click="showUpdateModal(s)" flat icon="star_border" label="Voter" size="md" color="yellow-10"></q-btn>
-          </q-card-actions>
-        </q-expansion-item>
-      </q-list> -->
 
     <!-- Morceaux refusés -->
     <div class="q-mt-lg q-pb-md q-pt-lg">
@@ -108,6 +119,7 @@
             <q-avatar square size="64px">
               <img :src="s.images[0].url">
             </q-avatar>
+            <div class="absolute q-item-letter">{{getTotal(s.votes)}} pts</div>
           </q-item-section>
 
           <q-item-section>
@@ -119,26 +131,48 @@
         <q-card>
           <q-card-section>
             <q-list>
-                <q-item-label v-if="s.votes && s.votes.length" style="width: 100%">
+                <q-item-label v-if="s.votes.length" style="width: 100%">
                   <div class="row q-ma-xs justify-between" v-for="vote in s.votes" :key="vote._id">
-                    <div class="col text-grey-9">{{ vote.created_by }}</div>
+                    <div class="col text-grey-9">{{ getUserPseudo(vote.created_by_id) }}</div>
                     <div class="col col-auto" >
                       <q-rating slot="subtitle" :value="vote.vote" readonly :max="5" />
+                      <q-btn @click="displayComment(vote)" v-if="vote.comment" style="position: absolute; margin-top: -2.1px" size="xs" flat round color="primary" icon="fas fa-info-circle" />
                     </div>
                   </div>
-                  <div class="text-grey-6 q-caption q-ml-xs q-mt-sm" v-if="s.comment">Commentaire :
-              <div v-html="s.comment" syle="word-break: break-word;"></div>
-            </div>
-            <div class="text-grey-6 q-caption q-ml-xs q-mt-md" style="font-size: 12px">Proposé le {{ formatDate(s.createdAt) }} par {{ s.created_by }}</div>
                 </q-item-label>
             </q-list>
-            <q-separator class="q-mt-sm"/>
-            <q-card-actions align="around" class="q-mb-none q-pb-none">
-              <q-btn @click="launchDeezer(s)" flat icon="fab fa-deezer" size="md"></q-btn>
-              <q-btn @click="launchSpotify(s.track.uri)" flat icon="fab fa-spotify" size="md" color="positive"></q-btn>
-              <q-btn @click="showUpdateModal(s)" flat icon="star_border" label="Voter" size="md" color="yellow-10"></q-btn>
-            </q-card-actions>
           </q-card-section>
+          <q-separator />
+          <q-card-section v-if="s.comment">
+        <q-icon class="text-grey-5" name="fas fa-quote-right" style="float: left; margin-right: 4px" />
+        <div v-html="s.comment" class="text-grey-8" syle="font-style: italic; word-break: break-word;"></div>
+      </q-card-section>
+      <q-separator />
+          <q-card-actions align="around">
+            <q-item-section avatar style="margin-right: -8px;">
+              <q-avatar v-if="getUserAvatar(s.created_by_id)" color="grey-7" text-color="white">
+                <img :src="getUserAvatar(s.created_by_id)" alt="">
+              </q-avatar>
+              <q-avatar v-else color="grey-7" text-color="white" icon="fas fa-user-astronaut">
+              </q-avatar>
+            </q-item-section>
+
+            <q-item-section>
+              <q-item-label>{{ getUserPseudo(s.created_by_id) }}</q-item-label>
+            </q-item-section>
+            <div v-if="s.spotify_preview_url">
+              <audio :id="'audio-'+s._id" :src="s.spotify_preview_url"></audio>
+              <q-btn class="play" :id="'play-'+s._id" @click="playMusic(s.spotify_preview_url, s._id)" flat color="primary" size="md" icon="ion-md-play" />
+              <q-btn class="pause hide" :id="'pause-'+s._id" @click="pauseMusic(s.spotify_preview_url, s._id)" color="primary" flat size="md" icon="ion-md-pause" />
+            </div>
+            <div>
+              <q-btn @click="launchDeezer(s)" flat icon="fab fa-deezer" size="md"></q-btn>
+              <q-btn @click="launchSpotify(s.spotify_uri)" flat icon="fab fa-spotify" size="md" color="positive"></q-btn>
+            </div>
+            <div>
+              <q-btn @click="showUpdateModal(s)" flat color="yellow-10" size="md" icon="how_to_vote" />
+            </div>
+          </q-card-actions>
         </q-card>
       </q-expansion-item>
   </q-page>
@@ -146,7 +180,6 @@
 
 <script>
 
-import axios from 'axios'
 import { mapState } from 'vuex'
 import moment from 'moment'
 import orderBy from 'lodash/orderBy'
@@ -161,17 +194,20 @@ export default {
       selections: [],
       rating: {
         muse: 1
-      }
+      },
+      commentTempUser: '',
+      commentTemp: '',
+      commentDialog: false
     }
   },
   computed: {
-    ...mapState('main', ['user', 'currentGroup']),
+    ...mapState('main', ['user', 'currentGroup', 'currentGroupSongs']),
     average () {
-      return parseInt((this.currentGroup.users.length * 5) / 1.2)
+      return parseInt((this.currentGroup.users.length * 5) / 1.3)
     },
     allVoteOk () {
       const result = []
-      this.currentGroup.songs.forEach(el => {
+      this.currentGroupSongs.forEach(el => {
         if (el.votes.length && el.votes.length === this.currentGroup.users.length) {
           let total = 0
           el.votes.forEach(vote => {
@@ -181,44 +217,77 @@ export default {
             el.total = total
             result.push(el)
           }
+        }
       })
       return orderBy(result, ['total'], ['desc'])
     },
     allVoteKo () {
       const result = []
-      this.currentGroup.songs.forEach(el => {
+      this.currentGroupSongs.forEach(el => {
         if (el.votes.length && el.votes.length === this.currentGroup.users.length) {
           let total = 0
           el.votes.forEach(vote => {
             total += vote.vote
           })
-          console.log('total =>', total)
           if (total <= this.average) {
             el.total = total
             result.push(el)
           }
+          /* const total = el.votes.reduce((tot, num) => {
+            return (tot.vote || tot) + num.vote
+          }) */
         }
       })
       return orderBy(result, ['total'], ['desc'])
     }
   },
   methods: {
+    getUserPseudo (id) {
+      if (this.currentGroup.profiles.find(p => p.user_id === id)) {
+        return this.currentGroup.profiles.find(p => p.user_id === id).pseudo
+      }
+    },
+    getUserAvatar (id) {
+      const profile = this.currentGroup.profiles.find(p => p.user_id === id)
+      if (profile && profile.avatar) {
+        return profile.avatar.url
+      }
+    },
+    displayComment (vote) {
+      this.commentTempUser = vote.created_by
+      this.commentTemp = vote.comment
+      this.commentDialog = true
+    },
     getVote (song) {
       const vote = song.votes.find(v => v.profile === this.user.profile)
       return vote.vote
     },
     getTotal (votes) {
-      return votes.reduce((tot, num) => {
-        return (tot.vote || tot) + num.vote
+      let total = 0
+      votes.forEach(vote => {
+        total += vote.vote
       })
+      return total
     },
     launchSpotify (id) {
       location.href = id
     },
     launchDeezer (s) {
-      axios.get('https://api.deezer.com/search?q=' + s.name + ' ' + s.artist)
+      this.$store.dispatch('main/searchOnSpotify', {
+        song: s.name + ' ' + s.artist,
+        plateform: 'deezer'
+      })
         .then(r => {
-          location.href = r[0].link
+          if (r.data[0]) {
+            // window.open(r.data[0].link, '_blank')
+            location.href = 'deezer://www.deezer.com/track/' + r.data[0].id
+          } else {
+            this.$q.notify({
+              type: 'negative',
+              message: 'Ce titre n\'a pas été trouvé sur Deezer',
+              position: 'top'
+            })
+          }
         })
     },
     showUpdateModal (track) {
@@ -234,7 +303,7 @@ export default {
         value: this.ratingModel
       })
         .then(r => {
-          this.$store.dispatch('main/getCurrentGroup', {
+          this.$store.dispatch('main/getCurrentGroupSongs', {
             groupId: this.$route.params.groupId
           })
             .then(() => {
@@ -247,28 +316,6 @@ export default {
               })
             })
         })
-      /* const userId = localStorage.getItem('userId')
-      const selection = this.songsList.find(sel => sel._id === this.trackSelected._id)
-      const vote = selection.vote.find(v => v.userId === userId)
-      vote.value = this.ratingModel
-      if (userId) {
-        Api().put('vote/' + this.trackSelected._id + '/update', selection.vote)
-          .then(resp => {
-            this.updateOpened = false
-            this.$q.notify({
-              type: 'positive',
-              message: 'Le vote a bien été mise à jour',
-              position: 'top'
-            })
-            // this.getSelections()
-          })
-      } else {
-        this.$q.notify({
-          type: 'negative',
-          message: 'Vous n\'êtes pas connecté. Veuillez relancer l\'application',
-          position: 'top'
-        })
-      } */
     },
     checkIfUserIsLogged () {
       if (!localStorage.getItem('userId')) {
