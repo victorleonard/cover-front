@@ -1,11 +1,11 @@
 <template>
 <q-page padding>
     <div class="row">
-      <q-card class="my-card">
-      <q-card-section v-if="profile && !profile.avatar && !profile.instruments">
-        Avant de commencer, merci de compléter ton profile
-      </q-card-section>
-    </q-card>
+      <!-- <q-card class="my-card">
+        <q-card-section v-if="!avatar || !instruments">
+        Avant de commencer, merci de compléter ton profile (au moins l'avatar et l'instrument)
+        </q-card-section>
+      </q-card> -->
     </div>
     <div class="row q-mt-md q-mb-md">
       <div class="col">
@@ -14,13 +14,17 @@
           @reset="onReset"
           class="q-gutter-md"
         >
-        <q-input v-model="pseudo" label="pseudo" />
+        <q-input v-model="pseudo" square filled label="pseudo" />
+        <p>
+        Ville :
+        </p>
         <q-select
+              square filled
               v-model="cityModel"
               use-input
               hide-selected
               fill-input
-              input-debounce="600"
+              input-debounce="200"
               :options="cityOptions"
               :option-label="opt => cityOptions ? opt.nom + ' - ' + opt.codeDepartement : ' '"
               @filter="filterFn"
@@ -34,12 +38,16 @@
               </template>
             </q-select>
         <q-select
+          square filled
           v-model="instruments"
           multiple
           :options="instrumentsList"
           label="Instruments"
           style="width: 95%"
         />
+        <p>
+        Avatar :
+        </p>
         <div v-if="avatar" class="relative-position">
           <q-avatar size="100px">
             <img :src="avatar">
@@ -47,6 +55,7 @@
           </q-avatar>
           </div>
           <q-uploader v-else
+            style="width: 95%"
             hide-upload-btn
             @added="fileIsAdded"
             :multiple="false"
@@ -70,7 +79,10 @@ import axios from 'axios'
 export default {
   name: 'profile',
   data: () => ({
-    cityModel: '',
+    cityModel: {
+      nom: undefined,
+      codeDepartement: undefined
+    },
     cityOptions: undefined,
     pseudo: '',
     commune: '',
@@ -99,6 +111,7 @@ export default {
       this.$store.dispatch('main/changeLoadingState', true)
       this.$store.dispatch('main/getMyProfile')
         .then(r => {
+          console.log('rrr', r)
           this.$store.dispatch('main/changeLoadingState', false)
           const p = r.data
           this.pseudo = p.pseudo
@@ -107,6 +120,8 @@ export default {
           }
           if (p.commune) {
             this.commune = p.commune
+            this.cityModel.nom = p.commune
+            this.cityModel.codeDepartement = p.codeDepartement
           }
           p.instruments.map(el => {
             this.instruments.push(el.nom)
