@@ -32,7 +32,7 @@ export default function (/* { store, ssrContext } */) {
     if (!publicRouter.find(el => el === to.name)) {
       if (!localStorage.getItem('token')) {
         Router.push({
-          name: 'welcome'
+          name: 'connect'
         })
       }
     }
