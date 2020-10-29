@@ -41,12 +41,18 @@ export default {
       image: image
     })
   },
-  createGroup (userId, name) {
+  createGroup (userId, name, commune, codeDepartement, codeRegion, image, country) {
     return Api().post('/groups', {
       users: [
         userId
       ],
-      name: name
+      admin: userId,
+      name: name,
+      commune: commune,
+      codeDepartement: codeDepartement,
+      codeRegion: codeRegion,
+      image: image,
+      country: country
       /* genre: genre,
       country: 'fr',
       departement: departement,

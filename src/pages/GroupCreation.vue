@@ -24,7 +24,7 @@
               use-input
               hide-selected
               fill-input
-              input-debounce="600"
+              input-debounce="200"
               :options="cityOptions"
               :option-label="opt => cityOptions ? opt.nom + ' - ' + opt.codeDepartement : ' '"
               @filter="filterFn"
