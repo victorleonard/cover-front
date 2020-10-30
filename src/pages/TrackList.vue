@@ -84,11 +84,14 @@
             <q-avatar square size="80px">
               <img :src="s.images[0].url">
             </q-avatar>
-            <div class="absolute q-item-letter">{{getTotal(s.votes)}} pts</div>
+            <div class="absolute q-item-letter">
+              {{ getTotal(s.votes) }}
+              <q-icon name="star" color="grey-4" />
+            </div>
           </q-item-section>
 
           <q-item-section>
-            <q-item-label overline>{{s.name}}</q-item-label>
+            <q-item-label class="text-weight-medium text-subtitle1">{{s.name}}</q-item-label>
             <q-item-label>{{s.artist}}</q-item-label>
             <q-linear-progress class="absolute" style="bottom: 0; left:0"
             :value="getLevelAverage(s.votes)" />
@@ -139,6 +142,7 @@
               <q-btn @click="launchDeezer(s)" flat icon="fab fa-deezer" size="md"></q-btn>
               <q-btn @click="launchSpotify(s.spotify_uri)" flat icon="fab fa-spotify" size="md" color="positive"></q-btn>
             </div>
+            <q-separator vertical/>
             <div>
               <q-btn @click="showUpdateModal(s)" flat color="yellow-10" size="md" icon="how_to_vote" />
             </div>
@@ -161,7 +165,10 @@
             <q-avatar square size="64px">
               <img :src="s.images[0].url">
             </q-avatar>
-            <div class="absolute q-item-letter">{{getTotal(s.votes)}} pts</div>
+            <div class="absolute q-item-letter">
+              {{ getTotal(s.votes) }}
+              <q-icon name="star" color="grey-4" />
+            </div>
           </q-item-section>
 
           <q-item-section>
