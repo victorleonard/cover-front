@@ -4,16 +4,24 @@
     <q-dialog class="modal" minimized v-model="levelModal">
       <q-card>
         <q-card-section>
-          <p class="text-center q-mb-none">Quelle est ton niveau sur ce titre ?</p>
+          <p class="text-h6 q-mb-none">Quel est ton niveau sur ce titre ?</p>
         </q-card-section>
+        <q-separator />
         <q-card-section>
             <q-rating
               icon="fas fa-music"
               color="light-blue-8"
               v-model="levelModel"
-              size="30px"
+              size="40px"
               :max="3"
             />
+            <q-separator class="q-mt-md" />
+              <ul class="text-subtitle1 text-weight-light">
+                <li>O : pas commencé</li>
+                <li>1: je dechiffre</li>
+                <li>2: c'est bon j'ai la structure, je maitrise techniquement le morceau mais c'est pas hyper fluide</li>
+                <li>3: I am God</li>
+              </ul>
         </q-card-section>
         <q-card-actions align="right">
           <q-btn
@@ -82,6 +90,8 @@
           <q-item-section>
             <q-item-label overline>{{s.name}}</q-item-label>
             <q-item-label>{{s.artist}}</q-item-label>
+            <q-linear-progress class="absolute" style="bottom: 0; left:0"
+            :value="getLevelAverage(s.votes)" />
           </q-item-section>
         </template>
 
@@ -276,6 +286,16 @@ export default {
     }
   },
   methods: {
+    getLevelAverage (votes) {
+      const maxTotal = votes.length * 3
+      let total = 0
+      votes.forEach(v => {
+        if (v.level) {
+          total += v.level
+        }
+      })
+      return total / maxTotal
+    },
     getUserPseudo (id) {
       if (this.currentGroup.profiles.find(p => p.user_id === id)) {
         return this.currentGroup.profiles.find(p => p.user_id === id).pseudo
