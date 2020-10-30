@@ -90,6 +90,11 @@ export async function updateVote ({ commit, state }, { voteId, value, comment })
   return r
 }
 
+export async function updateLevel ({ commit, state }, { voteId, value, comment }) {
+  const r = await SongService.updateLevel(voteId, value)
+  return r
+}
+
 export async function getCurrentGroup ({ commit, dispatch }, { groupId }) {
   const r = await GroupService.getGroup(groupId)
   const groupProfilesTemp = []

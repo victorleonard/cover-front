@@ -26,6 +26,11 @@ export default {
       comment: comment
     })
   },
+  updateLevel (voteId, value) {
+    return Api().put('/votes/' + voteId, {
+      level: value
+    })
+  },
   selectSong (song, comment, groupId, userId) {
     return Api().post('/songs', {
       spotify_data: song,

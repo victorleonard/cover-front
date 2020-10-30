@@ -1,5 +1,31 @@
 <template>
   <q-page v-if="currentGroup" padding class="search-page q-pl-md q-pr-md">
+    <!-- set or update level -->
+    <q-dialog class="modal" minimized v-model="levelModal">
+      <q-card>
+        <q-card-section>
+          <p class="text-center q-mb-none">Quelle est ton niveau sur ce titre ?</p>
+        </q-card-section>
+        <q-card-section>
+            <q-rating
+              icon="fas fa-music"
+              color="light-blue-8"
+              v-model="levelModel"
+              size="30px"
+              :max="3"
+            />
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn
+          :disable='!levelModel'
+          color="primary"
+          @click="updateLevel"
+          label="Mettre à jour"
+        />
+        </q-card-actions>
+        </q-card>
+    </q-dialog>
+
     <q-dialog
         v-model="commentDialog"
       >
@@ -65,6 +91,9 @@
                 <q-item-label v-if="s.votes.length" style="width: 100%">
                   <div class="row q-ma-xs justify-between" v-for="vote in s.votes" :key="vote._id">
                     <div class="col text-grey-9">{{ getUserPseudo(vote.created_by_id) }}</div>
+                    <div class="col col-auto q-mr-xl" >
+                      <q-rating slot="subtitle" icon="fas fa-music" color="light-blue-8" :value="vote.level ? vote.level : 0" readonly :max="3" />
+                    </div>
                     <div class="col col-auto" >
                       <q-rating slot="subtitle" :value="vote.vote" readonly :max="5" />
                       <q-btn @click="displayComment(vote)" v-if="vote.comment" style="position: absolute; margin-top: -2.1px" size="xs" flat round color="primary" icon="fas fa-info-circle" />
@@ -102,6 +131,9 @@
             </div>
             <div>
               <q-btn @click="showUpdateModal(s)" flat color="yellow-10" size="md" icon="how_to_vote" />
+            </div>
+            <div>
+              <q-btn @click="showLevelModal(s)" flat color="light-blue-8" size="md" icon="fas fa-music" />
             </div>
           </q-card-actions>
         </q-card>
@@ -188,6 +220,8 @@ export default {
   name: 'TrackList',
   data () {
     return {
+      levelModal: undefined,
+      levelModel: undefined,
       ratingModel: undefined,
       updateOpened: false,
       trackSelected: undefined,
@@ -290,10 +324,37 @@ export default {
           }
         })
     },
+    showLevelModal (track) {
+      this.levelModal = true
+      this.levelModel = 1
+      this.trackSelected = track
+    },
     showUpdateModal (track) {
       this.updateOpened = true
       this.ratingModel = 1
       this.trackSelected = track
+    },
+    updateLevel () {
+      this.$store.dispatch('main/changeLoadingState', true)
+      const vote = this.trackSelected.votes.find(v => v.created_by_id === this.user.id)
+      this.$store.dispatch('main/updateLevel', {
+        voteId: vote.id,
+        value: this.levelModel
+      })
+        .then(r => {
+          this.$store.dispatch('main/getCurrentGroupSongs', {
+            groupId: this.$route.params.groupId
+          })
+            .then(() => {
+              this.$store.dispatch('main/changeLoadingState', false)
+              this.levelModal = false
+              this.$q.notify({
+                type: 'positive',
+                message: 'Le niveau a bien été mise à jour',
+                position: 'top'
+              })
+            })
+        })
     },
     updateVote () {
       this.$store.dispatch('main/changeLoadingState', true)
