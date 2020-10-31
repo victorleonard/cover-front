@@ -103,7 +103,7 @@
             <q-list>
                 <q-item-label v-if="s.votes.length" style="width: 100%">
                   <div class="row q-ma-xs justify-between" v-for="vote in s.votes" :key="vote._id">
-                    <div class="col text-grey-9">{{ getUserPseudo(vote.created_by_id) }}</div>
+                    <div class="col text-grey-9">{{ getUserPseudo(vote.profile_id) }}</div>
                     <div class="col col-auto q-mr-xl" >
                       <q-rating slot="subtitle" icon="fas fa-music" color="light-blue-8" :value="vote.level ? vote.level : 0" readonly :max="3" />
                     </div>
@@ -154,7 +154,7 @@
       </q-expansion-item>
 
     <!-- Morceaux refusés -->
-    <div class="q-mt-lg q-pb-md q-pt-lg">
+    <div class="q-mt-xl q-pb-md q-pt-lg">
       <div class="q-subheading text-weight-bold text-grey-10 text-weight-regular" style="    text-transform: uppercase;">Titres refusés</div>
       <hr>
     </div>
@@ -182,7 +182,7 @@
             <q-list>
                 <q-item-label v-if="s.votes.length" style="width: 100%">
                   <div class="row q-ma-xs justify-between" v-for="vote in s.votes" :key="vote._id">
-                    <div class="col text-grey-9">{{ getUserPseudo(vote.created_by_id) }}</div>
+                    <div class="col text-grey-9">{{ getUserPseudo(vote.profile_id) }}</div>
                     <div class="col col-auto" >
                       <q-rating slot="subtitle" :value="vote.vote" readonly :max="5" />
                       <q-btn @click="displayComment(vote)" v-if="vote.comment" style="position: absolute; margin-top: -2.1px" size="xs" flat round color="primary" icon="fas fa-info-circle" />
@@ -254,12 +254,12 @@ export default {
   computed: {
     ...mapState('main', ['user', 'currentGroup', 'currentGroupSongs']),
     average () {
-      return parseInt((this.currentGroup.users.length * 5) / 1.3)
+      return parseInt((this.currentGroup.profiles.length * 5) / 1.3)
     },
     allVoteOk () {
       const result = []
       this.currentGroupSongs.forEach(el => {
-        if (el.votes.length && el.votes.length === this.currentGroup.users.length) {
+        if (el.votes.length && el.votes.length === this.currentGroup.profiles.length) {
           let total = 0
           el.votes.forEach(vote => {
             total += vote.vote
@@ -275,7 +275,7 @@ export default {
     allVoteKo () {
       const result = []
       this.currentGroupSongs.forEach(el => {
-        if (el.votes.length && el.votes.length === this.currentGroup.users.length) {
+        if (el.votes.length && el.votes.length === this.currentGroup.profiles.length) {
           let total = 0
           el.votes.forEach(vote => {
             total += vote.vote
@@ -304,12 +304,12 @@ export default {
       return total / maxTotal
     },
     getUserPseudo (id) {
-      if (this.currentGroup.profiles.find(p => p.user_id === id)) {
-        return this.currentGroup.profiles.find(p => p.user_id === id).pseudo
+      if (this.currentGroup.profiles.find(p => p.id === id)) {
+        return this.currentGroup.profiles.find(p => p.id === id).pseudo
       }
     },
     getUserAvatar (id) {
-      const profile = this.currentGroup.profiles.find(p => p.user_id === id)
+      const profile = this.currentGroup.profiles.find(p => p.id === id)
       if (profile && profile.avatar) {
         return profile.avatar.url
       }

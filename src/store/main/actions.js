@@ -97,7 +97,7 @@ export async function updateLevel ({ commit, state }, { voteId, value, comment }
 
 export async function getCurrentGroup ({ commit, dispatch }, { groupId }) {
   const r = await GroupService.getGroup(groupId)
-  const groupProfilesTemp = []
+  /* const groupProfilesTemp = []
   const res = r.data.users.map(async (u) => {
     const p = await dispatch('getProfile', {
       profileId: u.profile
@@ -105,7 +105,7 @@ export async function getCurrentGroup ({ commit, dispatch }, { groupId }) {
     groupProfilesTemp.push(p.data)
   })
   await Promise.all(res)
-  r.data.profiles = groupProfilesTemp
+  r.data.profiles = groupProfilesTemp */
   commit('UPDATE_CURRENT_GROUP', r.data)
   return r
 }
@@ -129,7 +129,18 @@ export async function resetCurrentGroup ({ commit }) {
 } */
 
 export async function getMyGroups ({ commit, state, dispatch }) {
-  const r = await GroupService.getMyGroups(state.user.id)
+  const groups = []
+  commit('CLEAR_GROUPS')
+  const res = state.user.groups.map(async g => {
+    const r = await dispatch('getGroup', {
+      groupId: g
+    })
+    groups.push(r)
+    commit('ADD_GROUP', r.data)
+  })
+  await Promise.all(res)
+  return groups
+  /* const r = await GroupService.getMyGroups(state.user.id)
   const groups = [...r.data]
   commit('UPDATE_MY_GROUPS', groups)
   groups.forEach(group => {
@@ -146,7 +157,7 @@ export async function getMyGroups ({ commit, state, dispatch }) {
         })
     })
   })
-  return r
+  return r */
 }
 
 export async function getGroups ({ dispatch, commit }) {

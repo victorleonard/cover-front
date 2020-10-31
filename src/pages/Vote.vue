@@ -1,5 +1,5 @@
 <template>
-  <q-page class="bg-grey-3" v-if="currentGroup && currentGroup.songs.length" padding>
+  <q-page class="bg-grey-3" v-if="currentGroup" padding>
       <q-dialog
         v-model="commentDialog"
       >
@@ -153,22 +153,22 @@
     <!--//////////// -->
     <!-- alreadyVote -->
     <!--/////////////-->
-    <div v-if="alreadyVote.length">
+    <div class="q-mt-xl" v-if="noSelection.length">
     <div class="q-mt-sm q-ml-sm q-mr-sm q-mb-lg">
       <div class="q-subheading text-weight-bold text-grey-10 text-weight-regular" style="text-transform: uppercase;">Votes effectués</div>
       <hr>
     </div>
     <div class="row">
-        <div v-for="s in alreadyVote" :key="s._id" class="col-xs-12 col-sm-6 col-md-4 col-lg-2 q-mb-lg q-pl-sm q-pr-sm">
+        <div v-for="s in noSelection" :key="s._id" class="col-xs-12 col-sm-6 col-md-4 col-lg-2 q-mb-lg q-pl-sm q-pr-sm">
     <q-card>
       <q-card-section class="q-pa-none">
-          <div style="border-bottom: 1px solid #ccc" class="row items-center bg-grey-1">
+          <div style="border-bottom: 1px solid #ccc" class="row items-center bg-grey-8">
             <div class="col col-3 col-md-6">
               <img style="max-width: 100%; display: block" :src="s.images[0].url" alt="">
             </div>
             <div class="col q-pr-sm" style="line-height: 1.2rem">
-                <div class="text-grey-9 q-title q-ml-sm">{{ s.name }}</div>
-                <div class="text-grey-7 q-subheading q-ml-sm q-mt-sm">{{s.artist}}</div>
+                <div class="text-white q-title q-ml-sm">{{ s.name }}</div>
+                <div class="text-white q-subheading q-ml-sm q-mt-sm">{{s.artist}}</div>
             </div>
           </div>
         </q-card-section>
@@ -256,12 +256,12 @@ export default {
     ...mapState('main', ['currentGroup', 'user', 'currentGroupSongs']),
     ...mapGetters('main', ['awaitingVote']),
     currentGroupUser () {
-      return orderBy(this.currentGroup.users, ['pseudo'], ['asc'])
+      return orderBy(this.currentGroup.profiles, ['pseudo'], ['asc'])
     },
     noSelection () {
       const result = []
       this.currentGroupSongs.forEach(selection => {
-        if (selection.votes.length < this.currentGroup.users.length) {
+        if ((selection.votes.length < this.currentGroup.profiles.length) && selection.votes.find(vote => vote.created_by_id === this.user.id)) {
           result.push(selection)
         }
       })
@@ -288,10 +288,12 @@ export default {
   },
   methods: {
     getUserPseudo (id) {
-      return this.currentGroup.profiles.find(p => p.user_id === id).pseudo
+      if (this.currentGroup.profiles.find(p => p.id === id)) {
+        return this.currentGroup.profiles.find(p => p.id === id).pseudo
+      }
     },
     getUserAvatar (id) {
-      const profile = this.currentGroup.profiles.find(p => p.user_id === id)
+      const profile = this.currentGroup.profiles.find(p => p.id === id)
       if (profile && profile.avatar) {
         return profile.avatar.url
       }
@@ -428,12 +430,6 @@ export default {
         } else {
           return true
         }
-      }
-    },
-    getUserName (userId) {
-      const userName = this.users.find(user => user._id === userId)
-      if (userName) {
-        return userName.name
       }
     },
     getVote (votes, userId) {

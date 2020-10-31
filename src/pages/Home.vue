@@ -1,18 +1,18 @@
 <template>
   <q-page padding>
     <div class="row q-pt-md q-pl-sm q-pr-sm">
-      <q-card v-for="group in myGroups" :key="group.id" class="my-card q-mb-lg" style="width: 100%">
+      <q-card v-for="group in myGroupsOrder" :key="group.id" class="my-card q-mb-lg" style="width: 100%">
         <q-img :src="getBestFormatImage(group.image.formats)" :ratio="4/3" style="min-height: 240px">
           <div class="text-h6 absolute-top text-left">
             {{ group.name }}
           </div>
         </q-img>
         <q-card-section class="q-pr-lg">
-        <q-chip v-for="user in group.users" :key="user.id">
-          <q-avatar v-if="user.profile.avatar">
-            <img :src="user.profile.avatar.url" alt="avatar">
+        <q-chip v-for="profile in group.profiles" :key="profile.id">
+          <q-avatar v-if="profile.avatar">
+            <img :src="profile.avatar.url" alt="avatar">
           </q-avatar>
-          {{ user.profile.pseudo }}
+          {{ profile.pseudo }}
         </q-chip>
       </q-card-section>
 
@@ -59,11 +59,15 @@
 import { mapState } from 'vuex'
 import { Plugins } from '@capacitor/core'
 const { PushNotifications } = Plugins
+import orderBy from 'lodash/orderBy'
 
 export default {
   name: 'home',
   computed: {
     ...mapState('main', ['profile', 'user', 'myGroups', 'myDemandInvitations']),
+    myGroupsOrder () {
+      return orderBy(this.myGroups, ['name'], ['desc'])
+    },
     myPendingDemandInvitations () {
       return this.myDemandInvitations.filter(el => el.status === 'pending')
     }
@@ -168,7 +172,7 @@ export default {
     this.$store.dispatch('main/getMyGroups')
       .then(r => {
         this.$store.dispatch('main/changeLoadingState', false)
-        if (!r.data.length) {
+        if (!r.length) {
           this.$router.push({ name: 'create-or-join' })
         }
       })
