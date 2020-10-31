@@ -19,7 +19,7 @@
 <script>
 
 import { mapState } from 'vuex'
-import { Loading } from 'quasar'
+import { Loading, QSpinnerPuff } from 'quasar'
 
 export default {
   name: 'App',
@@ -35,7 +35,10 @@ export default {
     },
     loading: function (val) {
       if (val) {
-        Loading.show()
+        Loading.show({
+          spinner: QSpinnerPuff
+          // other props
+        })
       } else {
         Loading.hide()
       }
