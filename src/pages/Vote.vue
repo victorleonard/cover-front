@@ -104,7 +104,7 @@
               <div class="col text-grey-9">{{ user.pseudo }}</div>
               <div class="col col-auto">
                 <q-rating slot="subtitle" :value="getVote(s, user)" readonly :max="5" />
-                <q-btn @click="displayComment(s.votes, user.user_id)" v-if="getComment(s.votes, user.user_id)" style="position: absolute; margin-top: -2.1px" size="xs" flat round color="primary" icon="fas fa-info-circle" />
+                <q-btn @click="displayComment(s, user)" v-if="getComment(s, user)" style="position: absolute; margin-top: -2.1px" size="xs" flat round color="primary" icon="fas fa-info-circle" />
               </div>
             </div>
           </q-item-label>
@@ -178,7 +178,7 @@
               <div class="col text-grey-9">{{ user.pseudo }}</div>
               <div class="col col-auto" >
                 <q-rating slot="subtitle" :value="getVote(s, user)" readonly :max="5" />
-                <q-btn @click="displayComment(s.votes, user.user_id)" v-if="getComment(s.votes, user.user_id)" style="position: absolute; margin-top: -2.1px" size="xs" flat round color="primary" icon="fas fa-info-circle" />
+                <q-btn @click="displayComment(s, user)" v-if="getComment(s, user)" style="position: absolute; margin-top: -2.1px" size="xs" flat round color="primary" icon="fas fa-info-circle" />
               </div>
             </div>
           </q-item-label>
@@ -448,14 +448,14 @@ export default {
         return 0
       }
     }, */
-    displayComment (votes, userId) {
-      const vote = votes.find(v => v.created_by_id === userId)
+    displayComment (song, user) {
+      const vote = song.votes.find(v => v.profile_id === user.id)
       this.commentTempUser = vote.created_by
       this.commentTemp = vote.comment
       this.commentDialog = true
     },
-    getComment (votes, userId) {
-      const vote = votes.find(v => v.created_by_id === userId)
+    getComment (song, user) {
+      const vote = song.votes.find(v => v.profile_id === user.id)
       if (vote) {
         return vote.comment
       } else {
