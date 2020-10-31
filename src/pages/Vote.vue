@@ -103,7 +103,7 @@
             <div class="row q-ma-xs justify-between" v-for="user in currentGroup.profiles" :key="user._id">
               <div class="col text-grey-9">{{ user.pseudo }}</div>
               <div class="col col-auto">
-                <q-rating slot="subtitle" :value="getVote(s.votes, user.user_id)" readonly :max="5" />
+                <q-rating slot="subtitle" :value="getVote(s, user)" readonly :max="5" />
                 <q-btn @click="displayComment(s.votes, user.user_id)" v-if="getComment(s.votes, user.user_id)" style="position: absolute; margin-top: -2.1px" size="xs" flat round color="primary" icon="fas fa-info-circle" />
               </div>
             </div>
@@ -177,7 +177,7 @@
             <div class="row q-ma-xs q-pr-sm justify-between" v-for="user in currentGroup.profiles" :key="user._id">
               <div class="col text-grey-9">{{ user.pseudo }}</div>
               <div class="col col-auto" >
-                <q-rating slot="subtitle" :value="getVote(s.votes, user.user_id)" readonly :max="5" />
+                <q-rating slot="subtitle" :value="getVote(s, user)" readonly :max="5" />
                 <q-btn @click="displayComment(s.votes, user.user_id)" v-if="getComment(s.votes, user.user_id)" style="position: absolute; margin-top: -2.1px" size="xs" flat round color="primary" icon="fas fa-info-circle" />
               </div>
             </div>
@@ -432,14 +432,22 @@ export default {
         }
       }
     },
-    getVote (votes, userId) {
-      const vote = votes.find(v => v.created_by_id === userId)
+    getVote (song, user) {
+      const vote = song.votes.find(v => v.profile_id === user.id)
       if (vote) {
         return vote.vote
       } else {
         return 0
       }
     },
+    /* getVote (votes, userId) {
+      const vote = votes.find(v => v.created_by_id === userId)
+      if (vote) {
+        return vote.vote
+      } else {
+        return 0
+      }
+    }, */
     displayComment (votes, userId) {
       const vote = votes.find(v => v.created_by_id === userId)
       this.commentTempUser = vote.created_by
