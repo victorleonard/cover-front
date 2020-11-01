@@ -2,7 +2,7 @@
 <q-page class="welcome fit column wrap justify-center items-center content-center" style="background-color: #FAFAFA;">
 <q-btn v-go-back=" '/' " align="right" class="go-back absolute-top-left" icon="fas fa-chevron-left" no-caps flat label="Back" />
   <div class="row">
-    <img class="logo" src="/cover.png" alt="">
+    <img class="logo" src="https://cover.s3.eu-west-3.amazonaws.com/cover_28108a73e4.png" alt="">
   </div>
   <div class="q-gutter-md" style="width: 500px; max-width: 90vw;">
     <form @submit.prevent="connect" class="q-pa-md">
@@ -41,8 +41,8 @@ export default {
     return {
       submitting: false,
       form: {
-        email: 'anthony@anthony.fr',
-        password: 'azerty'
+        email: '',
+        password: ''
       },
       tempUser: undefined,
       modal: false,
@@ -64,7 +64,8 @@ export default {
         .then(resp => {
           this.submitting = false
           this.$store.dispatch('main/getMe')
-            .then(() => {
+            .then(me => {
+              console.log('me', me)
               this.$store.dispatch('main/changeLoadingState', false)
               this.$router.push({
                 name: 'home'
@@ -79,26 +80,7 @@ export default {
             title: 'Error',
             message: error.response.data.data[0].messages[0].message
           })
-          /* const er = JSON.stringify(error)
-          const er2 = JSON.parse(er)
-          const messageError = er2.response.data.error.message
-          console.log(error.message, er2.response.data.error.message)
-          this.$q.dialog({
-            title: 'Error',
-            message: messageError
-          }) */
         })
-      /* Api().post('/user', {
-        'logemail': this.form.logemail,
-        'logpassword': this.form.logpassword
-      })
-        .then(resp => {
-          console.log('resp', resp)
-        }) */
-      /* Api().get('/profile')
-        .then(resp => {
-          console.log('get profile', resp)
-        }) */
     },
     identify (user) {
       this.tempUser = user
@@ -106,7 +88,6 @@ export default {
     }
   },
   mounted () {
-    console.log('REFERRER ==> ', document.referrer)
     /* Api().get('users')
       .then(resp => {
         this.users = resp.data.users

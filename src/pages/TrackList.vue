@@ -78,152 +78,32 @@
       <div class="q-caption text-grey-10">( > {{ average }} points )</div>
       <hr>
     </div>
-    <q-expansion-item v-for="s in allVoteOk" :key="s.id" class="shadow-1 q-mb-md">
-        <template v-slot:header style="padding: 0">
-          <q-item-section avatar>
-            <q-avatar square size="80px">
-              <img :src="s.images[0].url">
-            </q-avatar>
-            <div class="absolute q-item-letter">
-              {{ getTotal(s.votes) }}
-              <q-icon name="star" color="grey-4" />
-            </div>
-          </q-item-section>
-
-          <q-item-section>
-            <q-item-label class="text-weight-medium text-subtitle1">{{s.name}}</q-item-label>
-            <q-item-label>{{s.artist}}</q-item-label>
-            <q-linear-progress class="absolute" style="bottom: 0; left:0"
-            :value="getLevelAverage(s.votes)" />
-          </q-item-section>
-        </template>
-
-        <q-card>
-          <q-card-section>
-            <q-list>
-                <q-item-label v-if="s.votes.length" style="width: 100%">
-                  <div class="row q-ma-xs justify-between" v-for="vote in s.votes" :key="vote._id">
-                    <div class="col text-grey-9">{{ getUserPseudo(vote.profile_id) }}</div>
-                    <div class="col col-auto q-mr-xl" >
-                      <q-rating slot="subtitle" icon="fas fa-music" color="light-blue-8" :value="vote.level ? vote.level : 0" readonly :max="3" />
-                    </div>
-                    <div class="col col-auto" >
-                      <q-rating slot="subtitle" :value="vote.vote" readonly :max="5" />
-                      <q-btn @click="displayComment(vote)" v-if="vote.comment" style="position: absolute; margin-top: -2.1px" size="xs" flat round color="primary" icon="fas fa-info-circle" />
-                    </div>
-                  </div>
-                </q-item-label>
-            </q-list>
-          </q-card-section>
-          <q-separator />
-          <q-card-section v-if="s.comment">
-        <q-icon class="text-grey-5" name="fas fa-quote-right" style="float: left; margin-right: 4px" />
-        <div v-html="s.comment" class="text-grey-8" syle="font-style: italic; word-break: break-word;"></div>
-      </q-card-section>
-      <q-separator />
-          <q-card-actions align="around">
-            <q-item-section avatar style="margin-right: -8px;">
-              <q-avatar v-if="getUserAvatar(s.created_by_id)" color="grey-7" text-color="white">
-                <img :src="getUserAvatar(s.created_by_id)" alt="">
-              </q-avatar>
-              <q-avatar v-else color="grey-7" text-color="white" icon="fas fa-user-astronaut">
-              </q-avatar>
-            </q-item-section>
-
-            <q-item-section>
-              <q-item-label>{{ getUserPseudo(s.created_by_id) }}</q-item-label>
-            </q-item-section>
-            <div v-if="s.spotify_preview_url">
-              <audio :id="'audio-'+s._id" :src="s.spotify_preview_url"></audio>
-              <q-btn class="play" :id="'play-'+s._id" @click="playMusic(s.spotify_preview_url, s._id)" flat color="primary" size="md" icon="ion-md-play" />
-              <q-btn class="pause hide" :id="'pause-'+s._id" @click="pauseMusic(s.spotify_preview_url, s._id)" color="primary" flat size="md" icon="ion-md-pause" />
-            </div>
-            <div>
-              <q-btn @click="launchDeezer(s)" flat icon="fab fa-deezer" size="md"></q-btn>
-              <q-btn @click="launchSpotify(s.spotify_uri)" flat icon="fab fa-spotify" size="md" color="positive"></q-btn>
-            </div>
-            <q-separator vertical/>
-            <div>
-              <q-btn @click="showUpdateModal(s)" flat color="yellow-10" size="md" icon="how_to_vote" />
-            </div>
-            <div>
-              <q-btn @click="showLevelModal(s)" flat color="light-blue-8" size="md" icon="fas fa-music" />
-            </div>
-          </q-card-actions>
-        </q-card>
-      </q-expansion-item>
+    <CardResult
+      :level="true"
+      coverSize="80px"
+      @displayComment="displayComment"
+      @showLevelModal="showLevelModal"
+      @showUpdateModal="showUpdateModal"
+      :song="s"
+      v-for="s in allVoteOk"
+      :key="s.id"
+    />
 
     <!-- Morceaux refusés -->
     <div class="q-mt-xl q-pb-md q-pt-lg">
       <div class="q-subheading text-weight-bold text-grey-10 text-weight-regular" style="    text-transform: uppercase;">Titres refusés</div>
       <hr>
     </div>
-
-    <q-expansion-item v-for="s in allVoteKo" :key="s.id" class="shadow-1 q-mb-md">
-        <template v-slot:header style="padding: 0">
-          <q-item-section avatar>
-            <q-avatar square size="64px">
-              <img :src="s.images[0].url">
-            </q-avatar>
-            <div class="absolute q-item-letter">
-              {{ getTotal(s.votes) }}
-              <q-icon name="star" color="grey-4" />
-            </div>
-          </q-item-section>
-
-          <q-item-section>
-            <q-item-label overline>{{s.name}}</q-item-label>
-            <q-item-label>{{s.artist}}</q-item-label>
-          </q-item-section>
-        </template>
-
-        <q-card>
-          <q-card-section>
-            <q-list>
-                <q-item-label v-if="s.votes.length" style="width: 100%">
-                  <div class="row q-ma-xs justify-between" v-for="vote in s.votes" :key="vote._id">
-                    <div class="col text-grey-9">{{ getUserPseudo(vote.profile_id) }}</div>
-                    <div class="col col-auto" >
-                      <q-rating slot="subtitle" :value="vote.vote" readonly :max="5" />
-                      <q-btn @click="displayComment(vote)" v-if="vote.comment" style="position: absolute; margin-top: -2.1px" size="xs" flat round color="primary" icon="fas fa-info-circle" />
-                    </div>
-                  </div>
-                </q-item-label>
-            </q-list>
-          </q-card-section>
-          <q-separator />
-          <q-card-section v-if="s.comment">
-        <q-icon class="text-grey-5" name="fas fa-quote-right" style="float: left; margin-right: 4px" />
-        <div v-html="s.comment" class="text-grey-8" syle="font-style: italic; word-break: break-word;"></div>
-      </q-card-section>
-      <q-separator />
-          <q-card-actions align="around">
-            <q-item-section avatar style="margin-right: -8px;">
-              <q-avatar v-if="getUserAvatar(s.created_by_id)" color="grey-7" text-color="white">
-                <img :src="getUserAvatar(s.created_by_id)" alt="">
-              </q-avatar>
-              <q-avatar v-else color="grey-7" text-color="white" icon="fas fa-user-astronaut">
-              </q-avatar>
-            </q-item-section>
-
-            <q-item-section>
-              <q-item-label>{{ getUserPseudo(s.created_by_id) }}</q-item-label>
-            </q-item-section>
-            <div v-if="s.spotify_preview_url">
-              <audio :id="'audio-'+s._id" :src="s.spotify_preview_url"></audio>
-              <q-btn class="play" :id="'play-'+s._id" @click="playMusic(s.spotify_preview_url, s._id)" flat color="primary" size="md" icon="ion-md-play" />
-              <q-btn class="pause hide" :id="'pause-'+s._id" @click="pauseMusic(s.spotify_preview_url, s._id)" color="primary" flat size="md" icon="ion-md-pause" />
-            </div>
-            <div>
-              <q-btn @click="launchDeezer(s)" flat icon="fab fa-deezer" size="md"></q-btn>
-              <q-btn @click="launchSpotify(s.spotify_uri)" flat icon="fab fa-spotify" size="md" color="positive"></q-btn>
-            </div>
-            <div>
-              <q-btn @click="showUpdateModal(s)" flat color="yellow-10" size="md" icon="how_to_vote" />
-            </div>
-          </q-card-actions>
-        </q-card>
-      </q-expansion-item>
+    <CardResult
+      :level="false"
+      coverSize="64px"
+      @displayComment="displayComment"
+      @showLevelModal="showLevelModal"
+      @showUpdateModal="showUpdateModal"
+      :song="s"
+      v-for="s in allVoteKo"
+      :key="s.id"
+    />
   </q-page>
 </template>
 
@@ -232,9 +112,11 @@
 import { mapState } from 'vuex'
 import moment from 'moment'
 import orderBy from 'lodash/orderBy'
+import CardResult from './../components/CardResult'
 
 export default {
   name: 'TrackList',
+  components: { CardResult },
   data () {
     return {
       levelModal: undefined,
