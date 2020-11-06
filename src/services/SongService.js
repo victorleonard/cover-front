@@ -5,7 +5,10 @@ export default {
     return Api().get('/selection')
   },
   getGroupSongs (groupId) {
-    return Api().get('/songs?group=' + groupId)
+    return Api().get('/songs?group=' + groupId + '&status_ne=refuse')
+  },
+  getRefuseGroupSongs (groupId) {
+    return Api().get('/songs?group=' + groupId + '&status=refuse')
   },
   searchOnSpotify (song, plateform) {
     return Api().get('/searches?song=' + song + '&plateform=' + plateform)

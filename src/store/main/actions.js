@@ -116,19 +116,29 @@ export async function getCurrentGroupSongs ({ commit, state }, { groupId }) {
   return r
 }
 
+export async function getCurrentRefuseGroupSongs ({ commit, state }, { groupId }) {
+  const r = await SongService.getRefuseGroupSongs(groupId)
+  commit('UPDATE_CURRENT_REFUSE_GROUP_SONGS', r.data)
+  return r
+}
+
 export async function resetCurrentGroup ({ commit }) {
   commit('RESET_CURRENT_GROUP')
 }
-/* export async function getMyGroups ({ commit, state }) {
-  commit('CLEAR_GROUPS')
+export async function getMyGroups ({ commit, state }) {
+  const userId = state.user.profile
+  const r = await GroupService.getMyGroups(userId)
+  commit('UPDATE_MY_GROUPS', r.data)
+  return r.data
+  /* commit('CLEAR_GROUPS')
   const myGroupsId = state.user.groups
   myGroupsId.forEach(async groupId => {
     const r = await GroupService.getGroup(groupId)
     commit('ADD_GROUP', r.data)
-  })
-} */
+  }) */
+}
 
-export async function getMyGroups ({ commit, state, dispatch }) {
+/* export async function getMyGroups ({ commit, state, dispatch }) {
   const groups = []
   commit('CLEAR_GROUPS')
   const res = state.user.groups.map(async g => {
@@ -140,25 +150,7 @@ export async function getMyGroups ({ commit, state, dispatch }) {
   })
   await Promise.all(res)
   return groups
-  /* const r = await GroupService.getMyGroups(state.user.id)
-  const groups = [...r.data]
-  commit('UPDATE_MY_GROUPS', groups)
-  groups.forEach(group => {
-    group.users.map(user => {
-      dispatch('getProfile', {
-        profileId: user.profile
-      })
-        .then(p => {
-          commit('UPDATE_MY_GROUPS_USER', {
-            groupId: group.id,
-            userId: user.id,
-            profile: p.data
-          })
-        })
-    })
-  })
-  return r */
-}
+} */
 
 export async function getGroups ({ dispatch, commit }) {
   const r = await GroupService.getGroups()
@@ -187,13 +179,13 @@ export async function getGroup ({ commit, state }, { groupId }) {
 }
 
 export async function askInvitation ({ state }, { group, to, message }) {
-  const from = state.user.id
+  const from = state.user.profile
   const r = await InvitationService.askInvitation(group, to, from, message)
   return r
 }
 
 export async function getMyAskingInvitation ({ commit, state }) {
-  const from = state.user.id
+  const from = state.user.profile
   const r = await InvitationService.getMyAskingInvitation(from)
   commit('UPDATE_MY_ASKING_INVITATIONS', r.data)
   return r
@@ -356,9 +348,9 @@ export async function createGroup ({ state, commit }, { name, commune, codeDepar
   return r.data
 }
 
-export async function updateGroup ({ state, commit }, { groupId, name, image }) {
+export async function updateGroup ({ state, commit }, { groupId, name, image, score }) {
   commit('CHANGE_LOADING_STATE', true)
-  const r = await GroupService.updateGroup(groupId, name, image)
+  const r = await GroupService.updateGroup(groupId, name, image, score)
   commit('CHANGE_LOADING_STATE', false)
   return r.data
 }

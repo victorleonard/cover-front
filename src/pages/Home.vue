@@ -26,13 +26,13 @@
             <q-item>
               <q-item-section avatar>
                 <q-avatar color="primary" text-color="white">
-                  {{ demand.from.username[0] }}
+                  {{ demand.from.pseudo }}
                 </q-avatar>
               </q-item-section>
 
               <q-item-section>
-                <q-item-label>{{ demand.from.username }}</q-item-label>
-                <q-item-label caption lines="1">Guitariste</q-item-label>
+                <q-item-label>{{ demand.from.pseudo }}</q-item-label>
+                <q-item-label caption lines="1">...</q-item-label>
                 <q-item-label caption>{{ demand.message }}</q-item-label>
               </q-item-section>
 
@@ -127,7 +127,7 @@ export default {
       )
     },
     isAdmin (admin) {
-      return admin.id === this.user.id
+      return admin.id === this.user.profile
     },
     getMe () {
       this.$store.dispatch('main/getMe')

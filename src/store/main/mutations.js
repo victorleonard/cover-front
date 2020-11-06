@@ -78,6 +78,8 @@ export function UPDATE_CURRENT_GROUP (state, payload) {
 
 export function RESET_CURRENT_GROUP (state, payload) {
   state.currentGroup = undefined
+  state.currentGroupSongs = undefined
+  state.currentRefuseGroupSongs = undefined
 }
 
 export function UPDATE_CURRENT_GROUP_PROFILE (state, payload) {
@@ -86,6 +88,10 @@ export function UPDATE_CURRENT_GROUP_PROFILE (state, payload) {
 
 export function UPDATE_CURRENT_GROUP_SONGS (state, payload) {
   state.currentGroupSongs = payload
+}
+
+export function UPDATE_CURRENT_REFUSE_GROUP_SONGS (state, payload) {
+  state.currentRefuseGroupSongs = payload
 }
 
 export function UPDATE_GROUPS (state, payload) {

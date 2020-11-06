@@ -7,6 +7,7 @@ export default {
   myCreatorGroups: undefined,
   currentGroup: undefined,
   currentGroupSongs: undefined,
+  currentRefuseGroupSongs: undefined,
   currentGroupVotes: undefined,
   myGroups: undefined,
   groups: undefined,

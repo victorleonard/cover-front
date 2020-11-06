@@ -75,9 +75,10 @@
     <!-- Morceaux selectionnés -->
     <div class="q-ml-sm q-mr-sm q-pb-md">
       <div class="q-subheading text-weight-bold text-grey-10 text-weight-regular" style="text-transform: uppercase;">Titres selectionnés</div>
-      <div class="q-caption text-grey-10">( > {{ average }} points )</div>
+      <div class="q-caption text-grey-10">Au moins {{ currentGroup.score }} <q-icon name="star" color="grey-8" /></div>
       <hr>
     </div>
+    <div v-if="currentGroupSongs && songAccepted">
     <CardResult
       :level="true"
       coverSize="80px"
@@ -85,25 +86,34 @@
       @showLevelModal="showLevelModal"
       @showUpdateModal="showUpdateModal"
       :song="s"
-      v-for="s in allVoteOk"
+      v-for="s in songAccepted"
       :key="s.id"
     />
+    </div>
 
     <!-- Morceaux refusés -->
     <div class="q-mt-xl q-pb-md q-pt-lg">
       <div class="q-subheading text-weight-bold text-grey-10 text-weight-regular" style="    text-transform: uppercase;">Titres refusés</div>
+      <q-btn
+        @click="loadRefuseSong"
+        color="primary"
+        size="sm"
+        label="voir"
+      />
       <hr>
+      </div>
+    <div v-if="currentRefuseGroupSongs && songRefused">
+      <CardResult
+        :level="false"
+        coverSize="64px"
+        @displayComment="displayComment"
+        @showLevelModal="showLevelModal"
+        @showUpdateModal="showUpdateModal"
+        :song="s"
+        v-for="s in songRefused"
+        :key="s.id"
+      />
     </div>
-    <CardResult
-      :level="false"
-      coverSize="64px"
-      @displayComment="displayComment"
-      @showLevelModal="showLevelModal"
-      @showUpdateModal="showUpdateModal"
-      :song="s"
-      v-for="s in allVoteKo"
-      :key="s.id"
-    />
   </q-page>
 </template>
 
@@ -134,22 +144,35 @@ export default {
     }
   },
   computed: {
-    ...mapState('main', ['user', 'currentGroup', 'currentGroupSongs']),
+    ...mapState('main', ['user', 'currentGroup', 'currentGroupSongs', 'currentRefuseGroupSongs']),
     average () {
       return parseInt((this.currentGroup.profiles.length * 5) / 1.3)
     },
-    allVoteOk () {
+    songAccepted () {
+      const acceptedSong = this.currentGroupSongs.filter(s => s.status === 'accepted')
       const result = []
-      this.currentGroupSongs.forEach(el => {
+      acceptedSong.forEach(el => {
         if (el.votes.length && el.votes.length === this.currentGroup.profiles.length) {
           let total = 0
           el.votes.forEach(vote => {
             total += vote.vote
           })
-          if (total > this.average) {
-            el.total = total
-            result.push(el)
-          }
+          el.total = total
+          result.push(el)
+        }
+      })
+      return orderBy(result, ['total'], ['desc'])
+    },
+    songRefused () {
+      const result = []
+      this.currentRefuseGroupSongs.forEach(el => {
+        if (el.votes.length && el.votes.length === this.currentGroup.profiles.length) {
+          let total = 0
+          el.votes.forEach(vote => {
+            total += vote.vote
+          })
+          el.total = total
+          result.push(el)
         }
       })
       return orderBy(result, ['total'], ['desc'])
@@ -175,6 +198,18 @@ export default {
     }
   },
   methods: {
+    loadRefuseSong () {
+      this.$store.dispatch('main/changeLoadingState', true)
+      this.$store.dispatch('main/getCurrentRefuseGroupSongs', {
+        groupId: this.$route.params.groupId
+      })
+        .then(() => {
+          this.$store.dispatch('main/changeLoadingState', false)
+        })
+        .catch(() => {
+          this.$store.dispatch('main/changeLoadingState', false)
+        })
+    },
     getLevelAverage (votes) {
       const maxTotal = votes.length * 3
       let total = 0
@@ -197,9 +232,12 @@ export default {
       }
     },
     displayComment (vote) {
-      this.commentTempUser = vote.created_by
-      this.commentTemp = vote.comment
-      this.commentDialog = true
+      const userProfile = this.currentGroup.profiles.find(p => p.user === vote.user)
+      if (userProfile) {
+        this.commentTempUser = userProfile.pseudo
+        this.commentTemp = vote.comment
+        this.commentDialog = true
+      }
     },
     getVote (song) {
       const vote = song.votes.find(v => v.profile === this.user.profile)
@@ -285,6 +323,14 @@ export default {
                 position: 'top'
               })
             })
+        })
+        .catch(e => {
+          this.$store.dispatch('main/changeLoadingState', false)
+          this.$q.notify({
+            type: 'negative',
+            message: e.reponse,
+            position: 'top'
+          })
         })
     },
     checkIfUserIsLogged () {

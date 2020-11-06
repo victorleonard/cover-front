@@ -37,7 +37,7 @@ export function selectionWithoutVeto (state) {
 export function awaitingVote (state, getters) {
   if (state.currentGroupSongs) {
     return state.currentGroupSongs.filter(song => {
-      return !song.votes.find(vote => vote.created_by_id === state.user.id)
+      return !song.votes.find(vote => vote.user === state.user.id)
     })
   }
 }

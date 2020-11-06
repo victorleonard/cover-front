@@ -93,7 +93,7 @@ export default {
       this.$store.dispatch('main/changeLoadingState', true)
       this.$store.dispatch('main/askInvitation', {
         group: this.groupSelected.id,
-        to: this.groupSelected.admin.id,
+        to: this.groupSelected.admin.user,
         message: this.message
       })
         .then(() => {
