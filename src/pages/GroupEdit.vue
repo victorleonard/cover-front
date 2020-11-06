@@ -12,6 +12,14 @@
         >
           <q-input
             filled
+            type="number"
+            v-model="score"
+            label="Score *"
+            lazy-rules
+            :rules="[ val => val && val.length > 0 || 'Please type something']"
+          />
+          <q-input
+            filled
             v-model="name"
             label="Nom *"
             lazy-rules
@@ -102,6 +110,7 @@ export default {
     newMember: false,
     name: '',
     file: '',
+    score: 0,
     image: undefined,
     codeRegion: '',
     commune: '',
@@ -150,6 +159,7 @@ export default {
           this.image = d.image
           this.name = d.name
           this.users = d.users
+          this.score = d.score
         })
     },
     async onSubmit () {
@@ -164,14 +174,16 @@ export default {
               this.$store.dispatch('main/updateGroup', {
                 groupId: this.$route.params.groupId,
                 name: this.name,
-                image: r[0].id
+                image: r[0].id,
+                score: this.score
               })
                 .then(() => { this.getGroupData() })
             })
         } else {
           await this.$store.dispatch('main/updateGroup', {
             groupId: this.$route.params.groupId,
-            name: this.name
+            name: this.name,
+            score: this.score
           })
           this.$q.notify({
             type: 'positive',

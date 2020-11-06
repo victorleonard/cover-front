@@ -26,7 +26,7 @@ export default {
     return Api().get('/groups?filter{"where":{"creatorId":' + creatorId + '}}')
   },
   getMyGroups (userId) {
-    return Api().get('/groups?users.id=' + userId)
+    return Api().get('/groups?profiles.id=' + userId)
   },
   /* getMyGroups (userId) {
     return Api().get('/groups?filter{"where":{"member":[' + userId + ']}}')
@@ -35,10 +35,11 @@ export default {
   deleteMyGroup (groupId) {
     return Api().delete('/groups/' + groupId)
   },
-  updateGroup (groupId, name, image) {
+  updateGroup (groupId, name, image, score) {
     return Api().put('/groups/' + groupId, {
       name: name,
-      image: image
+      image: image,
+      score: score
     })
   },
   createGroup (userId, name, commune, codeDepartement, codeRegion, image, country) {
