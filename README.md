@@ -1,6 +1,6 @@
 # cover (cover)
 
-cover
+cover_
 
 ## Install the dependencies
 ```bash
