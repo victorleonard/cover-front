@@ -96,7 +96,7 @@ export async function updateLevel ({ commit, state }, { voteId, value, comment }
 }
 
 export async function getCurrentGroup ({ commit, dispatch }, { groupId }) {
-  const r = await GroupService.getGroup(groupId)
+  const r = await this.$axios.get(`/groups/${groupId}`)
   /* const groupProfilesTemp = []
   const res = r.data.users.map(async (u) => {
     const p = await dispatch('getProfile', {
@@ -111,7 +111,7 @@ export async function getCurrentGroup ({ commit, dispatch }, { groupId }) {
 }
 
 export async function getCurrentGroupSongs ({ commit, state }, { groupId }) {
-  const r = await SongService.getGroupSongs(groupId)
+  const r = await this.$axios.get('/songs?group=' + groupId + '&status_ne=refuse')
   commit('UPDATE_CURRENT_GROUP_SONGS', r.data)
   return r
 }
@@ -125,9 +125,12 @@ export async function getCurrentRefuseGroupSongs ({ commit, state }, { groupId }
 export async function resetCurrentGroup ({ commit }) {
   commit('RESET_CURRENT_GROUP')
 }
-export async function getMyGroups ({ commit, state }) {
-  const userId = state.user.profile
-  const r = await GroupService.getMyGroups(userId)
+export async function getMyGroups ({ commit, state }, { userId }) {
+  console.log('userId =>', userId)
+  // const userId = state.user.profile
+  // const r = await GroupService.getMyGroups(userId)
+  const r = await this.$axios.get(`/groups?users.id=${userId}`)
+  console.log('my croupge =>', r.data)
   commit('UPDATE_MY_GROUPS', r.data)
   return r.data
   /* commit('CLEAR_GROUPS')
@@ -153,7 +156,7 @@ export async function getMyGroups ({ commit, state }) {
 } */
 
 export async function getGroups ({ dispatch, commit }) {
-  const r = await GroupService.getGroups()
+  const r = this.$axios.get('/groups/')
   const groups = [...r.data]
   commit('UPDATE_GROUPS', r.data)
   groups.forEach(group => {
@@ -191,9 +194,8 @@ export async function getMyAskingInvitation ({ commit, state }) {
   return r
 }
 
-export async function getMyDemandInvitation ({ commit, state }) {
-  const to = state.user.id
-  const r = await InvitationService.getMyDemandInvitation(to)
+export async function getMyDemandInvitation ({ commit, state }, { userId }) {
+  const r = await this.$axios.get('/invitations?to=' + userId)
   commit('UPDATE_MY_DEMAND_INVITATIONS', r.data)
   return r
 }
@@ -262,8 +264,12 @@ export async function resetPassword ({ commit }, { code, password, passwordConfi
 
 export async function connectUser ({ commit, dispatch }, { email, password }) {
   commit('CHANGE_LOADING_STATE', true)
-  const response = await UserService.logIn(email, password)
-  if (response) {
+  const response = await this.$axios.post('/auth/local', {
+    identifier: email,
+    password: password
+  })
+  return response
+  /* if (response) {
     localStorage.setItem('token', response.data.jwt)
     commit('UPDATE_TOKEN', response.data.jwt)
     commit('UPDATE_USER', response.data.user)
@@ -281,11 +287,11 @@ export async function connectUser ({ commit, dispatch }, { email, password }) {
   } else {
     alert('error')
     console.error('error')
-  }
+  } */
 }
 
 export async function getMe ({ commit }) {
-  const r = await UserService.getMe()
+  const r = await this.$axios.get('users/me')
   commit('UPDATE_USER', r.data)
 }
 

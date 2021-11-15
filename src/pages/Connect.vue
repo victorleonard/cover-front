@@ -13,6 +13,8 @@
         type="submit"
         :loading="submitting"
         label="Connexion"
+        no-caps
+        unelevated
         class="q-mt-md"
         color="brand"
       >
@@ -47,15 +49,17 @@ export default {
       tempUser: undefined,
       modal: false,
       users: [],
-      currentUser: localStorage.getItem('userId'),
-      currentUserName: localStorage.getItem('userName')
+      currentUser: '',
+      currentUserName: ''
     }
   },
   methods: {
     connect () {
+      this.$q.cookies.remove('token')
+      this.$q.cookies.remove('user_id')
       this.submitting = true
       this.$store.dispatch('main/changeLoadingState', true)
-      localStorage.removeItem('token')
+      // localStorage.removeItem('token')
       this.$store
         .dispatch('main/connectUser', {
           email: this.form.email,
@@ -63,6 +67,8 @@ export default {
         })
         .then(resp => {
           this.submitting = false
+          this.$q.cookies.set('token', resp.data.jwt)
+          this.$q.cookies.set('user_id', resp.data.user.id)
           this.$store.dispatch('main/getMe')
             .then(me => {
               console.log('me', me)
@@ -88,6 +94,8 @@ export default {
     }
   },
   mounted () {
+    this.$axios.get('/version')
+    // this.$store.dispatch('main/getVersion')
     /* Api().get('users')
       .then(resp => {
         this.users = resp.data.users

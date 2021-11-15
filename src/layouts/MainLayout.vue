@@ -125,12 +125,14 @@ export default {
     logout () {
       this.$store.dispatch('main/logout')
         .then(() => {
+          this.$q.cookies.remove('token')
+          this.$q.cookies.remove('user_id')
           this.$router.push({ name: 'welcome' })
         })
     }
   },
   beforeCreate () {
-    // this.$store.dispatch('main/getMe')
+    this.$store.dispatch('main/getMe')
   }
 }
 </script>

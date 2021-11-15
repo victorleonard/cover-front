@@ -90,9 +90,7 @@
         leave-active-class="animated fadeOut"
         duration="200"
       >
-        <keep-alive>
         <router-view />
-        </keep-alive>
       </transition>
     </q-page-container>
 
@@ -126,12 +124,13 @@ export default {
   },
   data () {
     return {
+      currentGroup: undefined,
       leftDrawerOpen: false
     }
   },
   computed: {
     ...mapGetters('main', ['awaitingVote']),
-    ...mapState('main', ['user', 'currentGroup', 'currentGroupProfile', 'version'])
+    ...mapState('main', ['user', 'currentGroupProfile', 'version'])
   },
   methods: {
     refresh () {
@@ -151,13 +150,9 @@ export default {
         this.$store.dispatch('main/getCurrentGroup', {
           groupId: this.$route.params.groupId
         })
-          .then(() => {
-            this.$store.dispatch('main/getCurrentGroupSongs', {
-              groupId: this.$route.params.groupId
-            })
-              .then(() => {
-                this.$store.dispatch('main/changeLoadingState', false)
-              })
+          .then((r) => {
+            this.currentGroup = r.data
+            this.$store.dispatch('main/changeLoadingState', false)
           })
       })
     // this.$store.dispatch('main/getMe')
