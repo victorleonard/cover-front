@@ -1,5 +1,5 @@
 <template>
-  <q-page v-if="currentGroup" padding class="search-page q-pl-md q-pr-md">
+  <q-page v-if="songAccepted" padding class="search-page q-pl-md q-pr-md">
     <!-- set or update level -->
     <q-dialog class="modal" minimized v-model="levelModal">
       <q-card>
@@ -78,7 +78,7 @@
       <div class="q-caption text-grey-10">Au moins {{ currentGroup.score }} <q-icon name="star" color="grey-8" /></div>
       <hr>
     </div>
-    <div v-if="currentGroupSongs && songAccepted">
+    <div v-if="songAccepted">
     <CardResult
       :level="true"
       coverSize="80px"
@@ -102,7 +102,7 @@
       />
       <hr>
       </div>
-    <div v-if="currentRefuseGroupSongs && songRefused">
+    <div v-if="songRefused">
       <CardResult
         :level="false"
         coverSize="64px"
@@ -129,6 +129,8 @@ export default {
   components: { CardResult },
   data () {
     return {
+      songRefused: undefined,
+      songAccepted: undefined,
       levelModal: undefined,
       levelModel: undefined,
       ratingModel: undefined,
@@ -144,26 +146,32 @@ export default {
     }
   },
   computed: {
-    ...mapState('main', ['user', 'currentGroup', 'currentGroupSongs', 'currentRefuseGroupSongs']),
+    ...mapState('main', ['user', 'currentGroup']),
     average () {
+      if (!this.currentGroup) return
       return parseInt((this.currentGroup.profiles.length * 5) / 1.3)
-    },
+    }/*,
     songAccepted () {
-      const acceptedSong = this.currentGroupSongs.filter(s => s.status === 'accepted')
-      const result = []
-      acceptedSong.forEach(el => {
-        if (el.votes.length && el.votes.length === this.currentGroup.profiles.length) {
-          let total = 0
-          el.votes.forEach(vote => {
-            total += vote.vote
-          })
-          el.total = total
-          result.push(el)
-        }
-      })
-      return orderBy(result, ['total'], ['desc'])
+      if (this.currentGroupSongs && this.currentGroup) {
+        const acceptedSong = this.currentGroupSongs.filter(s => s.status === 'accepted')
+        const result = []
+        acceptedSong.forEach(el => {
+          if (el.votes.length && el.votes.length === this.currentGroup.profiles.length) {
+            let total = 0
+            el.votes.forEach(vote => {
+              total += vote.vote
+            })
+            el.total = total
+            result.push(el)
+          }
+        })
+        return orderBy(result, ['total'], ['desc'])
+      } else {
+        return undefined
+      }
     },
     songRefused () {
+      if (!this.currentRefuseGroupSongs) return
       const result = []
       this.currentRefuseGroupSongs.forEach(el => {
         if (el.votes.length && el.votes.length === this.currentGroup.profiles.length) {
@@ -176,31 +184,32 @@ export default {
         }
       })
       return orderBy(result, ['total'], ['desc'])
-    },
-    allVoteKo () {
-      const result = []
-      this.currentGroupSongs.forEach(el => {
-        if (el.votes.length && el.votes.length === this.currentGroup.profiles.length) {
-          let total = 0
-          el.votes.forEach(vote => {
-            total += vote.vote
-          })
-          if (total <= this.average) {
-            el.total = total
-            result.push(el)
-          }
-          /* const total = el.votes.reduce((tot, num) => {
-            return (tot.vote || tot) + num.vote
-          }) */
-        }
-      })
-      return orderBy(result, ['total'], ['desc'])
-    }
+    } */
   },
   methods: {
+    loadAcceptedSong () {
+      this.$store.dispatch('main/changeLoadingState', true)
+      this.$axios.get(`/songs?group=${this.$route.params.groupId}&status=accepted`)
+        .then(r => {
+          const result = r.data.map((song) => {
+            const songCopy = { ...song }
+            const total = songCopy.votes.reduce((a, b) => a + b, 0)
+            songCopy.total = total
+            return songCopy
+          })
+          console.log(result)
+          this.$store.dispatch('main/changeLoadingState', false)
+          this.songAccepted = orderBy(result, ['total'], ['desc'])
+        })
+    },
     loadRefuseSong () {
       this.$store.dispatch('main/changeLoadingState', true)
-      this.$store.dispatch('main/getCurrentRefuseGroupSongs', {
+      this.$axios.get(`/songs?group=${this.$route.params.groupId}&status=refuse`)
+        .then(r => {
+          this.songRefused = r.data
+          this.$store.dispatch('main/changeLoadingState', false)
+        })
+      /* this.$store.dispatch('main/getCurrentRefuseGroupSongs', {
         groupId: this.$route.params.groupId
       })
         .then(() => {
@@ -208,7 +217,7 @@ export default {
         })
         .catch(() => {
           this.$store.dispatch('main/changeLoadingState', false)
-        })
+        }) */
     },
     getLevelAverage (votes) {
       const maxTotal = votes.length * 3
@@ -333,13 +342,6 @@ export default {
           })
         })
     },
-    checkIfUserIsLogged () {
-      if (!localStorage.getItem('userId')) {
-        this.$router.push({
-          name: 'home'
-        })
-      }
-    },
     playMusic (track, id) {
       document.querySelectorAll('audio').forEach(el => {
         el.pause()
@@ -382,6 +384,7 @@ export default {
     }
   },
   mounted () {
+    this.loadAcceptedSong()
     /* this.checkIfUserIsLogged()
     let silentLoading
     if (this.songsList && this.songsList.length) {
