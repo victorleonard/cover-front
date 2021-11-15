@@ -63,12 +63,16 @@ import orderBy from 'lodash/orderBy'
 
 export default {
   name: 'home',
+  data: () => ({
+    myGroups: undefined
+  }),
   computed: {
-    ...mapState('main', ['profile', 'user', 'myGroups', 'myDemandInvitations']),
+    ...mapState('main', ['profile', 'user', 'myDemandInvitations']),
     myGroupsOrder () {
       return orderBy(this.myGroups, ['name'], ['desc'])
     },
     myPendingDemandInvitations () {
+      if (!this.myDemandInvitations) return
       return this.myDemandInvitations.filter(el => el.status === 'pending')
     }
   },
@@ -83,6 +87,7 @@ export default {
       }
     },
     hasInvitation (groupId) {
+      if (!this.myDemandInvitations) return
       return this.myPendingDemandInvitations.find(el => el.group.id === groupId)
     },
     pushRequestPermission () {
@@ -165,12 +170,12 @@ export default {
     }
   },
   mounted () {
-    // this.pushRequestPermission()
-  },
-  beforeCreate () {
     this.$store.dispatch('main/changeLoadingState', true)
-    this.$store.dispatch('main/getMyGroups')
+    this.$store.dispatch('main/getMyGroups', {
+      userId: this.$q.cookies.get('user_id')
+    })
       .then(r => {
+        this.myGroups = r
         this.$store.dispatch('main/changeLoadingState', false)
         if (!r.length) {
           this.$router.push({ name: 'create-or-join' })
@@ -180,7 +185,11 @@ export default {
         console.error('error', error)
         this.$store.dispatch('main/changeLoadingState', false)
       })
-    this.$store.dispatch('main/getMyDemandInvitation')
+  },
+  beforeCreate () {
+    this.$store.dispatch('main/getMyDemandInvitation', {
+      userId: this.$q.cookies.get('user_id')
+    })
   }
 }
 </script>

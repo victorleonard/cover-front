@@ -3,7 +3,7 @@ import Connect from './ConnectApi.js'
 
 export default {
   getVersion () {
-    return Connect().get('/version')
+    return this.$axios.get('/version')
   },
   getMe () {
     return Api().get('users/me')

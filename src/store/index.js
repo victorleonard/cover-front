@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import main from './main'
-import createPersistedState from 'vuex-persistedstate'
 
 // import example from './module-example'
 
@@ -18,7 +17,6 @@ Vue.use(Vuex)
 
 export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
-    plugins: [createPersistedState()],
     modules: {
       main
     },
