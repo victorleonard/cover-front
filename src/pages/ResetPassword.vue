@@ -22,7 +22,9 @@
     <div class="row justify-start" style="align-items: baseline">
       <q-btn
         type="submit"
-        label="submit"
+        label="Créer"
+        no-caps
+        unelevated
         class="q-mt-md"
         color="brand"
       >
@@ -50,20 +52,27 @@ export default {
       return searchParams.get(param)
     },
     resetPassword () {
-      const code = location.hash.split('=')[1]
+      const code = this.$route.query.code
+      // const code = location.hash.split('=')[1]
       this.$store.dispatch('main/changeLoadingState', true)
+      this.$axios.post('auth/reset-password', {
+        code: code,
+        password: this.password,
+        passwordConfirmation: this.passwordConfirmation
+      })/*
       this.$store
         .dispatch('main/resetPassword', {
           code: code,
           password: this.password,
           passwordConfirmation: this.passwordConfirmation
-        })
+        }) */
         .then(resp => {
           this.$store.dispatch('main/changeLoadingState', false)
           this.$q
             .dialog({
               title: 'Mot de passe modifié',
-              message: 'Votre mot de passe a bien été modifié'
+              message: 'Votre mot de passe a bien été modifié',
+              persistent: true
             })
             .onOk(() => {
               this.$router.push({

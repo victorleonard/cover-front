@@ -10,7 +10,9 @@
     <div class="row justify-start" style="align-items: baseline">
       <q-btn
         type="submit"
-        label="Reset"
+        label="Envoyer"
+        no-caps
+        unelevated
         class="q-mt-md"
         color="brand"
       >
@@ -32,20 +34,20 @@ export default {
   methods: {
     resetPassword () {
       this.$store.dispatch('main/changeLoadingState', true)
-      this.$store
-        .dispatch('main/forgotPassword', {
-          email: this.email
-        })
+      this.$axios.post('auth/forgot-password', {
+        email: this.email
+      })
         .then(resp => {
           this.$store.dispatch('main/changeLoadingState', false)
           this.$q
             .dialog({
               title: 'Email envoyé',
-              message: 'Un email....'
+              message: 'Un email vous a été envoyé pour réinitialiser votre mot de passe',
+              persistent: true
             })
             .onOk(() => {
               this.$router.push({
-                name: 'home'
+                name: '/'
               })
             })
         })

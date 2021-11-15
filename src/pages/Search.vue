@@ -97,13 +97,6 @@ export default {
     launchSpotify (id) {
       location.href = id
     },
-    checkIfUserIsLogged () {
-      if (!localStorage.getItem('userId')) {
-        this.$router.push({
-          name: 'home'
-        })
-      }
-    },
     allPause () {
       document.querySelectorAll('audio').forEach(el => {
         el.pause()
