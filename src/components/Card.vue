@@ -78,7 +78,7 @@ export default {
   },
   methods: {
     getVote (song, user) {
-      const vote = song.votes.find(v => v.user === user.user)
+      const vote = song.votes.find(v => v.profile_id === user.id)
       if (vote) {
         return vote.vote
       } else {
@@ -94,14 +94,14 @@ export default {
       }
     },
     getUserAvatar (id) {
-      const profile = this.currentGroup.profiles.find(p => p.user === id)
+      const profile = this.currentGroup.profiles.find(p => p.id === id)
       if (profile && profile.avatar) {
         return profile.avatar.url
       }
     },
     getUserPseudo (id) {
-      if (this.currentGroup.profiles.find(p => p.user === id)) {
-        return this.currentGroup.profiles.find(p => p.user === id).pseudo
+      if (this.currentGroup.profiles.find(p => p.id === id)) {
+        return this.currentGroup.profiles.find(p => p.id === id).pseudo
       }
     },
     playMusic (track, id) {

@@ -1,5 +1,5 @@
 <template>
-  <q-page class="bg-grey-3" v-if="currentGroup" padding>
+  <q-page class="bg-grey-3" v-if="group" padding>
       <q-dialog
         v-model="commentDialog"
       >
@@ -126,7 +126,7 @@
 
 <script>
 import Api from '../services/Api'
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import Card from './../components/Card'
 
 export default {
@@ -134,6 +134,8 @@ export default {
   components: { Card },
   data () {
     return {
+      group: undefined,
+      currentGroupSongs: undefined,
       songSelected: undefined,
       // songSelect: false,
       ratingModel: 0,
@@ -146,23 +148,41 @@ export default {
       commentDialog: false
     }
   },
+  watch: {
+    currentGroup () {
+      this.group = this.currentGroup
+    }
+  },
   computed: {
-    ...mapState('main', ['currentGroup', 'user', 'currentGroupSongs']),
-    ...mapGetters('main', ['awaitingVote']),
+    ...mapState('main', ['currentGroup', 'user']),
+    awaitingVote () {
+      const profileId = this.$q.cookies.get('profile_id')
+      if (this.group && this.currentGroupSongs) {
+        const wait = this.currentGroupSongs.filter(el => el.votes &&
+          el.votes.length !== this.group.profiles.length &&
+          !el.votes.find(v => v.profile_id === profileId))
+        return wait
+      } else {
+        return undefined
+      }
+    },
     noSelection () {
-      const result = []
-      this.currentGroupSongs.forEach(selection => {
-        if ((selection.votes.length < this.currentGroup.profiles.length) && selection.votes.find(vote => vote.created_by_id === this.user.id)) {
-          result.push(selection)
-        }
-      })
-      return result
+      const profileId = this.$q.cookies.get('profile_id')
+      if (this.group && this.currentGroupSongs) {
+        const wait = this.currentGroupSongs.filter(el => el.votes &&
+          el.votes.length !== this.group.profiles.length &&
+          el.votes.find(v => v.profile_id === profileId))
+        return wait
+      } else {
+        return undefined
+      }
     }
   },
   methods: {
     displayVoteDialog (t) {
+      const profileId = this.$q.cookies.get('profile_id')
       this.songSelected = t
-      if (t.votes.find(v => v.created_by_id === this.user.id)) {
+      if (t.votes.find(v => v.profile_id === profileId)) {
         this.voteDialogUpdate = true
       } else {
         this.voteDialog = true
@@ -195,14 +215,17 @@ export default {
       this.$store.dispatch('main/vote', {
         value: this.ratingModel,
         songId: this.songSelected.id,
+        groupId: this.$route.params.groupId,
+        userId: this.$q.cookies.get('user_id'),
         comment: this.comment
       })
-        .then((r) => {
+        .then(() => {
           this.$store.dispatch('main/getCurrentGroupSongs', {
             groupId: this.$route.params.groupId
           })
-            .then(() => {
+            .then((r) => {
               this.$store.dispatch('main/changeLoadingState', false)
+              this.currentGroupSongs = r.data
               this.voteDialog = false
               this.comment = ''
               this.$q.notify({
@@ -214,18 +237,20 @@ export default {
         })
     },
     updateVote () {
+      const profileId = this.$q.cookies.get('profile_id')
       this.$store.dispatch('main/changeLoadingState', true)
-      const vote = this.songSelected.votes.find(v => v.created_by_id === this.user.id)
+      const vote = this.songSelected.votes.find(v => v.profile_id === profileId)
       this.$store.dispatch('main/updateVote', {
         voteId: vote.id,
         value: this.ratingModel,
         comment: this.comment
       })
-        .then((r) => {
+        .then(() => {
           this.$store.dispatch('main/getCurrentGroupSongs', {
             groupId: this.$route.params.groupId
           })
-            .then(() => {
+            .then((r) => {
+              this.currentGroupSongs = r.data
               this.$store.dispatch('main/changeLoadingState', false)
               this.voteDialogUpdate = false
               this.comment = ''
@@ -239,9 +264,20 @@ export default {
     }
   },
   mounted () {
+    this.$store.dispatch('main/changeLoadingState', true)
+    this.$store.dispatch('main/getCurrentGroup', {
+      groupId: this.$route.params.groupId
+    })
+      .then(r => {
+        this.group = r.data
+      })
     this.$store.dispatch('main/getCurrentGroupSongs', {
       groupId: this.$route.params.groupId
     })
+      .then(r => {
+        this.$store.dispatch('main/changeLoadingState', false)
+        this.currentGroupSongs = r.data
+      })
   }
 }
 </script>

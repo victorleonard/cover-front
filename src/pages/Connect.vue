@@ -57,6 +57,7 @@ export default {
     connect () {
       this.$q.cookies.remove('token')
       this.$q.cookies.remove('user_id')
+      this.$q.cookies.remove('profile_id')
       this.submitting = true
       this.$store.dispatch('main/changeLoadingState', true)
       // localStorage.removeItem('token')
@@ -69,6 +70,7 @@ export default {
           this.submitting = false
           this.$q.cookies.set('token', resp.data.jwt)
           this.$q.cookies.set('user_id', resp.data.user.id)
+          this.$q.cookies.set('profile_id', resp.data.user.profile.id)
           this.$store.dispatch('main/getMe')
             .then(me => {
               console.log('me', me)

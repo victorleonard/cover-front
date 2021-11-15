@@ -79,14 +79,22 @@ export async function selectSong ({ commit, state }, { song, comment }) {
   const r = await SongService.selectSong(song, comment, state.currentGroup.id, state.user.id)
   return r
 }
-
-export async function vote ({ commit, state }, { value, songId, comment }) {
-  const r = await SongService.vote(value, songId, state.currentGroup.id, state.user.id, comment)
+export async function vote ({ commit, state }, { value, songId, groupId, userId, comment }) {
+  const r = await this.$axios.post('/votes', {
+    vote: value,
+    song: songId,
+    group: groupId,
+    user: userId,
+    comment: comment
+  })
   return r
 }
 
 export async function updateVote ({ commit, state }, { voteId, value, comment }) {
-  const r = await SongService.updateVote(voteId, value, comment)
+  const r = await this.$axios.put('/votes/' + voteId, {
+    vote: value,
+    comment: comment
+  })
   return r
 }
 
