@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import { Cookies } from 'quasar'
 
 import routes from './routes'
 
@@ -14,7 +15,10 @@ Vue.use(VueRouter)
  * with the Router instance.
  */
 
-export default function (/* { store, ssrContext } */) {
+export default function ({ store, ssrContext }) {
+  const cookies = process.env.SERVER
+    ? Cookies.parseSSR(ssrContext)
+    : Cookies // otherwise we're on client
   const Router = new VueRouter({
     scrollBehavior: () => ({ x: 0, y: 0 }),
     routes,
@@ -30,7 +34,7 @@ export default function (/* { store, ssrContext } */) {
 
   Router.afterEach((to, from) => {
     if (!publicRouter.find(el => el === to.name)) {
-      if (!localStorage.getItem('token')) {
+      if (!cookies.has('token')) {
         Router.push({
           name: 'connect'
         })
