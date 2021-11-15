@@ -127,6 +127,7 @@ export default {
         .then(() => {
           this.$q.cookies.remove('token')
           this.$q.cookies.remove('user_id')
+          this.$q.cookies.remove('profile_id')
           this.$router.push({ name: 'welcome' })
         })
     }
