@@ -19,7 +19,7 @@
 <script>
 
 import { mapState } from 'vuex'
-import { Loading, QSpinnerPuff } from 'quasar'
+// import { QSpinnerOrbit } from 'quasar'
 
 export default {
   name: 'App',
@@ -35,17 +35,14 @@ export default {
     },
     loading: function (val) {
       if (val) {
-        Loading.show({
-          spinner: QSpinnerPuff
-          // other props
-        })
+        this.$q.loading.show()
       } else {
-        Loading.hide()
+        this.$q.loading.hide()
       }
     }
   },
   mounted () {
-    this.$store.dispatch('main/getVersion')
+    /* this.$store.dispatch('main/getVersion')
       .then(r => {
         const serverVersion = r.data.num_version
         if (!this.version || (this.version !== serverVersion)) {
@@ -56,7 +53,7 @@ export default {
               location.reload()
             })
         }
-      })
+      }) */
   }
 }
 </script>
