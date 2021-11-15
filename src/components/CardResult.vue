@@ -24,13 +24,13 @@
       <q-list>
           <q-item-label v-if="song.votes.length" style="width: 100%">
             <div class="row q-ma-xs justify-between" v-for="vote in song.votes" :key="vote._id">
-              <div class="col text-grey-9">{{ getUserPseudo(vote.user) }}</div>
+              <div class="col text-grey-9">{{ getUserPseudo(vote.profile_id) }}</div>
               <div class="col col-auto q-mr-xl" >
                 <q-rating v-if="level" slot="subtitle" icon="fas fa-music" color="light-blue-8" :value="vote.level ? vote.level : 0" readonly :max="3" />
               </div>
               <div class="col col-auto" >
                 <q-rating slot="subtitle" :value="vote.vote" readonly :max="5" />
-                <q-btn @click="$emit('displayComment', vote)" v-if="vote.comment" style="position: absolute; margin-top: -2.1px" size="xs" flat round color="primary" icon="fas fa-info-circle" />
+                <q-btn @click="displayComment(vote)" v-if="vote.comment" style="position: absolute; margin-top: -2.1px" size="xs" flat round color="primary" icon="fas fa-info-circle" />
               </div>
             </div>
           </q-item-label>
@@ -98,6 +98,16 @@ export default {
     ...mapState('main', ['currentGroup'])
   },
   methods: {
+    displayComment (vote) {
+      this.$q.notify({
+        color: 'grey-9',
+        message: `${this.song.name}`,
+        caption: vote.comment,
+        actions: [{ icon: 'close', color: 'white' }],
+        position: 'top',
+        avatar: this.getUserAvatar(vote.profile_id)
+      })
+    },
     getVote (song, user) {
       const vote = song.votes.find(v => v.profile_id === user.id)
       if (vote) {
@@ -115,14 +125,14 @@ export default {
       }
     },
     getUserAvatar (id) {
-      const profile = this.currentGroup.profiles.find(p => p.user === id)
+      const profile = this.currentGroup.profiles.find(p => p.id === id)
       if (profile && profile.avatar) {
         return profile.avatar.url
       }
     },
     getUserPseudo (id) {
-      if (this.currentGroup.profiles.find(p => p.user === id)) {
-        return this.currentGroup.profiles.find(p => p.user === id).pseudo
+      if (this.currentGroup.profiles.find(p => p.id === id)) {
+        return this.currentGroup.profiles.find(p => p.id === id).pseudo
       }
     },
     playMusic (track, id) {
