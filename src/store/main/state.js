@@ -1,4 +1,5 @@
 export default {
+  apiHost: process.env.DEV ? 'http://localhost:1337' : 'https://cover-mobile.herokuapp.com/',
   version: undefined,
   loading: false,
   songsList: undefined,
