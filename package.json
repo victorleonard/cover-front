@@ -9,7 +9,7 @@
     "build": "quasar build -m ssr",
     "lint": "eslint --ext .js,.vue ./",
     "test": "echo \"No test specified\" && exit 0",
-    "start": "cd src-ssr && node index.js",
+    "start": "cd dist/ssr && yarn && yarn run start",
     "heroku-postbuild": "npm install --only=dev --no-shrinkwrap && npm run build"
   },
   "dependencies": {
