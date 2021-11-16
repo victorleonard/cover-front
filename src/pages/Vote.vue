@@ -39,7 +39,7 @@
           <q-separator />
 
           <q-card-actions align="right">
-            <q-btn flat color="primary" label="Voter" @click="vote" />
+            <q-btn flat color="primary" no-caps label="Voter" @click="vote" />
           </q-card-actions>
         </q-card>
       </q-dialog>
@@ -70,7 +70,7 @@
           <q-separator />
 
           <q-card-actions align="right">
-            <q-btn flat color="primary" label="Modifer mon vote" @click="updateVote" />
+            <q-btn flat color="primary" no-caps label="Modifer mon vote" @click="updateVote" />
           </q-card-actions>
         </q-card>
       </q-dialog>
@@ -174,9 +174,9 @@ export default {
   },
   methods: {
     displayVoteDialog (t) {
-      const profileId = this.$q.cookies.get('profile_id')
+      const userId = this.$q.cookies.get('user_id')
       this.songSelected = t
-      if (t.votes.find(v => v.profile_id === profileId)) {
+      if (t.votes.find(v => v.user === userId)) {
         this.voteDialogUpdate = true
       } else {
         this.voteDialog = true
