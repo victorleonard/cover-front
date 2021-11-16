@@ -21,7 +21,7 @@ const routes = [
       {
         path: 'register',
         name: 'register',
-        component: () => import('pages/Registerr.vue')
+        component: () => import('pages/Register.vue')
       },
       {
         path: 'profile',
