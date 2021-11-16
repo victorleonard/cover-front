@@ -74,12 +74,12 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 
 export default {
   name: 'search',
   data () {
     return {
+      currentGroupSongs: undefined,
       comment: '',
       songSelectDialog: false,
       songSelected: undefined,
@@ -89,9 +89,6 @@ export default {
       token: '',
       loading: false
     }
-  },
-  computed: {
-    ...mapState('main', ['currentGroupSongs'])
   },
   methods: {
     launchSpotify (id) {
@@ -141,7 +138,9 @@ export default {
       this.$store.dispatch('main/changeLoadingState', true)
       this.$store.dispatch('main/selectSong', {
         song: this.songSelected,
-        comment: this.comment
+        comment: this.comment,
+        groupId: this.$route.params.groupId,
+        userId: this.$q.cookies.get('user_id')
       })
         .then(song => {
           console.log('song', song)
@@ -154,14 +153,17 @@ export default {
               this.$store.dispatch('main/getCurrentGroupSongs', {
                 groupId: this.$route.params.groupId
               })
-              this.songSelectDialog = false
-              this.comment = ''
-              this.ratingModel = 1
-              this.$q.notify({
-                type: 'positive',
-                message: 'Titre séléctioné !',
-                position: 'top'
-              })
+                .then((r) => {
+                  this.currentGroupSongs = r.data
+                  this.songSelectDialog = false
+                  this.comment = ''
+                  this.ratingModel = 1
+                  this.$q.notify({
+                    type: 'positive',
+                    message: 'Titre séléctioné !',
+                    position: 'top'
+                  })
+                })
             })
             .catch(error => {
               console.error('error =>', error)
@@ -210,6 +212,14 @@ export default {
           })
       }
     }
+  },
+  mounted () {
+    this.$store.dispatch('main/getCurrentGroupSongs', {
+      groupId: this.$route.params.groupId
+    })
+      .then((r) => {
+        this.currentGroupSongs = r.data
+      })
   }
 }
 </script>

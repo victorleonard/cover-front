@@ -71,12 +71,24 @@ export async function setIosDeviceToken ({ commit, state }, { token }) {
 }
 
 export async function searchOnSpotify ({ commit, state }, { song, plateform }) {
-  const r = await SongService.searchOnSpotify(song, plateform)
+  const r = await this.$axios.get(`/searches?song=${song}&plateform=${plateform}`)
   return r
 }
 
-export async function selectSong ({ commit, state }, { song, comment }) {
-  const r = await SongService.selectSong(song, comment, state.currentGroup.id, state.user.id)
+export async function selectSong ({ commit, state }, { song, comment, groupId, userId }) {
+  const r = await this.$axios.post('/songs', {
+    spotify_data: song,
+    name: song.name,
+    spotify_id: song.id,
+    spotify_uri: song.uri,
+    artist: song.artists[0].name,
+    album: song.album.name,
+    group: groupId,
+    user: userId,
+    images: song.album.images,
+    comment: comment,
+    spotify_preview_url: song.preview_url
+  })
   return r
 }
 export async function vote ({ commit, state }, { value, songId, groupId, userId, comment }) {

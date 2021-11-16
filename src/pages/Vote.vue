@@ -92,6 +92,7 @@
           <Card
             class="col-xs-12 col-sm-6 col-md-4 col-lg-2 q-mb-lg q-pl-sm q-pr-sm"  @displayComment="displayComment"
             @displayVoteDialog="displayVoteDialog"
+            @loadSongs="loadSongs"
             v-for="s in awaitingVote"
             :song="s"
             :profiles="profiles"
@@ -115,6 +116,7 @@
           class="col-xs-12 col-sm-6 col-md-4 col-lg-2 q-mb-lg q-pl-sm q-pr-sm" @displayComment="displayComment"
           @displayVoteDialog="displayVoteDialog"
           v-for="s in noSelection"
+          @loadSongs="loadSongs"
           :song="s"
           :profiles="profiles"
           :key="s._id" />
@@ -127,7 +129,6 @@
 </template>
 
 <script>
-import Api from '../services/Api'
 import Card from './../components/Card'
 
 export default {
@@ -173,6 +174,16 @@ export default {
     }
   },
   methods: {
+    loadSongs () {
+      this.$store.dispatch('main/changeLoadingState', true)
+      this.$store.dispatch('main/getCurrentGroupSongs', {
+        groupId: this.$route.params.groupId
+      })
+        .then(r => {
+          this.$store.dispatch('main/changeLoadingState', false)
+          this.currentGroupSongs = r.data
+        })
+    },
     displayVoteDialog (t) {
       const userId = this.$q.cookies.get('user_id')
       this.songSelected = t
@@ -181,22 +192,6 @@ export default {
       } else {
         this.voteDialog = true
       }
-    },
-    remove (track) {
-      this.$q.dialog({
-        title: 'Confirm',
-        message: 'Voulez vous supprimer ce titre ?',
-        ok: 'Oui',
-        cancel: 'Non'
-      }).then(() => {
-        Api().delete('track/' + track._id)
-          .then(resp => {
-            this.$store.dispatch('main/loadSongs', false)
-            // this.$q.notify('Le titre a été supprimé')
-          })
-      }).catch(() => {
-        // this.$q.notify('Opération annulé')
-      })
     },
     displayComment (song, user) {
       const vote = song.votes.find(v => v.profile_id === user.id)

@@ -1,5 +1,17 @@
 <template>
 <div>
+  <q-dialog v-model="removeDialog" persistent>
+      <q-card>
+        <q-card-section class="row items-center">
+          <span class="q-ml-sm">Voulez vous supprimer le titre "{{ song.name }}" ?</span>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="Annuler" color="primary" v-close-popup />
+          <q-btn label="Oui" unelevated color="negative" @click="remove" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   <q-card>
   <q-card-section class="q-pa-none">
     <div style="border-bottom: 1px solid #ccc" class="row items-center bg-grey-1">
@@ -54,9 +66,9 @@
         <div>
           <q-btn label="Votez" no-caps dense @click="$emit('displayVoteDialog', song)" flat color="yellow-10" size="md" icon="how_to_vote" />
         </div>
-        <!-- <div v-if="user.id === s.created_by_id">
-          <q-btn @click="remove(s)" label="" flat color="negative" size="md" icon="ion-md-trash" />
-        </div> -->
+        <div v-if="userId === song.created_user_id">
+          <q-btn @click="removeDialog = true" label="" flat color="negative" size="md" icon="ion-md-trash" />
+        </div>
       </q-card-actions>
     </q-card>
 </div>
@@ -67,6 +79,9 @@ import { mapState } from 'vuex'
 
 export default {
   name: 'SongCard',
+  data: () => ({
+    removeDialog: false
+  }),
   props: {
     song: {
       type: Object,
@@ -78,9 +93,19 @@ export default {
     }
   },
   computed: {
-    ...mapState('main', ['currentGroup'])
+    ...mapState('main', ['currentGroup']),
+    userId () {
+      return this.$q.cookies.get('user_id')
+    }
   },
   methods: {
+    remove () {
+      this.$axios.delete('songs/' + this.song.id)
+        .then(() => {
+          this.$emit('loadSongs')
+          this.$q.notify('Le titre a été supprimé')
+        })
+    },
     getVote (song, user) {
       const vote = song.votes.find(v => v.user === user.user_id)
       if (vote) {
