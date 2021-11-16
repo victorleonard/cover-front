@@ -231,9 +231,9 @@ export default {
         })
     },
     updateVote () {
-      const profileId = this.$q.cookies.get('profile_id')
+      const userId = this.$q.cookies.get('user_id')
       this.$store.dispatch('main/changeLoadingState', true)
-      const vote = this.songSelected.votes.find(v => v.profile_id === profileId)
+      const vote = this.songSelected.votes.find(v => v.user === userId)
       this.$store.dispatch('main/updateVote', {
         voteId: vote.id,
         value: this.ratingModel,
