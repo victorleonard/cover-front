@@ -1,5 +1,5 @@
 <template>
-  <q-page class="bg-grey-3" v-if="group" padding>
+  <q-page class="bg-grey-3" padding>
       <q-dialog
         v-model="commentDialog"
       >
@@ -94,6 +94,7 @@
             @displayVoteDialog="displayVoteDialog"
             v-for="s in awaitingVote"
             :song="s"
+            :profiles="profiles"
             :key="s._id" />
         </div>
       </div>
@@ -102,7 +103,7 @@
     <!--//////////// -->
     <!-- alreadyVote -->
     <!--/////////////-->
-    <div class="q-mt-xl" v-if="noSelection.length">
+    <div class="q-mt-xl" v-if="noSelection && noSelection.length">
       <div class="q-mt-sm q-ml-sm q-mr-sm q-mb-lg">
         <div
           class="q-subheading text-weight-bold text-grey-10 text-weight-regular" style="text-transform: uppercase;">
@@ -115,10 +116,11 @@
           @displayVoteDialog="displayVoteDialog"
           v-for="s in noSelection"
           :song="s"
+          :profiles="profiles"
           :key="s._id" />
       </div>
     </div>
-    <div v-else class="q-ml-sm q-mr-sm q-mb-lg">
+    <div v-if="noSelection && !noSelection.length" class="q-ml-sm q-mr-sm q-mb-lg">
       <div class="q-subheading text-grey-10 text-weight-regular">Aucun vote en cours</div>
     </div>
   </q-page>
@@ -126,7 +128,6 @@
 
 <script>
 import Api from '../services/Api'
-import { mapState } from 'vuex'
 import Card from './../components/Card'
 
 export default {
@@ -134,10 +135,9 @@ export default {
   components: { Card },
   data () {
     return {
-      group: undefined,
+      profiles: undefined,
       currentGroupSongs: undefined,
       songSelected: undefined,
-      // songSelect: false,
       ratingModel: 0,
       trackSelected: undefined,
       voteDialog: false,
@@ -148,30 +148,24 @@ export default {
       commentDialog: false
     }
   },
-  watch: {
-    currentGroup () {
-      this.group = this.currentGroup
-    }
-  },
   computed: {
-    ...mapState('main', ['currentGroup', 'user']),
     awaitingVote () {
-      const profileId = this.$q.cookies.get('profile_id')
-      if (this.group && this.currentGroupSongs) {
+      const userId = this.$q.cookies.get('user_id')
+      if (this.profiles && this.currentGroupSongs) {
         const wait = this.currentGroupSongs.filter(el => el.votes &&
-          el.votes.length !== this.group.profiles.length &&
-          !el.votes.find(v => v.profile_id === profileId))
+          el.votes.length !== this.profiles.length &&
+          !el.votes.find(v => v.user === userId))
         return wait
       } else {
         return undefined
       }
     },
     noSelection () {
-      const profileId = this.$q.cookies.get('profile_id')
-      if (this.group && this.currentGroupSongs) {
+      const userId = this.$q.cookies.get('user_id')
+      if (this.profiles && this.currentGroupSongs) {
         const wait = this.currentGroupSongs.filter(el => el.votes &&
-          el.votes.length !== this.group.profiles.length &&
-          el.votes.find(v => v.profile_id === profileId))
+          el.votes.length !== this.profiles.length &&
+          el.votes.find(v => v.user === userId))
         return wait
       } else {
         return undefined
@@ -263,13 +257,11 @@ export default {
         })
     }
   },
-  mounted () {
+  created () {
     this.$store.dispatch('main/changeLoadingState', true)
-    this.$store.dispatch('main/getCurrentGroup', {
-      groupId: this.$route.params.groupId
-    })
+    this.$axios.get(`/profiles?groups.id=${this.$route.params.groupId}`)
       .then(r => {
-        this.group = r.data
+        this.profiles = r.data
       })
     this.$store.dispatch('main/getCurrentGroupSongs', {
       groupId: this.$route.params.groupId

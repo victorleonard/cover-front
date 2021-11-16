@@ -235,21 +235,12 @@ export default {
         })
     }
   },
-  mounted () {
+  created () {
     this.loadAcceptedSong()
     this.$axios.get(`/profiles?groups.id=${this.$route.params.groupId}`)
       .then(r => {
         this.profiles = r.data
       })
-    /* this.checkIfUserIsLogged()
-    let silentLoading
-    if (this.songsList && this.songsList.length) {
-      silentLoading = true
-    } else {
-      silentLoading = false
-    }
-    this.$store.dispatch('main/loadSongs', silentLoading)
-    this.$store.dispatch('main/loadUsers') */
   }
 }
 </script>

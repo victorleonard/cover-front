@@ -14,7 +14,7 @@
   </q-card-section>
     <q-list class="q-pt-none">
       <q-item-label class="q-pa-md" style="width: 100%">
-        <div class="row q-ma-xs justify-between" v-for="user in currentGroup.profiles" :key="user._id">
+        <div class="row q-ma-xs justify-between" v-for="user in profiles" :key="user._id">
           <div class="col text-grey-9">{{ user.pseudo }}</div>
           <div class="col col-auto">
             <q-rating slot="subtitle" :value="getVote(song, user)" readonly :max="5" />
@@ -31,8 +31,8 @@
       <q-separator />
       <q-card-actions align="around">
         <q-item-section avatar style="margin-right: -8px;">
-          <q-avatar v-if="getUserAvatar(song.created_by_id)" color="grey-7" text-color="white">
-            <img :src="getUserAvatar(song.created_by_id)" alt="">
+          <q-avatar v-if="getUserAvatar(song.created_profile_id)" color="grey-7" text-color="white">
+            <img :src="getUserAvatar(song.created_profile_id)" alt="">
           </q-avatar>
           <q-avatar v-else color="grey-7" text-color="white" icon="fas fa-user-astronaut">
           </q-avatar>
@@ -71,6 +71,10 @@ export default {
     song: {
       type: Object,
       default: () => {}
+    },
+    profiles: {
+      type: Array,
+      default: () => []
     }
   },
   computed: {
@@ -78,7 +82,7 @@ export default {
   },
   methods: {
     getVote (song, user) {
-      const vote = song.votes.find(v => v.profile_id === user.id)
+      const vote = song.votes.find(v => v.user === user.user_id)
       if (vote) {
         return vote.vote
       } else {
@@ -86,7 +90,7 @@ export default {
       }
     },
     getComment (song, user) {
-      const vote = song.votes.find(v => v.user === user.user)
+      const vote = song.votes.find(v => v.user === user.user_id)
       if (vote) {
         return vote.comment
       } else {
@@ -94,7 +98,7 @@ export default {
       }
     },
     getUserAvatar (id) {
-      const profile = this.currentGroup.profiles.find(p => p.id === id)
+      const profile = this.profiles.find(p => p.id === id)
       if (profile && profile.avatar) {
         return profile.avatar.url
       }
