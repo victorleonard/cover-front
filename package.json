@@ -10,7 +10,7 @@
     "lint": "eslint --ext .js,.vue ./",
     "test": "echo \"No test specified\" && exit 0",
     "start": "node dist/ssr",
-    "heroku-postbuild": "yarn && yarn quasar build -m ssr"
+    "heroku-postbuild": "yarn && yarn run build"
   },
   "dependencies": {
     "@capacitor/core": "^2.4.2",
