@@ -6,11 +6,11 @@
   "author": "Victor-LEONARD <leonard@abvent.fr>",
   "private": true,
   "scripts": {
-    "build": "yarn quasar build -m ssr",
+    "build": "quasar build -m ssr",
     "lint": "eslint --ext .js,.vue ./",
     "test": "echo \"No test specified\" && exit 0",
     "start": "node dist/ssr",
-    "heroku-postbuild": "yarn && yarn run build"
+    "heroku-postbuild": "npm install --only=dev --no-shrinkwrap && npm run build"
   },
   "dependencies": {
     "@capacitor/core": "^2.4.2",
