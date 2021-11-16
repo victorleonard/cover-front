@@ -110,7 +110,7 @@
 
 <script>
 import { QHeader, QFooter, QTabs, QRouteTab } from 'quasar'
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'vuex'
 
 export default {
   components: { QHeader, QFooter, QTabs, QRouteTab },
@@ -124,13 +124,25 @@ export default {
   },
   data () {
     return {
+      profiles: undefined,
+      currentGroupSongs: undefined,
       currentGroup: undefined,
       leftDrawerOpen: false
     }
   },
   computed: {
-    ...mapGetters('main', ['awaitingVote']),
-    ...mapState('main', ['user', 'currentGroupProfile', 'version'])
+    ...mapState('main', ['user', 'currentGroupProfile', 'version']),
+    awaitingVote () {
+      const userId = this.$q.cookies.get('user_id')
+      if (this.profiles && this.currentGroupSongs) {
+        const wait = this.currentGroupSongs.filter(el => el.votes &&
+          el.votes.length !== this.profiles.length &&
+          !el.votes.find(v => v.user === userId))
+        return wait
+      } else {
+        return undefined
+      }
+    }
   },
   methods: {
     refresh () {
@@ -142,6 +154,19 @@ export default {
           this.$router.push({ name: 'home' })
         })
     }
+  },
+  mounted () {
+    this.$axios.get(`/profiles?groups.id=${this.$route.params.groupId}`)
+      .then(r => {
+        this.profiles = r.data
+      })
+    this.$store.dispatch('main/getCurrentGroupSongs', {
+      groupId: this.$route.params.groupId
+    })
+      .then(r => {
+        this.$store.dispatch('main/changeLoadingState', false)
+        this.currentGroupSongs = r.data
+      })
   },
   beforeCreate () {
     this.$store.dispatch('main/changeLoadingState', true)
