@@ -106,7 +106,6 @@
       <CardResult
         :level="false"
         coverSize="64px"
-        @displayComment="displayComment"
         @showLevelModal="showLevelModal"
         @showUpdateModal="showUpdateModal"
         :profiles="profiles"

@@ -44,8 +44,8 @@
 <q-separator />
     <q-card-actions align="around">
       <q-item-section avatar style="margin-right: -8px;">
-        <q-avatar v-if="getUserAvatar(song.created_profile_id)" color="grey-7" text-color="white">
-          <img :src="getUserAvatar(song.created_profile_id)" alt="">
+        <q-avatar v-if="getUserAvatar(song.created_user_id)" color="grey-7" text-color="white">
+          <img :src="getUserAvatar(song.created_user_id)" alt="">
         </q-avatar>
         <q-avatar v-else color="grey-7" text-color="white" icon="fas fa-user-astronaut">
         </q-avatar>
@@ -105,11 +105,11 @@ export default {
         caption: vote.comment,
         actions: [{ icon: 'close', color: 'white' }],
         position: 'top',
-        avatar: this.getUserAvatar(vote.profile_id)
+        avatar: this.getUserAvatar(vote.user)
       })
     },
     getUserAvatar (id) {
-      const profile = this.profiles.find(p => p.id === id)
+      const profile = this.profiles.find(p => p.user_id === id)
       if (profile && profile.avatar) {
         return profile.avatar.url
       }
