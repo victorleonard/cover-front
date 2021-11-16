@@ -6,6 +6,7 @@
   "author": "Victor-LEONARD <leonard@abvent.fr>",
   "private": true,
   "scripts": {
+    "build": "yarn && yarn quasar build -m ssr",
     "lint": "eslint --ext .js,.vue ./",
     "test": "echo \"No test specified\" && exit 0"
   },
