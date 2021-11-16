@@ -3,7 +3,7 @@
   <template v-slot:header style="padding: 0">
     <q-item-section avatar>
       <q-avatar square :size="coverSize">
-        <img :src="song.images[0].url">
+        <img :src="song.images[0].url" alt="">
       </q-avatar>
       <div class="absolute q-item-letter">
         {{ getTotal(song.votes) }}
@@ -24,7 +24,7 @@
       <q-list>
           <q-item-label v-if="song.votes.length" style="width: 100%">
             <div class="row q-ma-xs justify-between" v-for="vote in song.votes" :key="vote._id">
-              <div class="col text-grey-9">{{ getUserPseudo(vote.user) }}</div>
+              <div class="col text-grey-9">{{ getUserPseudoFromVote(vote.user) }}</div>
               <div class="col col-auto q-mr-xl" >
                 <q-rating v-if="level" slot="subtitle" icon="fas fa-music" color="light-blue-8" :value="vote.level ? vote.level : 0" readonly :max="3" />
               </div>
@@ -44,15 +44,15 @@
 <q-separator />
     <q-card-actions align="around">
       <q-item-section avatar style="margin-right: -8px;">
-        <q-avatar v-if="getUserAvatar(song.user.id)" color="grey-7" text-color="white">
-          <img :src="getUserAvatar(song.user.id)" alt="">
+        <q-avatar v-if="getUserAvatar(song.created_profile_id)" color="grey-7" text-color="white">
+          <img :src="getUserAvatar(song.created_profile_id)" alt="">
         </q-avatar>
         <q-avatar v-else color="grey-7" text-color="white" icon="fas fa-user-astronaut">
         </q-avatar>
       </q-item-section>
 
       <q-item-section>
-        <q-item-label>{{ getUserPseudo(song.user.id) }}</q-item-label>
+        <q-item-label>{{ getUserPseudo(song.created_profile_id) }}</q-item-label>
       </q-item-section>
       <div v-if="song.spotify_preview_url">
         <audio :id="'audio-'+song._id" :src="song.spotify_preview_url"></audio>
@@ -76,7 +76,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 
 export default {
   name: 'SongCardResult',
@@ -92,10 +91,11 @@ export default {
     song: {
       type: Object,
       default: () => {}
+    },
+    profiles: {
+      type: Array,
+      default: () => []
     }
-  },
-  computed: {
-    ...mapState('main', ['currentGroup'])
   },
   methods: {
     displayComment (vote) {
@@ -108,33 +108,20 @@ export default {
         avatar: this.getUserAvatar(vote.profile_id)
       })
     },
-    getVote (song, user) {
-      const vote = song.votes.find(v => v.profile_id === user.id)
-      if (vote) {
-        return vote.vote
-      } else {
-        return 0
-      }
-    },
-    getComment (song, user) {
-      const vote = song.votes.find(v => v.profile_id === user.id)
-      if (vote) {
-        return vote.comment
-      } else {
-        return 0
-      }
-    },
     getUserAvatar (id) {
-      if (this.currentGroup) {
-        const profile = this.currentGroup.profiles.find(p => p.user === id)
-        if (profile && profile.avatar) {
-          return profile.avatar.url
-        }
+      const profile = this.profiles.find(p => p.id === id)
+      if (profile && profile.avatar) {
+        return profile.avatar.url
       }
     },
     getUserPseudo (id) {
-      if (this.currentGroup && this.currentGroup.profiles.find(p => p.user === id)) {
-        return this.currentGroup.profiles.find(p => p.user === id).pseudo
+      if (this.profiles.find(p => p.id === id)) {
+        return this.profiles.find(p => p.id === id).pseudo
+      }
+    },
+    getUserPseudoFromVote (id) {
+      if (this.profiles.find(p => p.user_id === id)) {
+        return this.profiles.find(p => p.user_id === id).pseudo
       }
     },
     playMusic (track, id) {

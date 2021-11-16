@@ -75,13 +75,14 @@
     <!-- Morceaux selectionnés -->
     <div class="q-ml-sm q-mr-sm q-pb-md">
       <div class="q-subheading text-weight-bold text-grey-10 text-weight-regular" style="text-transform: uppercase;">Titres selectionnés</div>
-      <div  v-if="currentGroup" class="q-caption text-grey-10">Au moins {{ currentGroup.score }} <q-icon name="star" color="grey-8" /></div>
+      <div v-if="currentGroup" class="q-caption text-grey-10">Au moins {{ currentGroup.score }} <q-icon name="star" color="grey-8" /></div>
       <hr>
     </div>
     <div v-if="songAccepted">
     <CardResult
       :level="true"
       coverSize="80px"
+      :profiles="profiles"
       @showLevelModal="showLevelModal"
       @showUpdateModal="showUpdateModal"
       :song="s"
@@ -108,6 +109,7 @@
         @displayComment="displayComment"
         @showLevelModal="showLevelModal"
         @showUpdateModal="showUpdateModal"
+        :profiles="profiles"
         :song="s"
         v-for="s in songRefused"
         :key="s.id"
@@ -119,7 +121,6 @@
 <script>
 
 import { mapState } from 'vuex'
-import moment from 'moment'
 import orderBy from 'lodash/orderBy'
 import CardResult from './../components/CardResult'
 
@@ -130,6 +131,7 @@ export default {
     return {
       songRefused: undefined,
       songAccepted: undefined,
+      profiles: undefined,
       levelModal: undefined,
       levelModel: undefined,
       ratingModel: undefined,
@@ -145,45 +147,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('main', ['user', 'currentGroup']),
-    average () {
-      if (!this.currentGroup) return
-      return parseInt((this.currentGroup.profiles.length * 5) / 1.3)
-    }/*,
-    songAccepted () {
-      if (this.currentGroupSongs && this.currentGroup) {
-        const acceptedSong = this.currentGroupSongs.filter(s => s.status === 'accepted')
-        const result = []
-        acceptedSong.forEach(el => {
-          if (el.votes.length && el.votes.length === this.currentGroup.profiles.length) {
-            let total = 0
-            el.votes.forEach(vote => {
-              total += vote.vote
-            })
-            el.total = total
-            result.push(el)
-          }
-        })
-        return orderBy(result, ['total'], ['desc'])
-      } else {
-        return undefined
-      }
-    },
-    songRefused () {
-      if (!this.currentRefuseGroupSongs) return
-      const result = []
-      this.currentRefuseGroupSongs.forEach(el => {
-        if (el.votes.length && el.votes.length === this.currentGroup.profiles.length) {
-          let total = 0
-          el.votes.forEach(vote => {
-            total += vote.vote
-          })
-          el.total = total
-          result.push(el)
-        }
-      })
-      return orderBy(result, ['total'], ['desc'])
-    } */
+    ...mapState('main', ['user', 'currentGroup'])
   },
   methods: {
     loadAcceptedSong () {
@@ -196,7 +160,6 @@ export default {
             songCopy.total = total
             return songCopy
           })
-          console.log(result)
           this.$store.dispatch('main/changeLoadingState', false)
           this.songAccepted = orderBy(result, ['total'], ['desc'])
         })
@@ -207,76 +170,6 @@ export default {
         .then(r => {
           this.songRefused = r.data
           this.$store.dispatch('main/changeLoadingState', false)
-        })
-      /* this.$store.dispatch('main/getCurrentRefuseGroupSongs', {
-        groupId: this.$route.params.groupId
-      })
-        .then(() => {
-          this.$store.dispatch('main/changeLoadingState', false)
-        })
-        .catch(() => {
-          this.$store.dispatch('main/changeLoadingState', false)
-        }) */
-    },
-    getLevelAverage (votes) {
-      const maxTotal = votes.length * 3
-      let total = 0
-      votes.forEach(v => {
-        if (v.level) {
-          total += v.level
-        }
-      })
-      return total / maxTotal
-    },
-    getUserPseudo (id) {
-      if (this.currentGroup.profiles.find(p => p.id === id)) {
-        return this.currentGroup.profiles.find(p => p.id === id).pseudo
-      }
-    },
-    getUserAvatar (id) {
-      const profile = this.currentGroup.profiles.find(p => p.id === id)
-      if (profile && profile.avatar) {
-        return profile.avatar.url
-      }
-    },
-    /* displayComment (vote) {
-      const userProfile = this.currentGroup.profiles.find(p => p.user === vote.user)
-      if (userProfile) {
-        this.commentTempUser = userProfile.pseudo
-        this.commentTemp = vote.comment
-        this.commentDialog = true
-      }
-    }, */
-    getVote (song) {
-      const vote = song.votes.find(v => v.profile === this.user.profile)
-      return vote.vote
-    },
-    getTotal (votes) {
-      let total = 0
-      votes.forEach(vote => {
-        total += vote.vote
-      })
-      return total
-    },
-    launchSpotify (id) {
-      location.href = id
-    },
-    launchDeezer (s) {
-      this.$store.dispatch('main/searchOnSpotify', {
-        song: s.name + ' ' + s.artist,
-        plateform: 'deezer'
-      })
-        .then(r => {
-          if (r.data[0]) {
-            // window.open(r.data[0].link, '_blank')
-            location.href = 'deezer://www.deezer.com/track/' + r.data[0].id
-          } else {
-            this.$q.notify({
-              type: 'negative',
-              message: 'Ce titre n\'a pas été trouvé sur Deezer',
-              position: 'top'
-            })
-          }
         })
     },
     showLevelModal (track) {
@@ -340,50 +233,14 @@ export default {
             position: 'top'
           })
         })
-    },
-    playMusic (track, id) {
-      document.querySelectorAll('audio').forEach(el => {
-        el.pause()
-      })
-      document.querySelectorAll('.pause').forEach(el => {
-        el.classList.add('hide')
-      })
-      document.querySelectorAll('.play').forEach(el => {
-        el.classList.remove('hide')
-      })
-      document.querySelector('#audio-' + id).play()
-      document.querySelector('#play-' + id).classList.add('hide')
-      document.querySelector('#pause-' + id).classList.remove('hide')
-    },
-    pauseMusic (track, id) {
-      document.querySelectorAll('audio').forEach(el => {
-        el.pause()
-      })
-      document.querySelector('#audio-' + id).pause()
-      document.querySelector('#play-' + id).classList.remove('hide')
-      document.querySelector('#pause-' + id).classList.add('hide')
-    },
-    getAverage (votes) {
-      let total = 0
-      votes.forEach(v => {
-        total += v.value
-      })
-      return total / votes.length
-    },
-    formatDate (date) {
-      return moment(date).lang('fr').format('L')
-    },
-    getUserName (userId) {
-      if (this.users) {
-        const userName = this.users.find(user => user._id === userId)
-        if (userName) {
-          return userName.name
-        }
-      }
     }
   },
   mounted () {
     this.loadAcceptedSong()
+    this.$axios.get(`/profiles?groups.id=${this.$route.params.groupId}`)
+      .then(r => {
+        this.profiles = r.data
+      })
     /* this.checkIfUserIsLogged()
     let silentLoading
     if (this.songsList && this.songsList.length) {
