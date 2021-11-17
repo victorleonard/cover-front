@@ -51,7 +51,7 @@
         </q-item-section>
 
         <q-item-section>
-          <!-- <q-item-label>{{ getUserPseudo(song.created_by_id) }}</q-item-label> -->
+          <q-item-label>{{ getUserPseudo(song.created_profile_id) }}</q-item-label>
         </q-item-section>
         <div v-if="song.spotify_preview_url">
           <audio :id="'audio-'+song._id" :src="song.spotify_preview_url"></audio>
