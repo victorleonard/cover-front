@@ -120,7 +120,8 @@ export default {
   },
   methods: {
     refresh () {
-      location.reload()
+      location.reload(true)
+      console.log('refresh')
     },
     logout () {
       this.$store.dispatch('main/logout')
