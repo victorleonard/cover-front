@@ -1,38 +1,52 @@
 <template>
   <div id="q-app">
-    <!-- <q-dialog class="q-pa-md q-gutter-sm" v-model="dialog" minimized position="top">
+    <q-dialog class="q-pa-md q-gutter-sm" v-model="dialog" minimized position="top" persistent>
       <q-card>
         <q-card-section class="row items-center no-wrap">
           <div>
-            <div class="text-weight-bold">Titre</div>
-            <div class="text-grey">Erreur</div>
+            <div class="text-weight-bold">Nouvelle mise à jour</div>
+            <div class="text-grey">Merci de cliquer sur le bouton pour mettre à jour</div>
           </div>
         </q-card-section>
         <q-card-actions align="right">
-          <q-btn flat label="OK" color="primary" v-close-popup />
+          <q-btn label="Mettre à jour" unelevated no-caps @click="refresh" color="primary" v-close-popup />
         </q-card-actions>
       </q-card>
-    </q-dialog> -->
+    </q-dialog>
     <router-view />
   </div>
 </template>
 <script>
 
 import { mapState } from 'vuex'
-// import { QSpinnerOrbit } from 'quasar'
 
 export default {
   name: 'App',
   data: () => ({
-    dialog: true
+    dialog: false
   }),
-  computed: mapState('main', ['version', 'loading', 'user', 'error']),
-  watch: {
-    error: (val) => {
-      if (val.type === true) {
-        this.dialog = true
-      }
+  computed: mapState('main', ['loading']),
+  methods: {
+    refresh () {
+      location.reload(true)
     },
+    checkNewVersion () {
+      console.log('check new version')
+      this.$axios.get('/version')
+        .then(r => {
+          const serverVersion = r.data.num_version
+          if (!this.$q.cookies.get('version')) {
+            this.$q.cookies.set('version', serverVersion)
+          } else {
+            if (parseFloat(this.$q.cookies.get('version')) !== parseFloat(serverVersion)) {
+              this.$q.cookies.set('version', serverVersion)
+              this.dialog = true
+            }
+          }
+        })
+    }
+  },
+  watch: {
     loading: function (val) {
       if (val) {
         this.$q.loading.show()
@@ -42,18 +56,9 @@ export default {
     }
   },
   mounted () {
-    /* this.$store.dispatch('main/getVersion')
-      .then(r => {
-        const serverVersion = r.data.num_version
-        if (!this.version || (this.version !== serverVersion)) {
-          this.$store.dispatch('main/setLocalVersion', {
-            version: serverVersion
-          })
-            .then(() => {
-              location.reload()
-            })
-        }
-      }) */
+    setInterval(() => {
+      this.checkNewVersion()
+    }, 60000)
   }
 }
 </script>
