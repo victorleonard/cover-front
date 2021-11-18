@@ -146,7 +146,9 @@ export default {
           console.log('song', song)
           this.$store.dispatch('main/vote', {
             value: this.ratingModel,
-            songId: song.data.id
+            songId: song.data.id,
+            groupId: this.$route.params.groupId,
+            userId: this.$q.cookies.get('user_id')
           })
             .then(() => {
               this.$store.dispatch('main/changeLoadingState', false)
