@@ -115,13 +115,13 @@ import { mapState } from 'vuex'
 export default {
   components: { QHeader, QFooter, QTabs, QRouteTab },
   name: 'MyLayout',
-  watch: {
+  /* watch: {
     '$route' (to, from) {
       this.$store.dispatch('main/getCurrentGroupSongs', {
         groupId: this.$route.params.groupId
       })
     }
-  },
+  }, */
   data () {
     return {
       profiles: undefined,
@@ -145,9 +145,6 @@ export default {
     }
   },
   methods: {
-    refresh () {
-      location.reload()
-    },
     logout () {
       this.$store.dispatch('main/logout')
         .then(() => {
