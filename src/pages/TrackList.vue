@@ -165,7 +165,7 @@ export default {
     },
     loadRefuseSong () {
       this.$store.dispatch('main/changeLoadingState', true)
-      this.$axios.get(`/songs?group=${this.$route.params.groupId}&status=refuse`)
+      this.$axios.get(`/songs?group=${this.$route.params.groupId}&status=refuse&_sort=createdAt:DESC`)
         .then(r => {
           this.songRefused = r.data
           this.$store.dispatch('main/changeLoadingState', false)
