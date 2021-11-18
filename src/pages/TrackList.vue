@@ -1,4 +1,5 @@
 <template>
+<q-pull-to-refresh @refresh="refresh">
   <q-page v-if="songAccepted" padding class="search-page q-pl-md q-pr-md">
     <!-- set or update level -->
     <q-dialog class="modal" minimized v-model="levelModal">
@@ -115,6 +116,7 @@
       />
     </div>
   </q-page>
+</q-pull-to-refresh>
 </template>
 
 <script>
@@ -149,6 +151,13 @@ export default {
     ...mapState('main', ['user', 'currentGroup'])
   },
   methods: {
+    refresh (done) {
+      this.$axios.get(`/songs?group=${this.$route.params.groupId}&status=accepted`)
+        .then(r => {
+          this.songAccepted = orderBy(r.data, ['total'], ['desc'])
+          done()
+        })
+    },
     loadAcceptedSong () {
       this.$store.dispatch('main/changeLoadingState', true)
       this.$axios.get(`/songs?group=${this.$route.params.groupId}&status=accepted`)

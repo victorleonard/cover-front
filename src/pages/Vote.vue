@@ -1,4 +1,5 @@
 <template>
+<q-pull-to-refresh @refresh="refresh">
   <q-page class="bg-grey-3" padding>
       <q-dialog
         v-model="commentDialog"
@@ -126,6 +127,7 @@
       <div class="q-subheading text-grey-10 text-weight-regular">Aucun vote en cours</div>
     </div>
   </q-page>
+</q-pull-to-refresh>
 </template>
 
 <script>
@@ -174,6 +176,15 @@ export default {
     }
   },
   methods: {
+    refresh (done) {
+      this.$store.dispatch('main/getCurrentGroupSongs', {
+        groupId: this.$route.params.groupId
+      })
+        .then(r => {
+          this.currentGroupSongs = r.data
+          done()
+        })
+    },
     loadSongs () {
       this.$store.dispatch('main/changeLoadingState', true)
       this.$store.dispatch('main/getCurrentGroupSongs', {
