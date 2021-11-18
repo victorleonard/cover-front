@@ -72,6 +72,36 @@
         </q-card-actions>
         </q-card>
     </q-dialog>
+    <!-- update vote -->
+    <!-- DIALOG selection -->
+      <q-dialog v-model="voteDialogUpdate">
+        <q-card class="my-card" v-if="trackSelected" style="width: 70vw">
+          <q-img :src="trackSelected.images[0].url" />
+
+          <q-card-section>
+            <div class="row no-wrap items-center">
+              <div class="text-h6">
+                {{ trackSelected.name }}
+              </div>
+            </div>
+            <div class="text-caption text-grey q-mb-sm">{{ trackSelected.artist }}</div>
+
+            <q-rating v-model="ratingModel" :max="5" size="32px" />
+          </q-card-section>
+
+          <q-card-section class="q-pt-none">
+            <q-editor v-model="comment" :toolbar="[
+          ['bold', 'italic', 'underline']
+        ]" min-height="5rem" />
+          </q-card-section>
+
+          <q-separator />
+
+          <q-card-actions align="right">
+            <q-btn flat color="primary" no-caps label="Modifer mon vote" @click="updateVote" />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
 
     <!-- Morceaux selectionnés -->
     <div class="q-ml-sm q-mr-sm q-pb-md">
@@ -85,7 +115,7 @@
       coverSize="80px"
       :profiles="profiles"
       @showLevelModal="showLevelModal"
-      @showUpdateModal="showUpdateModal"
+      @showUpdateModal="displayVoteDialog"
       :song="s"
       v-for="s in songAccepted"
       :key="s.id"
@@ -108,7 +138,7 @@
         :level="false"
         coverSize="64px"
         @showLevelModal="showLevelModal"
-        @showUpdateModal="showUpdateModal"
+        @showUpdateModal="displayVoteDialog"
         :profiles="profiles"
         :song="s"
         v-for="s in songRefused"
@@ -130,6 +160,7 @@ export default {
   components: { CardResult },
   data () {
     return {
+      voteDialogUpdate: false,
       songRefused: undefined,
       songAccepted: undefined,
       profiles: undefined,
@@ -142,6 +173,7 @@ export default {
       rating: {
         muse: 1
       },
+      comment: '',
       commentTempUser: '',
       commentTemp: '',
       commentDialog: false
@@ -179,11 +211,20 @@ export default {
       this.levelModel = 1
       this.trackSelected = track
     },
-    showUpdateModal (track) {
+    displayVoteDialog (song) {
+      console.log(song)
+      const userId = this.$q.cookies.get('user_id')
+      const vote = song.votes.find(v => v.user === userId)
+      this.comment = vote.comment
+      this.ratingModel = vote.vote
+      this.trackSelected = song
+      this.voteDialogUpdate = true
+    },
+    /* showUpdateModal (track) {
       this.updateOpened = true
       this.ratingModel = 1
       this.trackSelected = track
-    },
+    }, */
     updateLevel () {
       const userId = this.$q.cookies.get('user_id')
       this.$store.dispatch('main/changeLoadingState', true)
@@ -213,13 +254,18 @@ export default {
       const vote = this.trackSelected.votes.find(v => v.user === userId)
       this.$store.dispatch('main/updateVote', {
         voteId: vote.id,
-        value: this.ratingModel
+        value: this.ratingModel,
+        comment: this.comment
       })
         .then(r => {
+          if (r.data.song.status === 'refuse') {
+            this.loadRefuseSong()
+          }
           this.$store.dispatch('main/getCurrentGroupSongs', {
             groupId: this.$route.params.groupId
           })
             .then(() => {
+              this.voteDialogUpdate = false
               this.$store.dispatch('main/changeLoadingState', false)
               this.updateOpened = false
               this.$q.notify({

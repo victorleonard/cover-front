@@ -142,7 +142,6 @@ export default {
       currentGroupSongs: undefined,
       songSelected: undefined,
       ratingModel: 0,
-      trackSelected: undefined,
       voteDialog: false,
       comment: '',
       voteDialogUpdate: false,
