@@ -153,14 +153,8 @@ export default {
       this.$store.dispatch('main/changeLoadingState', true)
       this.$axios.get(`/songs?group=${this.$route.params.groupId}&status=accepted`)
         .then(r => {
-          const result = r.data.map((song) => {
-            const songCopy = { ...song }
-            const total = songCopy.votes.reduce((a, b) => a + b, 0)
-            songCopy.total = total
-            return songCopy
-          })
           this.$store.dispatch('main/changeLoadingState', false)
-          this.songAccepted = orderBy(result, ['total'], ['desc'])
+          this.songAccepted = orderBy(r.data, ['total'], ['desc'])
         })
     },
     loadRefuseSong () {
@@ -182,8 +176,9 @@ export default {
       this.trackSelected = track
     },
     updateLevel () {
+      const userId = this.$q.cookies.get('user_id')
       this.$store.dispatch('main/changeLoadingState', true)
-      const vote = this.trackSelected.votes.find(v => v.created_by_id === this.user.id)
+      const vote = this.trackSelected.votes.find(v => v.user === userId)
       this.$store.dispatch('main/updateLevel', {
         voteId: vote.id,
         value: this.levelModel
@@ -205,7 +200,8 @@ export default {
     },
     updateVote () {
       this.$store.dispatch('main/changeLoadingState', true)
-      const vote = this.trackSelected.votes.find(v => v.created_by_id === this.user.id)
+      const userId = this.$q.cookies.get('user_id')
+      const vote = this.trackSelected.votes.find(v => v.user === userId)
       this.$store.dispatch('main/updateVote', {
         voteId: vote.id,
         value: this.ratingModel
