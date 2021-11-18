@@ -91,7 +91,7 @@
       <div>
         <div class="row">
           <Card
-            class="col-xs-12 col-sm-6 col-md-4 col-lg-2 q-mb-lg q-pl-sm q-pr-sm"  @displayComment="displayComment"
+            class="col-xs-12 col-sm-6 col-md-4 col-lg-2 q-mb-lg q-pl-sm q-pr-sm"
             @displayVoteDialog="displayVoteDialog"
             @loadSongs="loadSongs"
             v-for="s in awaitingVote"
@@ -114,7 +114,7 @@
       </div>
       <div class="row">
         <Card
-          class="col-xs-12 col-sm-6 col-md-4 col-lg-2 q-mb-lg q-pl-sm q-pr-sm" @displayComment="displayComment"
+          class="col-xs-12 col-sm-6 col-md-4 col-lg-2 q-mb-lg q-pl-sm q-pr-sm"
           @displayVoteDialog="displayVoteDialog"
           v-for="s in noSelection"
           @loadSongs="loadSongs"
@@ -203,12 +203,6 @@ export default {
       } else {
         this.voteDialog = true
       }
-    },
-    displayComment (song, user) {
-      const vote = song.votes.find(v => v.profile_id === user.id)
-      this.commentTempUser = vote.created_by
-      this.commentTemp = vote.comment
-      this.commentDialog = true
     },
     vote () {
       this.$store.dispatch('main/changeLoadingState', true)

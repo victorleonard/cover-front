@@ -30,7 +30,7 @@
           <div class="col text-grey-9">{{ user.pseudo }}</div>
           <div class="col col-auto">
             <q-rating slot="subtitle" :value="getVote(song, user)" readonly :max="5" />
-            <q-btn @click="$emit('displayComment', song, user)" v-if="getComment(song, user)" style="position: absolute; margin-top: -2.1px" size="xs" flat round color="primary" icon="fas fa-info-circle" />
+            <q-btn @click="displayComment(song, user)" v-if="getComment(song, user)" style="position: absolute; margin-top: -2.1px" size="xs" flat round color="primary" icon="fas fa-info-circle" />
           </div>
         </div>
       </q-item-label>
@@ -99,6 +99,25 @@ export default {
     }
   },
   methods: {
+    displayComment (song, user) {
+      const vote = song.votes.find(v => v.user === user.user_id)
+      this.$q.notify({
+        color: 'grey-9',
+        message: `${user.pseudo} - ${this.song.name}`,
+        caption: vote.comment,
+        actions: [{ icon: 'close', color: 'white' }],
+        position: 'top',
+        avatar: this.getUserAvatar(user.id)
+      })
+    },
+    getComment (song, user) {
+      const vote = song.votes.find(v => v.user === user.user_id)
+      if (vote && vote.comment) {
+        return vote.comment
+      } else {
+        return 0
+      }
+    },
     remove () {
       this.$axios.delete('songs/' + this.song.id)
         .then(() => {
@@ -110,14 +129,6 @@ export default {
       const vote = song.votes.find(v => v.user === user.user_id)
       if (vote) {
         return vote.vote
-      } else {
-        return 0
-      }
-    },
-    getComment (song, user) {
-      const vote = song.votes.find(v => v.user === user.user_id)
-      if (vote) {
-        return vote.comment
       } else {
         return 0
       }
