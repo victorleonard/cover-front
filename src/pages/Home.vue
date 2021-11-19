@@ -2,12 +2,12 @@
   <q-page padding>
     <div class="row q-pt-md q-pl-sm q-pr-sm">
       <q-card v-for="group in myGroupsOrder" :key="group.id" class="my-card q-mb-lg" style="width: 100%">
-        <q-img :src="getBestFormatImage(group.image.formats)" :ratio="4/3" style="min-height: 240px">
+        <q-img class="bg-grey-9" :src="group.image.url" style="min-height: 240px">
           <div class="text-h6 absolute-top text-left">
             {{ group.name }}
           </div>
         </q-img>
-        <q-card-section class="q-pr-lg">
+        <q-card-section class="q-pr-xl">
         <q-chip v-for="profile in group.profiles" :key="profile.id">
           <q-avatar v-if="profile.avatar">
             <img :src="profile.avatar.url" alt="avatar">
@@ -78,6 +78,7 @@ export default {
   },
   methods: {
     getBestFormatImage (formats) {
+      console.log(formats)
       if (formats.medium) {
         return formats.medium.url
       } else if (formats.small) {
