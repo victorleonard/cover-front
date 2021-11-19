@@ -95,7 +95,7 @@
     </q-page-container>
 
     <q-footer bordered>
-      <q-tabs no-caps indicator-color="transparent" dense >
+      <q-tabs no-caps indicator-color="transparent">
         <q-route-tab :to="{ name: 'search' }" icon="add" exact replace label="Proposer"/>
         <q-route-tab :to="{ name: 'vote' }" icon="how_to_vote" exact replace label="Voter">
           <q-badge color="red" floating transparent v-if="awaitingVote && awaitingVote.length">
