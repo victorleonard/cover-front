@@ -5,6 +5,24 @@
     <div class="q-ml-sm q-mr-sm q-pb-md">
       <div class="q-subheading text-weight-bold text-grey-10 text-weight-regular" style="text-transform: uppercase;">SetList</div>
       <hr>
+      <div>
+        <div class="row">
+          <q-card v-for="song in setlist" class="q-mb-md" :key="song.id">
+            <q-card-section class="q-pa-none">
+              <div class="row items-center bg-grey-1">
+                <div class="col col-3 col-md-6">
+                  <img style="max-width: 100%; display: block" :src="song.images[0].url" alt="">
+                </div>
+                <div class="col q-pr-sm" style="line-height: 1.2rem">
+                    <div class="text-grey-9 q-title q-ml-sm">{{ song.name }}</div>
+                    <div class="text-grey-7 q-subheading q-ml-sm q-mt-sm">{{ song.artist }}</div>
+                </div>
+                <q-btn flat icon="eva-trash-2-outline" label="" @click="removeToSetList(song.id)" />
+              </div>
+            </q-card-section>
+          </q-card>
+        </div>
+      </div>
     </div>
   </q-page>
 </q-pull-to-refresh>
@@ -15,12 +33,39 @@
 export default {
   name: 'SetList',
   data () {
-    return {}
+    return {
+      setlist: undefined
+    }
   },
   methods: {
+    removeToSetList (id) {
+      this.$store.dispatch('main/changeLoadingState', true)
+      this.$axios.put(`/songs/${id}`, {
+        setlist: false
+      })
+        .then(() => {
+          this.$q.notify({
+            message: 'Le titre a été retiré de la setlist',
+            type: 'positive',
+            position: 'top'
+          })
+          this.loadSetList()
+        })
+    },
+    loadSetList () {
+      this.$store.dispatch('main/changeLoadingState', true)
+      this.$axios.get(`/songs?group=${this.$route.params.groupId}&setlist=true`)
+        .then(r => {
+          this.$store.dispatch('main/changeLoadingState', false)
+          this.setlist = r.data
+        })
+    },
     refresh () {
       console.log('refresh')
     }
+  },
+  created () {
+    this.loadSetList()
   }
 }
 </script>

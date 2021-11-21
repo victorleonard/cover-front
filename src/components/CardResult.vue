@@ -71,7 +71,7 @@
         <q-btn @click="$emit('showLevelModal', song)" flat color="light-blue-8" size="md" icon="eva-music-outline" />
       </div>
       <q-separator vertical/>
-        <q-btn @click="addToSetlist" flat color="green-10" :icon="song.setlist ? 'eva-checkmark-square-2-outline' : 'eva-square-outline'" />
+        <q-btn @click="song.setlist ? removeToSetlist() : addToSetlist()" flat color="green-10" :icon="song.setlist ? 'eva-checkmark-square-2-outline' : 'eva-square-outline'" />
     </q-card-actions>
   </q-card>
 </q-expansion-item>
@@ -101,7 +101,32 @@ export default {
   },
   methods: {
     addToSetlist () {
-      console.log('axios')
+      this.$store.dispatch('main/changeLoadingState', true)
+      this.$axios.put(`/songs/${this.song.id}`, {
+        setlist: true
+      })
+        .then(() => {
+          this.$emit('loadSongs')
+          this.$q.notify({
+            message: 'Le titre a été ajouté à la setlist',
+            type: 'positive',
+            position: 'top'
+          })
+        })
+    },
+    removeToSetlist () {
+      this.$store.dispatch('main/changeLoadingState', true)
+      this.$axios.put(`/songs/${this.song.id}`, {
+        setlist: false
+      })
+        .then(() => {
+          this.$q.notify({
+            message: 'Le titre a été retiré de la setlist',
+            type: 'positive',
+            position: 'top'
+          })
+          this.$emit('loadSongs')
+        })
     },
     displayComment (vote) {
       this.$q.notify({

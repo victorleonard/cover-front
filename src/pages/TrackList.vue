@@ -116,6 +116,7 @@
       :profiles="profiles"
       @showLevelModal="showLevelModal"
       @showUpdateModal="displayVoteDialog"
+      @loadSongs="loadAcceptedSong"
       :song="s"
       v-for="s in songAccepted"
       :key="s.id"
