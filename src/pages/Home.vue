@@ -47,8 +47,8 @@
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn color="white" style="position: absolute; top: 12px; right: 0; border-radius: 0" v-if="isAdmin(group.admin)" no-caps icon="edit" flat :to="{ name: 'group-edit', params: { groupId: group.id } }"></q-btn>
-        <q-btn size="lg" style="position: absolute; bottom: 0; right: 0; border-radius: 0" unelevated :to="{ name: 'group', params: { groupId: group.id } }" color="brand" icon="east" />
+        <q-btn color="white" style="position: absolute; top: 12px; right: 0; border-radius: 0" v-if="isAdmin(group.admin)" no-caps icon="eva-edit-outline" flat :to="{ name: 'group-edit', params: { groupId: group.id } }"></q-btn>
+        <q-btn size="lg" style="position: absolute; bottom: 0; right: 0; border-radius: 0" unelevated :to="{ name: 'group', params: { groupId: group.id } }" color="brand" icon="eva-arrow-right-outline" />
       </q-card-actions>
     </q-card>
     </div>

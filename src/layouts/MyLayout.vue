@@ -14,7 +14,7 @@
         /> -->
         <q-toolbar-title v-if="currentGroup">
           <q-btn v-go-back=" '/home' " flat round dense>
-            <q-icon name="fas fa-caret-left" />
+            <q-icon name="eva-chevron-left-outline" />
           </q-btn>
           <span> {{ currentGroup.name }}</span>
         </q-toolbar-title>
@@ -96,13 +96,14 @@
 
     <q-footer bordered>
       <q-tabs no-caps indicator-color="transparent">
-        <q-route-tab :to="{ name: 'search' }" icon="add" exact replace label="Proposer"/>
+        <q-route-tab :to="{ name: 'search' }" icon="eva-plus-outline" exact replace label="Proposer"/>
         <q-route-tab :to="{ name: 'vote' }" icon="how_to_vote" exact replace label="Voter">
           <q-badge color="red" floating transparent v-if="awaitingVote && awaitingVote.length">
             {{ awaitingVote.length }}
           </q-badge>
         </q-route-tab>
-        <q-route-tab  :to="{ name: 'group' }" icon="fas fa-star-half-alt " exact replace label="Résultats"/>
+        <q-route-tab  :to="{ name: 'group' }" icon="eva-star-outline" exact replace label="Résultats"/>
+        <q-route-tab  :to="{ name: 'setlist' }" icon="eva-list-outline" exact replace label="Setlist"/>
       </q-tabs>
     </q-footer>
   </q-layout>

@@ -5,7 +5,8 @@ const routes = [
     children: [
       { path: '/', name: 'group', component: () => import('pages/TrackList.vue') },
       { path: '/group/:groupId/vote', name: 'vote', component: () => import('pages/Vote.vue') },
-      { path: '/group/:groupId/search', name: 'search', component: () => import('pages/Search.vue') }
+      { path: '/group/:groupId/search', name: 'search', component: () => import('pages/Search.vue') },
+      { path: '/group/:groupId/setlist', name: 'setlist', component: () => import('pages/SetList.vue') }
     ]
   },
   {

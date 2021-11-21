@@ -7,7 +7,7 @@
       </q-avatar>
       <div class="absolute q-item-letter">
         {{ getTotal(song.votes) }}
-        <q-icon name="star" color="grey-4" />
+        <q-icon name="eva-star-outline" color="grey-4" style="margin-bottom: .1rem"/>
       </div>
     </q-item-section>
 
@@ -26,11 +26,11 @@
             <div class="row q-ma-xs justify-between" v-for="vote in song.votes" :key="vote._id">
               <div class="col text-grey-9">{{ getUserPseudoFromVote(vote.user) }}</div>
               <div class="col col-auto q-mr-xl" >
-                <q-rating v-if="level" slot="subtitle" icon="fas fa-music" color="light-blue-8" :value="vote.level ? vote.level : 0" readonly :max="3" />
+                <q-rating v-if="level" slot="subtitle" icon="eva-music-outline" color="light-blue-8" :value="vote.level ? vote.level : 0" readonly :max="3" />
               </div>
               <div class="col col-auto" >
                 <q-rating slot="subtitle" :value="vote.vote" readonly :max="5" />
-                <q-btn @click="displayComment(vote)" v-if="vote.comment" style="position: absolute; margin-top: -2.1px" size="xs" flat round color="primary" icon="fas fa-info-circle" />
+                <q-btn @click="displayComment(vote)" v-if="vote.comment" style="position: absolute; margin-top: -2.1px" size="xs" flat round color="primary" icon="eva-info-outline" />
               </div>
             </div>
           </q-item-label>
@@ -54,11 +54,11 @@
       <q-item-section>
         <q-item-label>{{ getUserPseudo(song.created_profile_id) }}</q-item-label>
       </q-item-section>
-      <div v-if="song.spotify_preview_url">
+      <!-- <div v-if="song.spotify_preview_url">
         <audio :id="'audio-'+song._id" :src="song.spotify_preview_url"></audio>
         <q-btn class="play" :id="'play-'+song._id" @click="playMusic(song.spotify_preview_url, s._id)" flat color="primary" size="md" icon="ion-md-play" />
         <q-btn class="pause hide" :id="'pause-'+song._id" @click="pauseMusic(song.spotify_preview_url, song._id)" color="primary" flat size="md" icon="ion-md-pause" />
-      </div>
+      </div> -->
       <div>
         <q-btn @click="launchDeezer(song)" flat icon="fab fa-deezer" size="md"></q-btn>
         <q-btn @click="launchSpotify(song.spotify_uri)" flat icon="fab fa-spotify" size="md" color="positive"></q-btn>
@@ -68,8 +68,10 @@
         <q-btn @click="$emit('showUpdateModal', song)" flat color="yellow-10" size="md" icon="how_to_vote" />
       </div>
       <div v-if="level">
-        <q-btn @click="$emit('showLevelModal', song)" flat color="light-blue-8" size="md" icon="fas fa-music" />
+        <q-btn @click="$emit('showLevelModal', song)" flat color="light-blue-8" size="md" icon="eva-music-outline" />
       </div>
+      <q-separator vertical/>
+        <q-btn @click="addToSetlist" flat color="green-10" :icon="song.setlist ? 'eva-checkmark-square-2-outline' : 'eva-square-outline'" />
     </q-card-actions>
   </q-card>
 </q-expansion-item>
@@ -98,6 +100,9 @@ export default {
     }
   },
   methods: {
+    addToSetlist () {
+      console.log('axios')
+    },
     displayComment (vote) {
       this.$q.notify({
         color: 'grey-9',

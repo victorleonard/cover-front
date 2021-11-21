@@ -15,7 +15,7 @@
         <q-toolbar-title>
           Mes groupes
         </q-toolbar-title>
-        <q-btn flat round dense icon="account_circle">
+        <q-btn flat round dense icon="eva-person-outline">
           <q-menu>
           <q-list style="min-width: 150px">
             <q-item clickable v-close-popup :to="{ name: 'profile' }">

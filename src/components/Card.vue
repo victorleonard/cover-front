@@ -30,7 +30,7 @@
           <div class="col text-grey-9">{{ user.pseudo }}</div>
           <div class="col col-auto">
             <q-rating slot="subtitle" :value="getVote(song, user)" readonly :max="5" />
-            <q-btn @click="displayComment(song, user)" v-if="getComment(song, user)" style="position: absolute; margin-top: -2.1px" size="xs" flat round color="primary" icon="fas fa-info-circle" />
+            <q-btn @click="displayComment(song, user)" v-if="getComment(song, user)" style="position: absolute; margin-top: -2.1px" size="xs" flat round color="primary" icon="eva-info-outline" />
           </div>
         </div>
       </q-item-label>
