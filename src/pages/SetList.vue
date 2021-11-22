@@ -33,6 +33,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import { copyToClipboard } from 'quasar'
 
 export default {
@@ -41,6 +42,9 @@ export default {
     return {
       setlist: undefined
     }
+  },
+  computed: {
+    ...mapState('main', ['currentGroup'])
   },
   methods: {
     share () {
@@ -60,7 +64,7 @@ export default {
         ]
       }).onOk(action => {
         if (action.id === 'share') {
-          copyToClipboard(`${window.location.origin}/share/${this.$route.params.groupId}`)
+          copyToClipboard(`http://app.victorleonard/cover3/share/${this.$route.params.groupId}`)
             .then(() => {
               this.$q.notify({
                 message: 'Le lien a été copié',
@@ -73,7 +77,7 @@ export default {
             })
         }
         if (action.id === 'wa') {
-          location.href = `whatsapp://send?text=Setlist du groupe ${this.d.group.name} : ${window.location.origin}/share/${this.$route.params.groupId}`
+          location.href = `whatsapp://send?text=Setlist du groupe ${this.currentGroup.name} : http://app.victorleonard/cover3/share/${this.$route.params.groupId}`
         }
         // console.log('Action chosen:', action.id)
       }).onCancel(() => {
