@@ -22,6 +22,10 @@
       ]" min-height="5rem" />
         </q-card-section>
 
+        <q-card-section class="q-pt-none">
+          <q-input outlined v-model="youtubeId" label="Youtube ID" />
+        </q-card-section>
+
         <q-separator />
 
         <q-card-actions align="right">
@@ -81,6 +85,7 @@ export default {
     return {
       currentGroupSongs: undefined,
       comment: '',
+      youtubeId: '',
       songSelectDialog: false,
       songSelected: undefined,
       search: '',
@@ -140,7 +145,8 @@ export default {
         song: this.songSelected,
         comment: this.comment,
         groupId: this.$route.params.groupId,
-        userId: this.$q.cookies.get('user_id')
+        userId: this.$q.cookies.get('user_id'),
+        youtubeId: this.youtubeId
       })
         .then(song => {
           console.log('song', song)

@@ -34,7 +34,7 @@ export default {
       level: value
     })
   },
-  selectSong (song, comment, groupId, userId) {
+  selectSong (song, comment, groupId, userId, youtubeId) {
     return Api().post('/songs', {
       spotify_data: song,
       name: song.name,
@@ -46,7 +46,8 @@ export default {
       user: userId,
       images: song.album.images,
       comment: comment,
-      spotify_preview_url: song.preview_url
+      spotify_preview_url: song.preview_url,
+      youtube_id: youtubeId
     })
   }
 }

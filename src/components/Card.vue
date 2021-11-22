@@ -1,5 +1,10 @@
 <template>
 <div>
+  <q-dialog v-model="video" v-if="song.youtube_id">
+      <q-video
+      :src="`https://www.youtube.com/embed/${song.youtube_id}?rel=0`"
+    />
+    </q-dialog>
   <q-dialog v-model="removeDialog" persistent>
       <q-card>
         <q-card-section class="row items-center">
@@ -53,12 +58,13 @@
         <q-item-section>
           <q-item-label>{{ getUserPseudo(song.created_profile_id) }}</q-item-label>
         </q-item-section>
-        <div v-if="song.spotify_preview_url">
+        <!-- <div v-if="song.spotify_preview_url">
           <audio :id="'audio-'+song._id" :src="song.spotify_preview_url"></audio>
           <q-btn class="play" :id="'play-'+song._id" @click="playMusic(song.spotify_preview_url, song._id)" flat color="primary" size="md" icon="ion-md-play" />
           <q-btn class="pause hide" :id="'pause-'+song._id" @click="pauseMusic(song.spotify_preview_url, song._id)" color="primary" flat size="md" icon="ion-md-pause" />
-        </div>
+        </div> -->
         <div>
+          <q-btn v-if="song.youtube_id" @click="video = true" flat icon="fab fa-youtube" color="negative" size="md"></q-btn>
           <q-btn @click="launchDeezer(song)" flat icon="fab fa-deezer" size="md"></q-btn>
           <q-btn @click="launchSpotify(song.spotify_uri)" flat icon="fab fa-spotify" size="md" color="positive"></q-btn>
         </div>
@@ -80,7 +86,8 @@ import { mapState } from 'vuex'
 export default {
   name: 'SongCard',
   data: () => ({
-    removeDialog: false
+    removeDialog: false,
+    video: false
   }),
   props: {
     song: {
