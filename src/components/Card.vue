@@ -1,10 +1,10 @@
 <template>
 <div>
-  <q-dialog v-model="video" v-if="song.youtube_id">
+  <q-dialog v-model="video" v-if="song.youtube_id" full-width>
       <q-video
       :src="`https://www.youtube.com/embed/${song.youtube_id}?rel=0`"
     />
-    </q-dialog>
+  </q-dialog>
   <q-dialog v-model="removeDialog" persistent>
       <q-card>
         <q-card-section class="row items-center">

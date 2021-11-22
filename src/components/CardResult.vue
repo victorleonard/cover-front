@@ -1,4 +1,10 @@
 <template>
+<div>
+  <q-dialog v-model="video" v-if="song.youtube_id" full-width>
+      <q-video
+      :src="`https://www.youtube.com/embed/${song.youtube_id}?rel=0`"
+    />
+  </q-dialog>
 <q-expansion-item class="shadow-1 q-mb-md">
   <template v-slot:header style="padding: 0">
     <q-item-section avatar>
@@ -60,6 +66,7 @@
         <q-btn class="pause hide" :id="'pause-'+song._id" @click="pauseMusic(song.spotify_preview_url, song._id)" color="primary" flat size="md" icon="ion-md-pause" />
       </div> -->
       <div>
+        <q-btn v-if="song.youtube_id" @click="video = true" flat icon="fab fa-youtube" color="negative" size="md"></q-btn>
         <q-btn @click="launchDeezer(song)" flat icon="fab fa-deezer" size="md"></q-btn>
         <q-btn @click="launchSpotify(song.spotify_uri)" flat icon="fab fa-spotify" size="md" color="positive"></q-btn>
       </div>
@@ -75,12 +82,16 @@
     </q-card-actions>
   </q-card>
 </q-expansion-item>
+</div>
 </template>
 
 <script>
 
 export default {
   name: 'SongCardResult',
+  data: () => ({
+    video: false
+  }),
   props: {
     level: {
       type: Boolean,
