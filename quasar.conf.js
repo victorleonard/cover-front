@@ -102,7 +102,8 @@ module.exports = function (/* ctx */) {
       // Quasar plugins
       plugins: [
         'Cookies',
-        'Notify'
+        'Notify',
+        'BottomSheet'
       ]
     },
 

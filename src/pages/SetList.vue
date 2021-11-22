@@ -3,8 +3,12 @@
   <q-page padding class="search-page q-pl-md q-pr-md">
     <!-- Morceaux selectionnés -->
     <div class="q-ml-sm q-mr-sm q-pb-md">
-      <div class="q-subheading text-weight-bold text-grey-10 text-weight-regular" style="text-transform: uppercase;">SetList</div>
-      <hr>
+      <q-toolbar class="q-mb-sm">
+      <q-toolbar-title>
+        Setlist
+      </q-toolbar-title>
+      <q-btn flat round dense icon="eva-share" @click="share" />
+    </q-toolbar>
       <div>
         <div class="row">
           <q-card v-for="song in setlist" class="q-mb-md" :key="song.id">
@@ -29,6 +33,7 @@
 </template>
 
 <script>
+import { copyToClipboard } from 'quasar'
 
 export default {
   name: 'SetList',
@@ -38,6 +43,45 @@ export default {
     }
   },
   methods: {
+    share () {
+      this.$q.bottomSheet({
+        message: 'Partager la setlist :',
+        actions: [
+          {
+            label: 'Copier le lien de partage',
+            icon: 'far fa-copy',
+            id: 'share'
+          },
+          {
+            label: 'Partager via Whatsapp',
+            icon: 'fab fa-whatsapp',
+            id: 'wa'
+          }
+        ]
+      }).onOk(action => {
+        if (action.id === 'share') {
+          copyToClipboard(`${window.location.origin}/share/${this.$route.params.groupId}`)
+            .then(() => {
+              this.$q.notify({
+                message: 'Le lien a été copié',
+                type: 'positive',
+                position: 'top'
+              })
+            })
+            .catch(() => {
+            // fail
+            })
+        }
+        if (action.id === 'wa') {
+          location.href = `whatsapp://send?text=Setlist du groupe ${this.d.group.name} : ${window.location.origin}/share/${this.$route.params.groupId}`
+        }
+        // console.log('Action chosen:', action.id)
+      }).onCancel(() => {
+        // console.log('Dismissed')
+      }).onDismiss(() => {
+        // console.log('I am triggered on both OK and Cancel')
+      })
+    },
     removeToSetList (id) {
       this.$store.dispatch('main/changeLoadingState', true)
       this.$axios.put(`/songs/${id}`, {

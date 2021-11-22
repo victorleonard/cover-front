@@ -64,7 +64,7 @@ export default {
     const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone)
 
     // Checks if should display install popup notification:
-    if (isIos() && !isInStandaloneMode()) {
+    if (isIos() && !isInStandaloneMode() && this.$route.name !== 'share') {
       this.$q.notify({
         position: 'bottom',
         html: true,
