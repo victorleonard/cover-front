@@ -23,7 +23,7 @@
         </q-card-section>
 
         <q-card-section class="q-pt-none">
-          <q-input outlined v-model="youtubeId" label="Youtube ID" />
+          <q-input outlined v-model="youtubeId" label="Lien Youtube" />
         </q-card-section>
 
         <q-separator />
@@ -139,14 +139,33 @@ export default {
         this.songSelectDialog = true
       }
     },
+    extractYoutubeID (url) {
+      var ID = ''
+      url = url.replace(/(>|<)/gi, '').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/)
+      if (url[2] !== undefined) {
+        ID = url[2].split(/[^0-9a-z_-]/i)
+        ID = ID[0]
+      } else {
+        return ''
+      }
+      return ID
+    },
     select () {
+      if (this.youtubeId && !this.extractYoutubeID(this.youtubeId)) {
+        this.$q.notify({
+          type: 'negative',
+          message: 'Le lien youtube n est pas correct',
+          position: 'top'
+        })
+        return
+      }
       this.$store.dispatch('main/changeLoadingState', true)
       this.$store.dispatch('main/selectSong', {
         song: this.songSelected,
         comment: this.comment,
         groupId: this.$route.params.groupId,
         userId: this.$q.cookies.get('user_id'),
-        youtubeId: this.youtubeId
+        youtubeId: this.youtubeId ? this.extractYoutubeID(this.youtubeId) : ''
       })
         .then(song => {
           console.log('song', song)
@@ -192,19 +211,6 @@ export default {
             position: 'top'
           })
         })
-      /* const userId = localStorage.getItem('userId')
-      Api().post('/add_track', {
-        track: t,
-        userId: userId
-      })
-        .then(resp => {
-          this.$store.dispatch('main/loadSongs', true)
-          this.$q.notify({
-            type: 'positive',
-            message: 'Morceau séléctioné !',
-            position: 'top'
-          })
-        }) */
     },
     searchSpotify () {
       this.searchResult = []
