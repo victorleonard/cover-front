@@ -70,15 +70,41 @@
         <q-btn @click="launchDeezer(song)" flat icon="fab fa-deezer" size="md"></q-btn>
         <q-btn @click="launchSpotify(song.spotify_uri)" flat icon="fab fa-spotify" size="md" color="positive"></q-btn>
       </div>
-      <q-separator vertical/>
-      <div>
+      <!-- <div>
         <q-btn @click="$emit('showUpdateModal', song)" flat color="yellow-10" size="md" icon="how_to_vote" />
-      </div>
-      <div v-if="level">
+      </div> -->
+      <!-- <div v-if="level">
         <q-btn @click="$emit('showLevelModal', song)" flat color="light-blue-8" size="md" icon="eva-music-outline" />
-      </div>
-      <q-separator vertical/>
-        <q-btn @click="song.setlist ? removeToSetlist() : addToSetlist()" flat color="green-10" :icon="song.setlist ? 'eva-checkmark-square-2-outline' : 'eva-square-outline'" />
+      </div> -->
+      <q-separator vertical inset class="q-ml-sm"/>
+        <!-- <q-btn @click="song.setlist ? removeToSetlist() : addToSetlist()" flat color="green-10" :icon="song.setlist ? 'eva-checkmark-square-2-outline' : 'eva-square-outline'" /> -->
+        <q-btn color="grey-7" round flat icon="more_vert">
+          <q-menu cover auto-close>
+            <q-list>
+              <q-item clickable @click="$emit('showUpdateModal', song)">
+                <q-item-section avatar>
+                  <q-icon color="yellow-10" name="how_to_vote" />
+                </q-item-section>
+                <q-item-section>Modifier mon vote</q-item-section>
+              </q-item>
+              <q-item v-if="level" clickable @click="$emit('showLevelModal', song)">
+                <q-item-section avatar>
+                  <q-icon color="light-blue-8" name="eva-music-outline" />
+                </q-item-section>
+                <q-item-section>Modifer mon niveau</q-item-section>
+              </q-item>
+              <q-item clickable @click="song.setlist ? removeToSetlist() : addToSetlist()">
+                <q-item-section avatar>
+                  <q-icon color="green-10" name="eva-list-outline" />
+                </q-item-section>
+                <q-item-section>{{ song.setlist ? 'Retier de la setlist' : 'Ajouter à la setlist' }}</q-item-section>
+              </q-item>
+              <!-- <q-item clickable @click="removeDialog = true">
+                <q-item-section>Suprimmer ce titre</q-item-section>
+              </q-item> -->
+            </q-list>
+          </q-menu>
+        </q-btn>
     </q-card-actions>
   </q-card>
 </q-expansion-item>

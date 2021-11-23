@@ -54,10 +54,16 @@
                 <q-item-section>Modifer mon commentaire</q-item-section>
               </q-item> -->
               <q-item clickable @click="dialog.video = true">
+                <q-item-section avatar>
+                  <q-icon color="negative" name="fab fa-youtube" />
+                </q-item-section>
                 <q-item-section>Modifer la vidéo youtube</q-item-section>
               </q-item>
               <q-item clickable @click="removeDialog = true">
-                <q-item-section>Suprimmer ce titre</q-item-section>
+                <q-item-section avatar>
+                  <q-icon color="negative" name="eva-trash-2-outline" />
+                </q-item-section>
+                <q-item-section>Supprimer ce titre</q-item-section>
               </q-item>
             </q-list>
           </q-menu>
