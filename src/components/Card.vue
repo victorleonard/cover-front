@@ -1,5 +1,21 @@
 <template>
 <div>
+  <q-dialog v-model="dialog.video">
+    <q-card style="min-width: 350px">
+      <q-card-section>
+        <div class="text-h6">Modifier l'url youtube</div>
+      </q-card-section>
+
+      <q-card-section class="q-pt-none">
+        <q-input dense v-model="song.youtube_id" autofocus/>
+      </q-card-section>
+
+      <q-card-actions align="right" class="text-primary">
+        <q-btn flat label="Annuler" no-caps v-close-popup />
+        <q-btn flat label="Mettre à jour" no-caps v-close-popup @click="updateVideo" />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
   <q-dialog v-model="video" v-if="song.youtube_id" full-width>
       <q-video
       :src="`https://www.youtube.com/embed/${song.youtube_id}?rel=0`"
@@ -26,6 +42,26 @@
       <div class="col q-pr-sm" style="line-height: 1.2rem">
           <div class="text-grey-9 q-title q-ml-sm">{{ song.name }}</div>
           <div class="text-grey-7 q-subheading q-ml-sm q-mt-sm">{{song.artist}}</div>
+      </div>
+      <div v-if="userId === song.created_user_id" class="col-auto">
+        <q-btn color="grey-7" round flat icon="more_vert">
+          <q-menu cover auto-close>
+            <q-list>
+              <!-- <q-item clickable>
+                <q-item-section>Modifier mon vote</q-item-section>
+              </q-item>
+              <q-item clickable>
+                <q-item-section>Modifer mon commentaire</q-item-section>
+              </q-item> -->
+              <q-item clickable @click="dialog.video = true">
+                <q-item-section>Modifer la vidéo youtube</q-item-section>
+              </q-item>
+              <q-item clickable @click="removeDialog = true">
+                <q-item-section>Suprimmer ce titre</q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </q-btn>
       </div>
     </div>
   </q-card-section>
@@ -72,9 +108,6 @@
         <div>
           <q-btn label="Votez" no-caps dense @click="$emit('displayVoteDialog', song)" flat color="yellow-10" size="md" icon="how_to_vote" />
         </div>
-        <div v-if="userId === song.created_user_id">
-          <q-btn @click="removeDialog = true" label="" flat color="negative" size="md" icon="ion-md-trash" />
-        </div>
       </q-card-actions>
     </q-card>
 </div>
@@ -86,6 +119,9 @@ import { mapState } from 'vuex'
 export default {
   name: 'SongCard',
   data: () => ({
+    dialog: {
+      video: false
+    },
     removeDialog: false,
     video: false
   }),
@@ -106,6 +142,33 @@ export default {
     }
   },
   methods: {
+    extractYoutubeID (url) {
+      var ID = ''
+      url = url.replace(/(>|<)/gi, '').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/)
+      if (url[2] !== undefined) {
+        ID = url[2].split(/[^0-9a-z_-]/i)
+        ID = ID[0]
+      } else {
+        return ''
+      }
+      return ID
+    },
+    updateVideo () {
+      if (!this.extractYoutubeID(this.song.youtube_id)) {
+        this.$q.notify({
+          type: 'negative',
+          message: 'Le lien youtube n est pas correct',
+          position: 'top'
+        })
+        return
+      }
+      this.$axios.put(`songs/${this.song.id}`, {
+        youtube_id: this.extractYoutubeID(this.song.youtube_id)
+      })
+        .then(() => {
+          this.$emit('loadSongs')
+        })
+    },
     displayComment (song, user) {
       const vote = song.votes.find(v => v.user === user.user_id)
       this.$q.notify({
