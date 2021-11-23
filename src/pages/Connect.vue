@@ -68,9 +68,15 @@ export default {
         })
         .then(resp => {
           this.submitting = false
-          this.$q.cookies.set('token', resp.data.jwt)
-          this.$q.cookies.set('user_id', resp.data.user.id)
-          this.$q.cookies.set('profile_id', resp.data.user.profile.id)
+          this.$q.cookies.set('token', resp.data.jwt, {
+            expires: 360
+          })
+          this.$q.cookies.set('user_id', resp.data.user.id, {
+            expires: 360
+          })
+          this.$q.cookies.set('profile_id', resp.data.user.profile.id, {
+            expires: 360
+          })
           this.$store.dispatch('main/getMe')
             .then(me => {
               console.log('me', me)
