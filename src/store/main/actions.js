@@ -146,12 +146,12 @@ export async function getCurrentRefuseGroupSongs ({ commit, state }, { groupId }
 export async function resetCurrentGroup ({ commit }) {
   commit('RESET_CURRENT_GROUP')
 }
-export async function getMyGroups ({ commit, state }, { userId }) {
-  console.log('userId =>', userId)
+export async function getMyGroups ({ commit, state }, { profileId }) {
+  console.log('userId =>', profileId)
   // const userId = state.user.profile
   // const r = await GroupService.getMyGroups(userId)
-  const r = await this.$axios.get(`/groups?users.id=${userId}`)
-  console.log('my croupge =>', r.data)
+  const r = await this.$axios.get(`/groups?profiles=${profileId}`)
+  console.log('my groups =>', r.data)
   commit('UPDATE_MY_GROUPS', r.data)
   return r.data
   /* commit('CLEAR_GROUPS')
@@ -177,7 +177,7 @@ export async function getMyGroups ({ commit, state }, { userId }) {
 } */
 
 export async function getGroups ({ dispatch, commit }) {
-  const r = this.$axios.get('/groups/')
+  const r = await this.$axios.get('/groups')
   const groups = [...r.data]
   commit('UPDATE_GROUPS', r.data)
   groups.forEach(group => {
@@ -210,7 +210,8 @@ export async function askInvitation ({ state }, { group, to, message }) {
 
 export async function getMyAskingInvitation ({ commit, state }) {
   const from = state.user.profile
-  const r = await InvitationService.getMyAskingInvitation(from)
+  const r = this.$axios.get('/invitations?from=' + from)
+  // const r = await InvitationService.getMyAskingInvitation(from)
   commit('UPDATE_MY_ASKING_INVITATIONS', r.data)
   return r
 }

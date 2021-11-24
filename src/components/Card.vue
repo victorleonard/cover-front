@@ -176,7 +176,7 @@ export default {
         })
     },
     displayComment (song, user) {
-      const vote = song.votes.find(v => v.user === user.user_id)
+      const vote = song.votes.find(v => v.user === user.user.id)
       this.$q.notify({
         color: 'grey-9',
         message: `${user.pseudo} - ${this.song.name}`,
@@ -187,7 +187,7 @@ export default {
       })
     },
     getComment (song, user) {
-      const vote = song.votes.find(v => v.user === user.user_id)
+      const vote = song.votes.find(v => v.user === user.user.id)
       if (vote && vote.comment) {
         return vote.comment
       } else {
@@ -202,7 +202,7 @@ export default {
         })
     },
     getVote (song, user) {
-      const vote = song.votes.find(v => v.user === user.user_id)
+      const vote = song.votes.find(v => v.user === user.user.id)
       if (vote) {
         return vote.vote
       } else {

@@ -176,7 +176,7 @@ export default {
       })
     },
     getUserAvatar (id) {
-      const profile = this.profiles.find(p => p.user_id === id)
+      const profile = this.profiles.find(p => p.user.id === id)
       if (profile && profile.avatar) {
         return profile.avatar.url
       }
@@ -187,8 +187,8 @@ export default {
       }
     },
     getUserPseudoFromVote (id) {
-      if (this.profiles.find(p => p.user_id === id)) {
-        return this.profiles.find(p => p.user_id === id).pseudo
+      if (this.profiles.find(p => p.user.id === id)) {
+        return this.profiles.find(p => p.user.id === id).pseudo
       }
     },
     playMusic (track, id) {

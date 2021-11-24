@@ -173,7 +173,7 @@ export default {
   mounted () {
     this.$store.dispatch('main/changeLoadingState', true)
     this.$store.dispatch('main/getMyGroups', {
-      userId: this.$q.cookies.get('user_id')
+      profileId: this.$q.cookies.get('profile_id')
     })
       .then(r => {
         this.myGroups = r

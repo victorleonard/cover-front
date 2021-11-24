@@ -30,20 +30,31 @@
   <div class="row">
     <div class="col">
     <h4 class="q-mt-md q-mb-md">Liste des groupes</h4>
-    <q-card class="my-card q-mb-lg" v-for="group in groups" :key="group.id">
-      <img :src="getBestFormatImage(group.image.formats)" alt="group image">
-
-      <q-card-section>
-        <div class="text-h6">{{ group.name }}</div>
-        <div class="text-subtitle2">{{ group.commune }}</div>
+    <q-card v-for="group in groups" class="q-mb-md" :key="group.id">
+      <q-card-section class="q-pa-none">
+        <div class="row items-center bg-grey-1">
+          <div class="col col-3 col-md-6">
+            <q-img
+              :src="group.image.url"
+              contain
+              class="bg-grey-9"
+              style="max-height: 100px;"
+              spinner-color="white"
+            />
+            <!-- <img style="max-width: 100%; display: block" :src="group.image.url" alt=""> -->
+          </div>
+          <div class="col q-pr-sm" style="line-height: 1.2rem">
+            <div class="text-grey-9 q-title q-ml-sm">{{ group.name }}</div>
+            <div class="text-grey-7 q-subheading q-ml-sm q-mt-sm">{{ group.commune }}</div>
+          </div>
+        </div>
       </q-card-section>
-
-      <q-card-section class="q-pt-none">
-        <q-chip v-for="user in group.users" :key="user.id">
-          <q-avatar v-if="user.profile.avatar">
-            <img :src="user.profile.avatar.url" alt="avatar">
+      <q-card-section>
+        <q-chip v-for="profile in group.profiles" :key="profile.id">
+          <q-avatar v-if="profile.avatar">
+            <img :src="profile.avatar.url" alt="avatar">
           </q-avatar>
-          {{ user.profile.pseudo }}
+          {{ profile.pseudo }}
         </q-chip>
       </q-card-section>
       <q-card-actions align="right" v-if="isAlreadyMember(group.id)">

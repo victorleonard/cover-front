@@ -197,8 +197,10 @@ export default {
     displayVoteDialog (t) {
       const userId = this.$q.cookies.get('user_id')
       this.songSelected = t
+      console.log(t)
       if (t.votes.find(v => v.user === userId)) {
         this.voteDialogUpdate = true
+        this.ratingModel = t.votes.find(v => v.user === userId).vote
       } else {
         this.voteDialog = true
       }
