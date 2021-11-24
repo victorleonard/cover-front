@@ -1,7 +1,7 @@
 <template>
   <q-page class="welcome fit column wrap justify-center items-center content-center">
     <div class="row">
-      <img class="logo" src="~assets/cover_logo_full_2.png" style="max-width: 150px" alt="">
+      <img class="logo" src="~assets/cover_logo_full_3.png" style="max-width: 150px" alt="">
     </div>
     <div class="q-mt-xl">
       <q-btn :to="{ name: 'home' }" icon="eva-arrow-right-outline" size="lg" round outline no-caps  color="brand" text-color="white" />
