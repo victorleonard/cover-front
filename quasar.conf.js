@@ -124,13 +124,13 @@ module.exports = function (/* ctx */) {
       workboxPluginMode: 'GenerateSW', // 'GenerateSW' or 'InjectManifest'
       workboxOptions: {}, // only for GenerateSW
       manifest: {
-        name: 'cover',
-        short_name: 'cover',
-        description: 'cover',
+        name: 'Cover',
+        short_name: 'Cover',
+        description: 'Music Cover',
         display: 'standalone',
         orientation: 'portrait',
         background_color: '#ffffff',
-        theme_color: '#ff7043',
+        theme_color: '#ffffff',
         icons: [
           {
             src: 'icons/icon-128x128.png',
