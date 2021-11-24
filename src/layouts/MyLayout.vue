@@ -1,8 +1,7 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header reveal>
-      <q-toolbar
-        class="bg-brand"
+    <q-header reveal bordered>
+      <q-toolbar class="text-grey-9"
       >
       <!-- <q-btn
           flat
@@ -18,6 +17,9 @@
           </q-btn>
           <span> {{ currentGroup.name }}</span>
         </q-toolbar-title>
+        <q-avatar v-if="currentGroup && currentGroup.image && currentGroup.image.url" class="bg-grey-9">
+          <img :src="currentGroup.image.url">
+        </q-avatar>
       </q-toolbar>
     </q-header>
 

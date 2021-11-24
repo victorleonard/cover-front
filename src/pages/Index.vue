@@ -1,5 +1,5 @@
 <template>
-  <q-page class="welcome fit column wrap justify-center items-center content-center">
+  <q-page class="bg-grey-10 welcome fit column wrap justify-center items-center content-center">
     <div class="row">
       <img class="logo" src="~assets/cover_logo.png" style="max-width: 200px" alt="">
     </div>
@@ -15,11 +15,3 @@ export default {
   name: 'PageIndex'
 }
 </script>
-
-<style lang="scss" scoped>
-  .welcome {
-   /*  background-image: url('https://cover.s3.eu-west-3.amazonaws.com/bg_home_d164df054e.jpg');
-    background-size: cover; */
-    background-color: rgba(0,0,0,0.9);
-  }
-</style>
