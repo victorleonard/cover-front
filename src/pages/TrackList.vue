@@ -106,7 +106,7 @@
     <!-- Morceaux selectionnés -->
     <div class="q-ml-sm q-mr-sm q-pb-md">
       <div class="q-subheading text-weight-bold text-grey-10 text-weight-regular" style="text-transform: uppercase;">Titres selectionnés</div>
-      <div v-if="currentGroup" class="q-caption text-grey-10">Au moins {{ currentGroup.score }} <q-icon name="star" color="grey-8" /></div>
+      <div v-if="currentGroup" class="q-caption text-grey-10">Au moins {{ currentGroup.score }} <q-icon name="eva-star-outline" color="grey-8" style="margin-bottom: .2rem" /></div>
       <hr>
     </div>
     <div v-if="songAccepted">

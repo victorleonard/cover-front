@@ -11,11 +11,11 @@
           aria-label="Menu"
           @click="leftDrawerOpen = !leftDrawerOpen"
         /> -->
-        <q-toolbar-title v-if="currentGroup">
+        <q-toolbar-title v-if="currentGroup" class="flex">
           <q-btn v-go-back=" '/home' " flat round dense>
             <q-icon name="eva-chevron-left-outline" />
           </q-btn>
-          <span> {{ currentGroup.name }}</span>
+          <div style="margin: 0 auto"> {{ currentGroup.name }}</div>
         </q-toolbar-title>
         <q-avatar v-if="currentGroup && currentGroup.image && currentGroup.image.url" class="bg-grey-9">
           <img :src="currentGroup.image.url">
