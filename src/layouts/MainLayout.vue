@@ -15,7 +15,11 @@
         <q-toolbar-title>
           Mes groupes
         </q-toolbar-title>
-        <q-btn flat round dense icon="eva-person-outline">
+        <q-btn flat round dense>
+          <q-avatar>
+            <img v-if="profile && profile.avatar && profile.avatar.url" :src="profile.avatar.url">
+            <q-icon v-else name="eva-person-outline" />
+          </q-avatar>
           <q-menu>
           <q-list style="min-width: 150px">
             <q-item clickable v-close-popup :to="{ name: 'profile' }">
@@ -116,7 +120,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('main', ['user', 'myGroups'])
+    ...mapState('main', ['user', 'myGroups', 'profile'])
   },
   methods: {
     refresh () {
@@ -135,6 +139,9 @@ export default {
   },
   beforeCreate () {
     this.$store.dispatch('main/getMe')
+    this.$store.dispatch('main/getMyProfile', {
+      profileId: this.$q.cookies.get('profile_id')
+    })
   }
 }
 </script>
