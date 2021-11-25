@@ -44,7 +44,7 @@
           <div class="text-grey-7 q-subheading q-ml-sm q-mt-sm">{{song.artist}}</div>
       </div>
       <div v-if="userId === song.created_user_id" class="col-auto">
-        <q-btn color="grey-7" round flat icon="more_vert">
+        <q-btn color="grey-7" round flat icon="eva-more-vertical-outline">
           <q-menu cover auto-close>
             <q-list>
               <!-- <q-item clickable>
@@ -93,7 +93,7 @@
           <q-avatar v-if="getUserAvatar(song.created_profile_id)" color="grey-7" text-color="white">
             <img :src="getUserAvatar(song.created_profile_id)" alt="">
           </q-avatar>
-          <q-avatar v-else color="grey-7" text-color="white" icon="fas fa-user-astronaut">
+          <q-avatar v-else color="grey-7" text-color="white" icon="eva-person-outline">
           </q-avatar>
         </q-item-section>
 
@@ -107,7 +107,11 @@
         </div> -->
         <div>
           <q-btn v-if="song.youtube_id" @click="video = true" flat icon="fab fa-youtube" color="negative" size="md"></q-btn>
-          <q-btn @click="launchDeezer(song)" flat icon="fab fa-deezer" size="md"></q-btn>
+          <q-btn flat @click="launchDeezer(song)">
+            <q-avatar square size="md">
+              <img src="~assets/deezer_logo.svg">
+            </q-avatar>
+          </q-btn>
           <q-btn @click="launchSpotify(song.spotify_uri)" flat icon="fab fa-spotify" size="md" color="positive"></q-btn>
         </div>
         <q-separator vertical/>
