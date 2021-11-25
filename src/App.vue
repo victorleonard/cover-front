@@ -1,6 +1,6 @@
 <template>
   <div id="q-app">
-    <q-dialog class="q-pa-md q-gutter-sm" v-model="dialog" minimized position="top" persistent>
+    <q-dialog class="q-pa-md q-gutter-sm" v-model="dialog" minimized position="bottom" persistent>
       <q-card>
         <q-card-section class="row items-center no-wrap">
           <div>
@@ -23,11 +23,12 @@ import { mapState } from 'vuex'
 export default {
   name: 'App',
   data: () => ({
-    dialog: false
+    dialog: true
   }),
   computed: mapState('main', ['loading']),
   methods: {
     refresh () {
+      this.$q.loading.show()
       location.reload(true)
     },
     checkNewVersion () {
