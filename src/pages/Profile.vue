@@ -109,7 +109,9 @@ export default {
     getProfileData () {
       this.instruments = []
       this.$store.dispatch('main/changeLoadingState', true)
-      this.$store.dispatch('main/getMyProfile')
+      this.$store.dispatch('main/getMyProfile', {
+        profileId: this.$q.cookies.get('profile_id')
+      })
         .then(r => {
           console.log('rrr', r)
           this.$store.dispatch('main/changeLoadingState', false)
