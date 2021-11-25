@@ -185,5 +185,4 @@ footer{
   .search-page .q-collapsible-cursor-pointer > .q-collapsible-inner > .q-item img {
     display: block;
   }
-  .q-header { z-index: 9999; }
 </style>
