@@ -285,31 +285,11 @@ export async function resetPassword ({ commit }, { code, password, passwordConfi
 }
 
 export async function connectUser ({ commit, dispatch }, { email, password }) {
-  commit('CHANGE_LOADING_STATE', true)
   const response = await this.$axios.post('/auth/local', {
     identifier: email,
     password: password
   })
   return response
-  /* if (response) {
-    localStorage.setItem('token', response.data.jwt)
-    commit('UPDATE_TOKEN', response.data.jwt)
-    commit('UPDATE_USER', response.data.user)
-    commit('CHANGE_LOADING_STATE', false)
-    if (!response.data.user.profile) {
-      dispatch('createProfile', {
-        pseudo: response.data.user.username
-      })
-    } else {
-      dispatch('getProfile', {
-        profileId: response.data.user.profile.id
-      })
-    }
-    return response
-  } else {
-    alert('error')
-    console.error('error')
-  } */
 }
 
 export async function getMe ({ commit }) {

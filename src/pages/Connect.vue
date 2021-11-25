@@ -2,12 +2,12 @@
 <q-page class="welcome fit column wrap justify-center items-center content-center" style="background-color: #FAFAFA;">
 <q-btn v-go-back=" '/' " align="right" class="go-back absolute-top-left" icon="fas fa-chevron-left" no-caps flat label="Back" />
   <div class="row">
-    <img class="logo" src="https://cover.s3.eu-west-3.amazonaws.com/cover_28108a73e4.png" alt="">
+    <img class="logo" src="~assets/cover_logo.png" style="max-width: 200px" alt="">
   </div>
   <div class="q-gutter-md" style="width: 500px; max-width: 90vw;">
     <form @submit.prevent="connect" class="q-pa-md">
-    <q-input v-model="form.email" type="email" label="Email" />
-    <q-input v-model="form.password" type="password" label="Mot de passe" />
+    <q-input v-model="form.email" outlined type="email" label="Email" />
+    <q-input v-model="form.password" class="q-mt-md" outlined type="password" label="Mot de passe" />
     <div class="row justify-start" style="align-items: baseline">
       <q-btn
         type="submit"
@@ -59,7 +59,7 @@ export default {
       this.$q.cookies.remove('user_id')
       this.$q.cookies.remove('profile_id')
       this.submitting = true
-      this.$store.dispatch('main/changeLoadingState', true)
+      /* this.$store.dispatch('main/changeLoadingState', true) */
       // localStorage.removeItem('token')
       this.$store
         .dispatch('main/connectUser', {
@@ -80,7 +80,7 @@ export default {
           this.$store.dispatch('main/getMe')
             .then(me => {
               console.log('me', me)
-              this.$store.dispatch('main/changeLoadingState', false)
+              /* this.$store.dispatch('main/changeLoadingState', false) */
               this.$router.push({
                 name: 'home'
               })
@@ -89,7 +89,7 @@ export default {
         .catch(error => {
           this.submitting = false
           console.log(error.response)
-          this.$store.dispatch('main/changeLoadingState', false)
+          /* this.$store.dispatch('main/changeLoadingState', false) */
           this.$q.dialog({
             title: 'Error',
             message: error.response.data.data[0].messages[0].message
