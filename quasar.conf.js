@@ -31,7 +31,6 @@ module.exports = function (/* ctx */) {
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
     extras: [
-      'ionicons-v4',
       // 'mdi-v5',
       'fontawesome-v5',
       'eva-icons',
@@ -84,7 +83,7 @@ module.exports = function (/* ctx */) {
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
     framework: {
       iconSet: 'eva-icons', // Quasar icon set
-      lang: 'en-us', // Quasar language pack
+      lang: 'fr', // Quasar language pack
       config: {},
 
       // Possible values for "importStrategy":
