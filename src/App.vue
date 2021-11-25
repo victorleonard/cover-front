@@ -23,7 +23,7 @@ import { mapState } from 'vuex'
 export default {
   name: 'App',
   data: () => ({
-    dialog: true
+    dialog: false
   }),
   computed: mapState('main', ['loading']),
   methods: {
