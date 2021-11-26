@@ -99,10 +99,10 @@ footer{
   top: 30px;
 }
 .text-brand {
-  color:rgb(255, 112, 67);
+  color:#fa886d;
 }
 .bg-brand {
-  background: rgb(255, 112, 67);
+  background: #fa886d;
 }
 @media only screen and (min-device-width : 375px) and (max-device-width : 812px) and (-webkit-device-pixel-ratio : 3) {
     .q-tabs-head {
@@ -110,7 +110,7 @@ footer{
     }
   }
   .q-rating {
-    color: #f57f17 !important;
+    color: #fa886d !important;
   }
   .q-rating i {
     text-shadow: none;
@@ -122,7 +122,7 @@ footer{
     color: #444;
   }
   .q-tab--active {
-    color: #e64a19 !important;
+    color: #fa886d !important;
   }
   .q-tabs {
     color: #444
