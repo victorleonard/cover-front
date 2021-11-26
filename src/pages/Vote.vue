@@ -80,7 +80,7 @@
     <!-- awaitingVote -->
     <!--//////////// -->
 
-    <div v-if="awaitingVote && awaitingVote.length">
+    <div class="q-mb-xl" v-if="awaitingVote && awaitingVote.length">
       <div class="q-ml-sm q-mr-sm q-mb-lg">
         <div
           class="q-subheading text-weight-bold text-grey-10 text-weight-regular" style="text-transform: uppercase;">
@@ -105,7 +105,7 @@
     <!--//////////// -->
     <!-- alreadyVote -->
     <!--/////////////-->
-    <div class="q-mt-xl" v-if="noSelection && noSelection.length">
+    <div v-if="noSelection && noSelection.length">
       <div class="q-mt-sm q-ml-sm q-mr-sm q-mb-lg">
         <div
           class="q-subheading text-weight-bold text-grey-10 text-weight-regular" style="text-transform: uppercase;">
