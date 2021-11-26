@@ -13,15 +13,12 @@
         />
  -->
         <q-toolbar-title class="flex">
-          <q-avatar square v-if="$route.name === 'home'">
-            <img src="~assets/cover_logo.png">
-          </q-avatar>
+          <q-img style="max-width: 100px" v-if="$route.name === 'home'" src="~assets/cover_logo_inline.png"/>
           <q-btn v-else v-go-back=" '/home' " flat round dense>
             <q-icon name="eva-chevron-left-outline" />
           </q-btn>
           <div style="margin: 0 auto">
-            <span v-if="$route.name === 'home'">Mes groupes</span>
-            <span v-else-if="$route.name === 'profile'">Mon Profile</span>
+            <span v-if="$route.name === 'profile'">Mon Profile</span>
             <span v-else></span>
           </div>
         </q-toolbar-title>
