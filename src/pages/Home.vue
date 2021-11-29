@@ -2,7 +2,7 @@
   <q-page padding>
     <div class="row q-pt-md q-pl-sm q-pr-sm">
       <q-card v-for="group in myGroupsOrder" :key="group.id" class="my-card q-mb-lg" style="width: 100%">
-        <q-img class="bg-grey-9" :src="group.image.url" style="min-height: 240px">
+        <q-img class="bg-grey-9" :ratio="16/9" contain :src="group.image.url">
           <div class="text-h6 absolute-top text-left">
             {{ group.name }}
           </div>
