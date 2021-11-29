@@ -54,10 +54,13 @@
     </q-toolbar>
       <div>
         <div class="row">
-          <draggable v-model="setlist.songs" group="people" @end="sortSetList">
+          <draggable v-model="setlist.songs" group="people" :options="{handle:'.move'}" @end="sortSetList">
             <q-card v-for="song in setlist.songs" class="q-mb-md" :key="song.id">
             <q-card-section class="q-pa-none">
               <div class="row items-center bg-grey-1">
+                <div class="col col-auto">
+                  <q-btn class="move" flat icon="fas fa-grip-vertical" label=""/>
+                </div>
                 <div class="col col-3 col-md-6">
                   <img style="max-width: 100%; display: block" :src="song.image_url" alt="">
                 </div>
