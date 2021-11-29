@@ -1,6 +1,6 @@
 <template>
 <q-page padding v-if="profile && profileCopy">
-  <q-dialog v-model="edit.pseudo" persistent>
+  <q-dialog v-model="edit.pseudo">
       <q-card style="min-width: 350px">
         <q-card-section>
           <div class="text-h6">Pseudo</div>
@@ -13,6 +13,31 @@
         <q-card-actions align="right" class="text-primary">
           <q-btn flat label="Annuler" v-close-popup />
           <q-btn @click="editProfile('pseudo')" flat label="Mettre à jour" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="edit.avatar">
+      <q-card style="min-width: 350px">
+        <q-card-section>
+          <div class="text-h6">Avatar</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <q-uploader
+            style="width: 95%"
+            hide-upload-btn
+            @added="fileIsAdded"
+            :multiple="false"
+            :factory="upload"
+            accept=".jpg, image/*"
+            @rejected="onRejected"
+          />
+        </q-card-section>
+
+        <q-card-actions align="right" class="text-primary">
+          <q-btn flat label="Annuler" v-close-popup />
+          <q-btn @click="editAvatar" flat label="Mettre à jour" v-close-popup />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -41,9 +66,9 @@
               <q-item-label caption>Ville :</q-item-label>
               <q-item-label>{{ profile.commune }}</q-item-label>
             </q-item-section>
-            <q-item-section side top>
+            <!-- <q-item-section side top>
               <q-item-label caption>Edit</q-item-label>
-            </q-item-section>
+            </q-item-section> -->
           </q-item>
           <q-separator spaced />
           <q-item>
@@ -57,7 +82,7 @@
               </q-item-label>
             </q-item-section>
             <q-item-section side top>
-              <q-item-label caption>Edit</q-item-label>
+              <q-btn icon="eva-edit" flat no-caps caption @click="edit.avatar = true"></q-btn>
             </q-item-section>
           </q-item>
           <q-separator spaced />
@@ -72,9 +97,9 @@
                 </ul>
               </q-item-label>
             </q-item-section>
-            <q-item-section side top>
+            <!-- <q-item-section side top>
               <q-item-label caption>Edit</q-item-label>
-            </q-item-section>
+            </q-item-section> -->
           </q-item>
           <q-separator spaced />
         </q-list>
@@ -148,7 +173,8 @@ export default {
   data: () => ({
     profileCopy: undefined,
     edit: {
-      pseudo: false
+      pseudo: false,
+      avatar: false
     },
     cityModel: {
       nom: undefined,
@@ -167,13 +193,28 @@ export default {
     ...mapState('main', ['profile'])
   },
   methods: {
+    editAvatar () {
+      this.$store.dispatch('main/changeLoadingState', true)
+      const formData = new FormData()
+      formData.append('files', this.file)
+      this.$axios.post('https://cover-mobile.herokuapp.com/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+        .then(r => {
+          this.$axios.put(`profiles/${this.profile.id}`, {
+            avatar: r.data[0].id
+          })
+            .then(() => { this.getProfileData() })
+        })
+    },
     editProfile (el) {
       this.$store.dispatch('main/changeLoadingState', true)
-      this.$axios.put(`profile/${this.profile.id}`, {
+      this.$axios.put(`profiles/${this.profile.id}`, {
         [el]: this.profileCopy[el]
       })
         .then(() => {
           this.$store.dispatch('main/changeLoadingState', false)
+          this.getProfileData()
         })
     },
     filterFn (val, update, abort) {
