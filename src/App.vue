@@ -67,7 +67,7 @@ export default {
     // Checks if should display install popup notification:
     if (isIos() && !isInStandaloneMode() && this.$route.name !== 'share') {
       this.$q.notify({
-        position: 'bottom',
+        position: 'top',
         html: true,
         message: 'Vous pouvez ajouter cette webapp sur votre iphone :<br/> cliquer sur <img src="safari_navigation_action.png" class="q-px-sm"/> puis sur <img src="webapp_install_safari.png" style="max-width: 300px" class="q-py-md q-px-md"/>',
         color: 'grey-7'

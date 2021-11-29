@@ -14,7 +14,7 @@
         <q-card-section v-html="commentTemp">
         </q-card-section>
       </q-card>
-    </q-dialog>
+      </q-dialog>
       <!-- DIALOG selection -->
       <q-dialog v-model="voteDialog">
         <q-card class="my-card" v-if="songSelected" style="width: 70vw">
@@ -79,20 +79,22 @@
     <!--//////////// -->
     <!-- awaitingVote -->
     <!--//////////// -->
-    <q-tabs
-      v-model="tab"
-      align="justify"
-      no-caps
-      class="bg-white text-grey-8"
-      inline-label
-      active-color="brand"
-      indicator-color="brand"
-    >
-      <q-tab name="awaitingVote" active-class="text-brand" label="Votes en attente" />
-      <q-tab name="alreadyVote" active-class="text-brand" label="Votes effectués" />
-    </q-tabs>
+    <q-header :style="revealClass === undefined ? 'margin-top: 50px' : null" :class="!revealClass || revealClass === undefined ? 'revealClassOff' : 'revealClassOn'" reveal @reveal="reveal">
+        <q-tabs
+          v-model="tab"
+          align="justify"
+          no-caps
+          class="bg-white text-grey-8"
+          inline-label
+          active-color="brand"
+          indicator-color="brand"
+        >
+          <q-tab name="awaitingVote" active-class="text-brand" label="Votes en attente" />
+          <q-tab name="alreadyVote" active-class="text-brand" label="Votes effectués" />
+        </q-tabs>
+      </q-header>
 
-    <q-tab-panels class="bg-grey-2" v-model="tab" animated swipeable>
+    <q-tab-panels class="bg-grey-2 q-mt-lg q-pt-lg" v-model="tab" animated swipeable>
       <q-tab-panel name="awaitingVote">
         <div class="q-mb-xl" v-if="awaitingVote && awaitingVote.length">
           <!-- <div class="q-ml-sm q-mr-sm q-mb-lg">
@@ -157,6 +159,7 @@ export default {
   components: { Card },
   data () {
     return {
+      revealClass: undefined,
       tab: 'awaitingVote',
       profiles: undefined,
       currentGroupSongs: undefined,
@@ -195,6 +198,9 @@ export default {
     }
   },
   methods: {
+    reveal (event) {
+      this.revealClass = event
+    },
     refresh (done) {
       this.$store.dispatch('main/getCurrentGroupSongs', {
         groupId: this.$route.params.groupId
@@ -294,3 +300,12 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+  .revealClassOn {
+    margin-top: 50px;
+  }
+  .revealClassOff {
+    margin-top: 55px;
+  }
+</style>
