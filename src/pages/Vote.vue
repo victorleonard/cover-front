@@ -83,7 +83,7 @@
       v-model="tab"
       align="justify"
       no-caps
-      class="text-grey-8"
+      class="bg-white text-grey-8"
       inline-label
       active-color="brand"
       indicator-color="brand"
@@ -92,7 +92,7 @@
       <q-tab name="alreadyVote" active-class="text-brand" label="Votes effectués" />
     </q-tabs>
 
-    <q-tab-panels class="bg-grey-1" v-model="tab" animated swipeable>
+    <q-tab-panels class="bg-grey-2" v-model="tab" animated swipeable>
       <q-tab-panel name="awaitingVote">
         <div class="q-mb-xl" v-if="awaitingVote && awaitingVote.length">
           <!-- <div class="q-ml-sm q-mr-sm q-mb-lg">
