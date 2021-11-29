@@ -1,6 +1,6 @@
 <template>
   <div id="q-app">
-    <q-dialog style="z-index: 99999" class="q-pa-md q-gutter-sm" v-model="dialog" minimized position="top" persistent>
+    <q-dialog class="q-pa-md q-gutter-sm" v-model="dialog" minimized position="top" persistent>
       <q-card>
         <q-card-section class="row items-center no-wrap">
           <div>
@@ -95,6 +95,9 @@ footer{
 /* .search-page .q-field--standout.q-field--focused .q-field__control {
   background-color: red !important;
 } */
+.q-dialog {
+  z-index: 9999 !important;
+}
 .go-back {
   top: 30px;
 }
