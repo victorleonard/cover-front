@@ -79,21 +79,6 @@
     <!--//////////// -->
     <!-- awaitingVote -->
     <!--//////////// -->
-    <!-- <q-header style="margin-top: 50px;" reveal>
-        <q-tabs
-          v-model="tab"
-          align="justify"
-          no-caps
-          class="bg-white text-grey-8"
-          inline-label
-          active-color="brand"
-          indicator-color="brand"
-        >
-          <q-tab name="awaitingVote" active-class="text-brand" label="Votes en attente" />
-          <q-tab name="alreadyVote" active-class="text-brand" label="Votes effectués" />
-        </q-tabs>
-      </q-header> -->
-
     <q-tabs
       v-model="tab"
       align="justify"
@@ -107,7 +92,7 @@
       <q-tab name="alreadyVote" active-class="text-brand" label="Votes effectués" />
     </q-tabs>
 
-    <q-tab-panels class="bg-grey-2 q-mt-lg q-pt-lg" v-model="tab" animated swipeable>
+    <q-tab-panels class="bg-grey-2" v-model="tab" animated swipeable>
       <q-tab-panel name="awaitingVote">
         <div class="q-mb-xl" v-if="awaitingVote && awaitingVote.length">
           <!-- <div class="q-ml-sm q-mr-sm q-mb-lg">
