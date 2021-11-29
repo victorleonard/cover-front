@@ -104,7 +104,7 @@
       </q-dialog>
 
     <!-- Morceaux selectionnés -->
-    <div class="q-ml-sm q-mr-sm q-pb-md q-mt-lg q-pt-lg">
+    <div class="q-ml-sm q-mr-sm q-pb-md">
       <div class="q-subheading text-weight-bold text-grey-10 text-weight-regular" style="text-transform: uppercase;">Titres selectionnés</div>
       <div v-if="currentGroup" class="q-caption text-grey-10">Au moins {{ currentGroup.score }} <q-icon name="eva-star-outline" color="grey-8" style="margin-bottom: .2rem" /></div>
       <hr>
@@ -125,7 +125,7 @@
 
     <!-- Morceaux refusés -->
     <div class="q-mt-xl q-pb-md q-pt-lg">
-      <div class="q-subheading text-weight-bold text-grey-10 text-weight-regular" style="    text-transform: uppercase;">Titres refusés</div>
+      <div class="q-subheading text-weight-bold text-grey-10 text-weight-regular" style="text-transform: uppercase;">Titres refusés</div>
       <q-btn
         @click="loadRefuseSong"
         color="primary"

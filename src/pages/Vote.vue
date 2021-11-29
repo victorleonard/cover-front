@@ -79,7 +79,7 @@
     <!--//////////// -->
     <!-- awaitingVote -->
     <!--//////////// -->
-    <q-header :style="revealClass === undefined ? 'margin-top: 50px' : null" :class="!revealClass || revealClass === undefined ? 'revealClassOff' : 'revealClassOn'" reveal @reveal="reveal">
+    <!-- <q-header style="margin-top: 50px;" reveal>
         <q-tabs
           v-model="tab"
           align="justify"
@@ -92,7 +92,20 @@
           <q-tab name="awaitingVote" active-class="text-brand" label="Votes en attente" />
           <q-tab name="alreadyVote" active-class="text-brand" label="Votes effectués" />
         </q-tabs>
-      </q-header>
+      </q-header> -->
+
+    <q-tabs
+      v-model="tab"
+      align="justify"
+      no-caps
+      class="bg-white text-grey-8"
+      inline-label
+      active-color="brand"
+      indicator-color="brand"
+    >
+      <q-tab name="awaitingVote" active-class="text-brand" label="Votes en attente" />
+      <q-tab name="alreadyVote" active-class="text-brand" label="Votes effectués" />
+    </q-tabs>
 
     <q-tab-panels class="bg-grey-2 q-mt-lg q-pt-lg" v-model="tab" animated swipeable>
       <q-tab-panel name="awaitingVote">
@@ -159,7 +172,6 @@ export default {
   components: { Card },
   data () {
     return {
-      revealClass: undefined,
       tab: 'awaitingVote',
       profiles: undefined,
       currentGroupSongs: undefined,
@@ -198,9 +210,6 @@ export default {
     }
   },
   methods: {
-    reveal (event) {
-      this.revealClass = event
-    },
     refresh (done) {
       this.$store.dispatch('main/getCurrentGroupSongs', {
         groupId: this.$route.params.groupId
@@ -300,12 +309,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-  .revealClassOn {
-    margin-top: 50px;
-  }
-  .revealClassOff {
-    margin-top: 55px;
-  }
-</style>
