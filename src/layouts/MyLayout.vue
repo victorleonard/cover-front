@@ -1,6 +1,6 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header reveal>
+    <q-header reveal v-if="$route.name !== 'setlist'">
       <q-toolbar class="text-grey-9"
       >
       <!-- <q-btn
@@ -104,7 +104,7 @@
           <q-badge color="red" floating transparent rounded v-if="awaitingVote && awaitingVote.length" :label="awaitingVote.length"/>
         </q-route-tab>
         <q-route-tab  :to="{ name: 'group' }" active-class="text-brand" icon="eva-star-outline" exact replace label="Résultats"/>
-        <q-route-tab  :to="{ name: 'setlist' }" active-class="text-brand" icon="eva-list-outline" exact replace label="Setlist"/>
+        <q-route-tab  :to="{ name: 'setlists' }" active-class="text-brand" icon="eva-list-outline" exact replace label="Setlist"/>
       </q-tabs>
     </q-footer>
   </q-layout>

@@ -97,12 +97,12 @@
                 </q-item-section>
                 <q-item-section>Modifer mon niveau</q-item-section>
               </q-item>
-              <q-item clickable @click="song.setlist ? removeToSetlist() : addToSetlist()">
+              <!-- <q-item clickable @click="song.setlist ? removeToSetlist() : addToSetlist()">
                 <q-item-section avatar>
                   <q-icon color="green-10" name="eva-list-outline" />
                 </q-item-section>
                 <q-item-section>{{ song.setlist ? 'Retier de la setlist' : 'Ajouter à la setlist' }}</q-item-section>
-              </q-item>
+              </q-item> -->
               <!-- <q-item clickable @click="removeDialog = true">
                 <q-item-section>Suprimmer ce titre</q-item-section>
               </q-item> -->

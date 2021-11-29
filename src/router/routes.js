@@ -11,7 +11,8 @@ const routes = [
       { path: '/', name: 'group', component: () => import('pages/TrackList.vue') },
       { path: '/group/:groupId/vote', name: 'vote', component: () => import('pages/Vote.vue') },
       { path: '/group/:groupId/search', name: 'search', component: () => import('pages/Search.vue') },
-      { path: '/group/:groupId/setlist', name: 'setlist', component: () => import('pages/SetList.vue') }
+      { path: '/group/:groupId/setlists', name: 'setlists', component: () => import('pages/SetLists.vue') },
+      { path: '/group/:groupId/setlist/:id', name: 'setlist', component: () => import('pages/SetList.vue') }
     ]
   },
   {

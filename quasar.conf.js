@@ -103,7 +103,8 @@ module.exports = function (/* ctx */) {
         'Cookies',
         'Notify',
         'BottomSheet',
-        'Loading'
+        'Loading',
+        'Dialog'
       ]
     },
 
