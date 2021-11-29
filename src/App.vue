@@ -1,6 +1,6 @@
 <template>
   <div id="q-app">
-    <q-dialog class="q-pa-md q-gutter-sm" v-model="dialog" minimized position="top" persistent>
+    <q-dialog style="z-index: 99999" class="q-pa-md q-gutter-sm" v-model="dialog" minimized position="top" persistent>
       <q-card>
         <q-card-section class="row items-center no-wrap">
           <div>
