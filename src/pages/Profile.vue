@@ -1,5 +1,21 @@
 <template>
-<q-page padding>
+<q-page padding v-if="profile && profileCopy">
+  <q-dialog v-model="edit.pseudo" persistent>
+      <q-card style="min-width: 350px">
+        <q-card-section>
+          <div class="text-h6">Pseudo</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <q-input dense v-model="profileCopy.pseudo" autofocus />
+        </q-card-section>
+
+        <q-card-actions align="right" class="text-primary">
+          <q-btn flat label="Annuler" v-close-popup />
+          <q-btn @click="editProfile('pseudo')" flat label="Mettre à jour" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
     <div class="row">
       <!-- <q-card class="my-card">
         <q-card-section v-if="!avatar || !instruments">
@@ -9,7 +25,60 @@
     </div>
     <div class="row q-mt-md q-mb-md">
       <div class="col">
-        <q-form
+        <q-list class="bg-white">
+          <q-item>
+            <q-item-section>
+              <q-item-label caption>Pseudo :</q-item-label>
+              <q-item-label>{{ profile.pseudo }}</q-item-label>
+            </q-item-section>
+            <q-item-section side top>
+              <q-btn icon="eva-edit" flat no-caps caption @click="edit.pseudo = true"></q-btn>
+            </q-item-section>
+          </q-item>
+          <q-separator spaced />
+          <q-item>
+            <q-item-section>
+              <q-item-label caption>Ville :</q-item-label>
+              <q-item-label>{{ profile.commune }}</q-item-label>
+            </q-item-section>
+            <q-item-section side top>
+              <q-item-label caption>Edit</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-separator spaced />
+          <q-item>
+            <q-item-section>
+              <q-item-label caption>Avatar</q-item-label>
+              <q-item-label>
+                <q-avatar size="70px">
+                  <img :src="profile.avatar.url">
+                  <!-- <q-btn round color="red" icon="fas fa-trash" size="sm" @click="avatar = undefined" style="position: absolute; right: 1px; top: 1px" /> -->
+                </q-avatar>
+              </q-item-label>
+            </q-item-section>
+            <q-item-section side top>
+              <q-item-label caption>Edit</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-separator spaced />
+          <q-item>
+            <q-item-section>
+              <q-item-label caption>Instruments</q-item-label>
+              <q-item-label>
+                <ul>
+                  <li v-for="instrument in profile.instruments" :key="instrument.id">
+                    {{ instrument.nom }}
+                  </li>
+                </ul>
+              </q-item-label>
+            </q-item-section>
+            <q-item-section side top>
+              <q-item-label caption>Edit</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-separator spaced />
+        </q-list>
+        <!-- <q-form
           @submit="onSubmit"
           @reset="onReset"
           class="q-gutter-md"
@@ -19,24 +88,24 @@
         Ville :
         </p>
         <q-select
-              square filled
-              v-model="cityModel"
-              use-input
-              hide-selected
-              fill-input
-              input-debounce="200"
-              :options="cityOptions"
-              :option-label="opt => cityOptions ? opt.nom + ' - ' + opt.codeDepartement : ' '"
-              @filter="filterFn"
-            >
-              <template v-slot:no-option>
-                <q-item>
-                  <q-item-section class="text-grey">
-                    No results
-                  </q-item-section>
-                </q-item>
-              </template>
-            </q-select>
+          square filled
+          v-model="cityModel"
+          use-input
+          hide-selected
+          fill-input
+          input-debounce="200"
+          :options="cityOptions"
+          :option-label="opt => cityOptions ? opt.nom + ' - ' + opt.codeDepartement : ' '"
+          @filter="filterFn"
+        >
+          <template v-slot:no-option>
+            <q-item>
+              <q-item-section class="text-grey">
+                No results
+              </q-item-section>
+            </q-item>
+          </template>
+        </q-select>
         <q-select
           square filled
           v-model="instruments"
@@ -64,10 +133,8 @@
             @rejected="onRejected"
           />
         <q-btn type="submit" unelevated color="brand" label="Sauvegarder" />
-        </q-form>
+        </q-form> -->
       </div>
-    </div>
-    <div class="row">
     </div>
 </q-page>
 </template>
@@ -79,6 +146,10 @@ import axios from 'axios'
 export default {
   name: 'profile',
   data: () => ({
+    profileCopy: undefined,
+    edit: {
+      pseudo: false
+    },
     cityModel: {
       nom: undefined,
       codeDepartement: undefined
@@ -96,6 +167,15 @@ export default {
     ...mapState('main', ['profile'])
   },
   methods: {
+    editProfile (el) {
+      this.$store.dispatch('main/changeLoadingState', true)
+      this.$axios.put(`profile/${this.profile.id}`, {
+        [el]: this.profileCopy[el]
+      })
+        .then(() => {
+          this.$store.dispatch('main/changeLoadingState', false)
+        })
+    },
     filterFn (val, update, abort) {
       update(() => {
         console.log(val)
@@ -113,21 +193,8 @@ export default {
         profileId: this.$q.cookies.get('profile_id')
       })
         .then(r => {
-          console.log('rrr', r)
+          this.profileCopy = { ...r.data }
           this.$store.dispatch('main/changeLoadingState', false)
-          const p = r.data
-          this.pseudo = p.pseudo
-          if (p.avatar) {
-            this.avatar = p.avatar.url
-          }
-          if (p.commune) {
-            this.commune = p.commune
-            this.cityModel.nom = p.commune
-            this.cityModel.codeDepartement = p.codeDepartement
-          }
-          p.instruments.map(el => {
-            this.instruments.push(el.nom)
-          })
         })
     },
     getInstruments () {
@@ -208,37 +275,11 @@ export default {
         }) */
       }
     },
-    /* onSubmit () {
-      if (this.profile) {
-        this.$store.dispatch('main/updateProfile', {
-          pseudo: this.pseudo,
-          image: r[0].id
-        })
-      } else {
-        this.$store.dispatch('main/createProfile', {
-          pseudo: this.pseudo
-        })
-      }
-    }, */
     onReset () {}
   },
   mounted () {
     this.getProfileData()
-    this.getInstruments()
-    /* if (this.profile) {
-      this.pseudo = this.profile.pseudo
-      this.commune = this.profile.commune
-      this.profile.instruments.map(el => {
-        this.instruments.push(el.nom)
-      })
-      this.$store.dispatch('main/getInstruments')
-        .then(r => {
-          this.instrumentFullList = r.data
-          r.data.map(el => {
-            this.instrumentsList.push(el.nom)
-          })
-        })
-    } */
+    // this.getInstruments()
   }
 }
 </script>

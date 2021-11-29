@@ -1,6 +1,6 @@
 <template>
 <q-pull-to-refresh @refresh="refresh">
-  <q-page class="bg-grey-3" padding>
+  <q-page class="bg-grey-2">
       <q-dialog
         v-model="commentDialog"
       >
@@ -85,12 +85,14 @@
       no-caps
       class="text-grey-8"
       inline-label
+      active-color="brand"
+      indicator-color="brand"
     >
-      <q-tab name="awaitingVote" label="Votes en attente" />
-      <q-tab name="alreadyVote" label="Votes effectués" />
+      <q-tab name="awaitingVote" active-class="text-brand" label="Votes en attente" />
+      <q-tab name="alreadyVote" active-class="text-brand" label="Votes effectués" />
     </q-tabs>
 
-    <q-tab-panels v-model="tab" animated>
+    <q-tab-panels class="bg-grey-1" v-model="tab" animated swipeable>
       <q-tab-panel name="awaitingVote">
         <div class="q-mb-xl" v-if="awaitingVote && awaitingVote.length">
           <!-- <div class="q-ml-sm q-mr-sm q-mb-lg">
@@ -137,11 +139,6 @@
               :key="s._id" />
           </div>
         </div>
-      </q-tab-panel>
-
-      <q-tab-panel name="movies">
-        <div class="text-h6">Movies</div>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit.
       </q-tab-panel>
     </q-tab-panels>
 
