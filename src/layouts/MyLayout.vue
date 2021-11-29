@@ -97,15 +97,14 @@
     </q-page-container>
 
     <q-footer bordered>
-      <q-tabs no-caps indicator-color="transparent">
-        <q-route-tab :to="{ name: 'search' }" icon="eva-plus-outline" exact replace label="Proposer"/>
-        <q-route-tab :to="{ name: 'vote' }" icon="how_to_vote" exact replace label="Voter">
-          <q-badge color="red" floating transparent v-if="awaitingVote && awaitingVote.length">
-            {{ awaitingVote.length }}
-          </q-badge>
+      <q-tabs
+      narrow-indicator no-caps class="text-grey-8" indicator-color="transparent">
+        <q-route-tab :to="{ name: 'search' }" active-class="text-brand" icon="eva-plus-outline" exact replace label="Proposer"/>
+        <q-route-tab :to="{ name: 'vote' }" active-class="text-brand" icon="how_to_vote" exact replace label="Voter">
+          <q-badge color="red" floating transparent rounded v-if="awaitingVote && awaitingVote.length" :label="awaitingVote.length"/>
         </q-route-tab>
-        <q-route-tab  :to="{ name: 'group' }" icon="eva-star-outline" exact replace label="Résultats"/>
-        <q-route-tab  :to="{ name: 'setlist' }" icon="eva-list-outline" exact replace label="Setlist"/>
+        <q-route-tab  :to="{ name: 'group' }" active-class="text-brand" icon="eva-star-outline" exact replace label="Résultats"/>
+        <q-route-tab  :to="{ name: 'setlist' }" active-class="text-brand" icon="eva-list-outline" exact replace label="Setlist"/>
       </q-tabs>
     </q-footer>
   </q-layout>

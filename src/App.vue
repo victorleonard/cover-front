@@ -118,15 +118,15 @@ footer{
   .q-layout__section--marginal {
     background-color: rgba(255, 255, 255, 0.95);
   }
-  .q-tabs-row {
+  /* .q-tabs-row {
     color: #444;
-  }
-  .q-tab--active {
+  } */
+  /* .q-tab--active {
     color: #fa886d !important;
-  }
-  .q-tabs {
+  } */
+  /* .q-tabs {
     color: #444
-  }
+  } */
   hr {
     height: 1px;
     padding: 0;

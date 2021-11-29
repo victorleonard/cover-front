@@ -79,50 +79,72 @@
     <!--//////////// -->
     <!-- awaitingVote -->
     <!--//////////// -->
+    <q-tabs
+      v-model="tab"
+      align="justify"
+      no-caps
+      class="text-grey-8"
+      inline-label
+    >
+      <q-tab name="awaitingVote" label="Votes en attente" />
+      <q-tab name="alreadyVote" label="Votes effectués" />
+    </q-tabs>
 
-    <div class="q-mb-xl" v-if="awaitingVote && awaitingVote.length">
-      <div class="q-ml-sm q-mr-sm q-mb-lg">
-        <div
-          class="q-subheading text-weight-bold text-grey-10 text-weight-regular" style="text-transform: uppercase;">
-          Votes en attente
+    <q-tab-panels v-model="tab" animated>
+      <q-tab-panel name="awaitingVote">
+        <div class="q-mb-xl" v-if="awaitingVote && awaitingVote.length">
+          <!-- <div class="q-ml-sm q-mr-sm q-mb-lg">
+            <div
+              class="q-subheading text-weight-bold text-grey-10 text-weight-regular" style="text-transform: uppercase;">
+              Votes en attente
+            </div>
+            <hr>
+          </div> -->
+          <div>
+            <div class="row">
+              <Card
+                class="col-xs-12 col-sm-6 col-md-4 col-lg-2 q-mb-lg q-pl-sm q-pr-sm"
+                @displayVoteDialog="displayVoteDialog"
+                @loadSongs="loadSongs"
+                v-for="s in awaitingVote"
+                :song="s"
+                :profiles="profiles"
+                :key="s._id" />
+            </div>
+          </div>
         </div>
-        <hr>
-      </div>
-      <div>
-        <div class="row">
-          <Card
-            class="col-xs-12 col-sm-6 col-md-4 col-lg-2 q-mb-lg q-pl-sm q-pr-sm"
-            @displayVoteDialog="displayVoteDialog"
-            @loadSongs="loadSongs"
-            v-for="s in awaitingVote"
-            :song="s"
-            :profiles="profiles"
-            :key="s._id" />
-        </div>
-      </div>
-    </div>
+      </q-tab-panel>
 
-    <!--//////////// -->
-    <!-- alreadyVote -->
-    <!--/////////////-->
-    <div v-if="noSelection && noSelection.length">
-      <div class="q-mt-sm q-ml-sm q-mr-sm q-mb-lg">
-        <div
-          class="q-subheading text-weight-bold text-grey-10 text-weight-regular" style="text-transform: uppercase;">
-          Votes effectués</div>
-        <hr>
-      </div>
-      <div class="row">
-        <Card
-          class="col-xs-12 col-sm-6 col-md-4 col-lg-2 q-mb-lg q-pl-sm q-pr-sm"
-          @displayVoteDialog="displayVoteDialog"
-          v-for="s in noSelection"
-          @loadSongs="loadSongs"
-          :song="s"
-          :profiles="profiles"
-          :key="s._id" />
-      </div>
-    </div>
+      <q-tab-panel name="alreadyVote">
+        <!--//////////// -->
+        <!-- alreadyVote -->
+        <!--/////////////-->
+        <div v-if="noSelection && noSelection.length">
+          <!-- <div class="q-mt-sm q-ml-sm q-mr-sm q-mb-lg">
+            <div
+              class="q-subheading text-weight-bold text-grey-10 text-weight-regular" style="text-transform: uppercase;">
+              Votes effectués</div>
+            <hr>
+          </div> -->
+          <div class="row">
+            <Card
+              class="col-xs-12 col-sm-6 col-md-4 col-lg-2 q-mb-lg q-pl-sm q-pr-sm"
+              @displayVoteDialog="displayVoteDialog"
+              v-for="s in noSelection"
+              @loadSongs="loadSongs"
+              :song="s"
+              :profiles="profiles"
+              :key="s._id" />
+          </div>
+        </div>
+      </q-tab-panel>
+
+      <q-tab-panel name="movies">
+        <div class="text-h6">Movies</div>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit.
+      </q-tab-panel>
+    </q-tab-panels>
+
     <div v-if="noSelection && !noSelection.length" class="q-ml-sm q-mr-sm q-mb-lg">
       <div class="q-subheading text-grey-10 text-weight-regular">Aucun vote en cours</div>
     </div>
@@ -138,6 +160,7 @@ export default {
   components: { Card },
   data () {
     return {
+      tab: 'awaitingVote',
       profiles: undefined,
       currentGroupSongs: undefined,
       songSelected: undefined,
