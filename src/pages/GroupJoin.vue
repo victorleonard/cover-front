@@ -29,14 +29,13 @@
 
   <div class="row">
     <div class="col">
-    <h4 class="q-mt-md q-mb-md">Liste des groupes</h4>
-    <q-card v-for="group in groups" class="q-mb-md" :key="group.id">
+    <q-card flat v-for="group in groups" class="q-mb-md" :key="group.id">
       <q-card-section class="q-pa-none">
-        <div class="row items-center bg-grey-1">
+        <div class="row items-center bg-white">
           <div class="col col-3 col-md-6">
             <q-img
+              :ratio="4/3" contain
               :src="group.image.url"
-              contain
               class="bg-grey-9"
               style="max-height: 100px;"
               spinner-color="white"
@@ -45,25 +44,28 @@
           </div>
           <div class="col q-pr-sm" style="line-height: 1.2rem">
             <div class="text-grey-9 q-title q-ml-sm">{{ group.name }}</div>
-            <div class="text-grey-7 q-subheading q-ml-sm q-mt-sm">{{ group.commune }}</div>
+            <div class="text-grey-7 q-subheading q-ml-sm q-mt-sm">{{ group.city }}</div>
+          </div>
+          <div class="col col-auto">
+            <q-btn color="grey-7" size="lg" label="" flat icon-right="fas fa-caret-right" />
           </div>
         </div>
       </q-card-section>
-      <q-card-section>
+      <!-- <q-card-section>
         <q-chip v-for="profile in group.profiles" :key="profile.id">
           <q-avatar v-if="profile.avatar">
             <img :src="profile.avatar.url" alt="avatar">
           </q-avatar>
           {{ profile.pseudo }}
         </q-chip>
-      </q-card-section>
-      <q-card-actions align="right" v-if="isAlreadyMember(group.id)">
+      </q-card-section> -->
+      <!-- <q-card-actions align="right" v-if="isAlreadyMember(group.id)">
         <div><q-chip color="green" text-color="white" icon="fas fa-guitar" label="Déjà membre" /></div>
       </q-card-actions>
       <q-card-actions align="right" v-else>
         <q-btn v-if="!alreadyAsk(group.id)" @click="askInvitationDialog = true, groupSelected = group" color="primary" label="rejoindre" icon-right="fas fa-caret-right" />
         <div v-else><q-chip color="red" text-color="white" icon="fas fa-clock" label="Demande en attente" /></div>
-      </q-card-actions>
+      </q-card-actions> -->
     </q-card>
     </div>
   </div>
@@ -79,10 +81,11 @@ export default {
     pseudo: '',
     askInvitationDialog: false,
     groupSelected: undefined,
-    message: ''
+    message: '',
+    myAskingInvitations: undefined
   }),
   computed: {
-    ...mapState('main', ['groups', 'user', 'myAskingInvitations'])
+    ...mapState('main', ['groups', 'user'])
   },
   methods: {
     getBestFormatImage (formats) {
@@ -129,7 +132,10 @@ export default {
   },
   beforeCreate () {
     this.$store.dispatch('main/getGroups')
-    this.$store.dispatch('main/getMyAskingInvitation')
+    this.$axios.get('/invitations?from=' + this.$q.cookies.get('profile_id'))
+      .then(res => {
+        this.myAskingInvitations = res.data
+      })
   }
 }
 </script>

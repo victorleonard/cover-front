@@ -11,8 +11,25 @@
         </q-card-section>
 
         <q-card-actions align="right" class="text-primary">
-          <q-btn flat label="Annuler" v-close-popup />
-          <q-btn @click="editProfile('pseudo')" flat label="Mettre à jour" v-close-popup />
+          <q-btn flat no-caps label="Annuler" color="grey-8" v-close-popup />
+          <q-btn @click="editProfile('pseudo')" unelevated no-caps color="brand" label="Mettre à jour" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="edit.location">
+      <q-card style="min-width: 350px">
+        <q-card-section>
+          <div class="text-h6">Ville</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <search-city :cityProp="city" :error="cityError" @city_selected="selectCity" @clear="clearLocation" />
+        </q-card-section>
+
+        <q-card-actions align="right" class="text-primary">
+          <q-btn flat label="Annuler" color="grey-8" no-caps v-close-popup />
+          <q-btn @click="editLocation" unelevated no-caps color="brand" label="Mettre à jour" v-close-popup />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -36,8 +53,8 @@
         </q-card-section>
 
         <q-card-actions align="right" class="text-primary">
-          <q-btn flat label="Annuler" v-close-popup />
-          <q-btn @click="editAvatar" flat label="Mettre à jour" v-close-popup />
+          <q-btn flat label="Annuler" no-caps color="grey-8" v-close-popup />
+          <q-btn @click="editAvatar" unelevated no-caps color="brand" label="Mettre à jour" v-close-popup />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -64,18 +81,20 @@
           <q-item>
             <q-item-section>
               <q-item-label caption>Ville :</q-item-label>
-              <q-item-label>{{ profile.commune }}</q-item-label>
+              <q-item-label>
+                {{ profile.locality && profile.area_level_2 ? `${profile.locality} - ${profile.area_level_2}` : '' }}
+              </q-item-label>
             </q-item-section>
-            <!-- <q-item-section side top>
-              <q-item-label caption>Edit</q-item-label>
-            </q-item-section> -->
+            <q-item-section side top>
+              <q-btn icon="eva-edit" flat no-caps caption @click="edit.location = true"></q-btn>
+            </q-item-section>
           </q-item>
           <q-separator spaced />
           <q-item>
             <q-item-section>
               <q-item-label caption>Avatar</q-item-label>
               <q-item-label>
-                <q-avatar size="70px">
+                <q-avatar size="70px" v-if="profile.avatar">
                   <img :src="profile.avatar.url">
                   <!-- <q-btn round color="red" icon="fas fa-trash" size="sm" @click="avatar = undefined" style="position: absolute; right: 1px; top: 1px" /> -->
                 </q-avatar>
@@ -103,62 +122,6 @@
           </q-item>
           <q-separator spaced />
         </q-list>
-        <!-- <q-form
-          @submit="onSubmit"
-          @reset="onReset"
-          class="q-gutter-md"
-        >
-        <q-input v-model="pseudo" square filled label="pseudo" />
-        <p>
-        Ville :
-        </p>
-        <q-select
-          square filled
-          v-model="cityModel"
-          use-input
-          hide-selected
-          fill-input
-          input-debounce="200"
-          :options="cityOptions"
-          :option-label="opt => cityOptions ? opt.nom + ' - ' + opt.codeDepartement : ' '"
-          @filter="filterFn"
-        >
-          <template v-slot:no-option>
-            <q-item>
-              <q-item-section class="text-grey">
-                No results
-              </q-item-section>
-            </q-item>
-          </template>
-        </q-select>
-        <q-select
-          square filled
-          v-model="instruments"
-          multiple
-          :options="instrumentsList"
-          label="Instruments"
-          style="width: 95%"
-        />
-        <p>
-        Avatar :
-        </p>
-        <div v-if="avatar" class="relative-position">
-          <q-avatar size="100px">
-            <img :src="avatar">
-            <q-btn round color="red" icon="fas fa-trash" size="sm" @click="avatar = undefined" style="position: absolute; right: 1px; top: 1px" />
-          </q-avatar>
-          </div>
-          <q-uploader v-else
-            style="width: 95%"
-            hide-upload-btn
-            @added="fileIsAdded"
-            :multiple="false"
-            :factory="upload"
-            accept=".jpg, image/*"
-            @rejected="onRejected"
-          />
-        <q-btn type="submit" unelevated color="brand" label="Sauvegarder" />
-        </q-form> -->
       </div>
     </div>
 </q-page>
@@ -167,14 +130,25 @@
 <script>
 import { mapState } from 'vuex'
 import axios from 'axios'
+import SearchCity from 'src/components/SearchCity.vue'
 
 export default {
+  components: { SearchCity },
   name: 'profile',
   data: () => ({
+    city: undefined,
+    location: {
+      place_id: '',
+      name: '',
+      type: '',
+      country: ''
+    },
+    cityError: false,
     profileCopy: undefined,
     edit: {
       pseudo: false,
-      avatar: false
+      avatar: false,
+      location: false
     },
     cityModel: {
       nom: undefined,
@@ -193,6 +167,38 @@ export default {
     ...mapState('main', ['profile'])
   },
   methods: {
+    editLocation () {
+      this.$store.dispatch('main/changeLoadingState', true)
+      this.$axios.put(`profiles/location/${this.profile.id}`, {
+        place_id: this.location.place_id
+      })
+        .then(() => {
+          this.$store.dispatch('main/changeLoadingState', false)
+          this.getProfileData()
+        })
+        .catch(() => {
+          this.$store.dispatch('main/changeLoadingState', false)
+          this.$q.notify({
+            type: 'negative',
+            message: 'server error'
+          })
+        })
+    },
+    selectCity (val) {
+      this.cityError = false
+      this.location = {
+        name: val.structured_formatting.main_text,
+        country: val.structured_formatting.secondary_text,
+        place_id: val.place_id
+      }
+    },
+    clearLocation () {
+      this.location = {
+        name: '',
+        place_id: '',
+        country: ''
+      }
+    },
     editAvatar () {
       this.$store.dispatch('main/changeLoadingState', true)
       const formData = new FormData()
@@ -261,62 +267,7 @@ export default {
         type: 'negative',
         message: `${rejectedEntries.length} file(s) did not pass validation constraints`
       })
-    },
-    async onSubmit () {
-      console.log('submit')
-      this.$store.dispatch('main/changeLoadingState', true)
-      const instrumentsId = []
-      this.instruments.forEach(i => {
-        const id = this.instrumentFullList.find(ifl => ifl.nom === i)
-        instrumentsId.push(id)
-      })
-      try {
-        if (this.file) {
-          this.$store.dispatch('main/upload', {
-            file: this.file
-          })
-            .then(r => {
-              this.$store.dispatch('main/updateProfile', {
-                pseudo: this.pseudo,
-                instruments: instrumentsId,
-                avatar: r[0].id,
-                commune: this.cityModel ? this.cityModel.nom : '',
-                codeDepartement: this.cityModel ? this.cityModel.codeDepartement : '',
-                codeRegion: this.cityModel ? this.cityModel.codeRegion : ''
-              })
-                .then(() => {
-                  this.$store.dispatch('main/changeLoadingState', false)
-                  this.getProfileData()
-                })
-            })
-        } else {
-          await this.$store.dispatch('main/updateProfile', {
-            pseudo: this.pseudo,
-            name: this.name,
-            instruments: instrumentsId,
-            commune: this.cityModel ? this.cityModel.nom : '',
-            codeDepartement: this.cityModel ? this.cityModel.codeDepartement : '',
-            codeRegion: this.cityModel ? this.cityModel.codeRegion : ''
-          })
-          this.$store.dispatch('main/changeLoadingState', false)
-          this.$q.notify({
-            type: 'positive',
-            message: 'Le profile a été mis à jour',
-            position: 'top'
-          })
-          this.getProfileData()
-        }
-      } catch (e) {
-        this.$store.dispatch('main/changeLoadingState', false)
-        console.error(e)
-        /* this.$q.notify({
-          type: 'negative',
-          message: e.response.data.message,
-          position: 'top'
-        }) */
-      }
-    },
-    onReset () {}
+    }
   },
   mounted () {
     this.getProfileData()

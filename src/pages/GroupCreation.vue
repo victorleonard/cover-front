@@ -5,52 +5,15 @@
         <q-form @submit="onSubmit" class="q-gutter-md">
           <div>Nom :</div>
           <q-input
-            filled
+            bg-color="white"
+            outlined
             v-model="name"
             lazy-rules
             :rules="[val => (val && val.length > 0) || 'Please type something']"
           />
-          <q-separator />
 
           <div>Lieu de répète :</div>
-          <q-select
-            filled
-            :loading="searchAddressLoading"
-            :value="address"
-            use-input
-            clearable
-            hide-selected
-            fill-input
-            lazy-rules
-            error-message="Please select something"
-            input-debounce="500"
-            :options="addresses"
-            @filter="filterAddressFn"
-            @input-value="setAddress"
-            @clear="
-              addresses = [];
-              address = '';
-            "
-            label=""
-          >
-            <template v-slot:option="scope">
-              <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
-                <q-item-section>
-                  <q-item-label>{{
-                    `${scope.opt.properties.label}`
-                  }}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </template>
-            <template v-slot:no-option v-if="address && address.length">
-              <q-item>
-                <q-item-section class="text-grey">
-                  Aucun résultat
-                </q-item-section>
-              </q-item>
-            </template>
-          </q-select>
-          <q-separator />
+          <search-city :cityProp="city" :error="cityError" @city_selected="selectCity" @clear="clearLocation" />
           <div>Image :</div>
           <div v-if="image" class="relative-position">
             <q-img :src="image.url" spinner-color="white" />
@@ -121,8 +84,8 @@
               </q-dialog>
             </div>
           <q-separator /> -->
-          <div>
-            <q-btn label="Créer" type="submit" color="brand" />
+          <div class="q-mt-lg">
+            <q-btn label="Créer" unelevated no-caps type="submit" color="brand" icon="eva-save-outline" />
             <!-- <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" /> -->
           </div>
         </q-form>
@@ -133,26 +96,25 @@
 
 <script>
 import { mapState } from 'vuex'
-import axios from 'axios'
+import SearchCity from 'src/components/SearchCity.vue'
 
 export default {
   name: 'group-creation',
+  components: { SearchCity },
   data: () => ({
-    searchAddressLoading: false,
-    address: '',
-    addresses: [],
-    form: {
-      address: ''
+    city: undefined,
+    location: {
+      place_id: '',
+      name: '',
+      type: '',
+      country: ''
     },
-    cityModel: '',
-    cityOptions: undefined,
+    cityError: false,
+    searchAddressLoading: false,
     newMember: false,
     name: '',
     file: '',
     image: undefined,
-    codeRegion: '',
-    commune: '',
-    codeDepartement: '',
     users: undefined,
     usersList: undefined
   }),
@@ -160,35 +122,20 @@ export default {
     ...mapState('main', ['profile', 'user', 'token'])
   },
   methods: {
-    filterAddressFn (val, update, abort) {
-      update(() => {
-        if (val.length) {
-          this.searchAddressLoading = true
-          axios
-            .get(`https://api-adresse.data.gouv.fr/search/?q=${val}`)
-            .then(resp => {
-              this.addresses = resp.data.features
-              this.searchAddressLoading = false
-              update()
-            })
-        }
-      })
-    },
-    setAddress (val) {
-      if (val && val.properties) {
-        this.form.address = val
-        this.address = val.properties.label
+    selectCity (val) {
+      this.cityError = false
+      this.location = {
+        name: val.structured_formatting.main_text,
+        country: val.structured_formatting.secondary_text,
+        place_id: val.place_id
       }
     },
-    filterFn (val, update, abort) {
-      update(() => {
-        console.log(val)
-        axios.get('https://geo.api.gouv.fr/communes?nom=' + val + '&fields=nom,code,codesPostaux,codeDepartement,codeRegion,population&format=json&geometry=centre')
-          .then(r => {
-            this.cityOptions = r.data
-            console.log(r)
-          })
-      })
+    clearLocation () {
+      this.location = {
+        name: '',
+        place_id: '',
+        country: ''
+      }
     },
     addMember () {
       this.$store.dispatch('main/getProfiles')
@@ -242,15 +189,7 @@ export default {
                 admin: this.$q.cookies.get('profile_id'),
                 name: this.name,
                 image: r.data[0].id,
-                city: this.form.address.properties.city,
-                postcode: this.form.address.properties.postcode,
-                citycode: this.form.address.properties.citycode,
-                region: this.form.address.properties.context.split(',')[2].trim(),
-                department: this.form.address.properties.context
-                  .split(',')[1]
-                  .trim(),
-                address: this.form.address.properties.name,
-                country: 'FR',
+                place_id: this.location.place_id,
                 profiles: [this.$q.cookies.get('profile_id')]
               })
                 .then(() => {

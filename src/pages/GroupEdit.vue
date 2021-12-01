@@ -1,127 +1,216 @@
 <template>
-  <q-page padding>
+<q-page padding v-if="currentGroup && currentGroupCopy">
+  <q-dialog v-model="edit.name">
+      <q-card style="min-width: 350px">
+        <q-card-section>
+          <div class="text-h6">Nom</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <q-input dense v-model="currentGroupCopy.name" autofocus />
+        </q-card-section>
+
+        <q-card-actions align="right" class="text-primary">
+          <q-btn flat label="Annuler" no-caps color="grey-8" v-close-popup />
+          <q-btn @click="editName" unelevated no-caps color="brand" label="Mettre à jour" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="edit.location">
+      <q-card style="min-width: 350px">
+        <q-card-section>
+          <div class="text-h6">Lieu de répèt</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <search-city :cityProp="city" :error="cityError" @city_selected="selectCity" @clear="clearLocation" />
+        </q-card-section>
+
+        <q-card-actions align="right" class="text-primary">
+          <q-btn flat label="Annuler" no-caps color="grey-8" v-close-popup />
+          <q-btn @click="editLocation" unelevated no-caps color="brand" label="Mettre à jour" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="edit.avatar">
+      <q-card style="min-width: 350px">
+        <q-card-section>
+          <div class="text-h6">Image</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <q-uploader
+            style="width: 95%"
+            hide-upload-btn
+            @added="fileIsAdded"
+            :multiple="false"
+            :factory="upload"
+            accept=".jpg, image/*"
+            @rejected="onRejected"
+          />
+        </q-card-section>
+
+        <q-card-actions align="right" class="text-primary">
+          <q-btn flat label="Annuler" no-caps color="grey-8" v-close-popup />
+          <q-btn @click="editImage" unelevated no-caps color="brand" label="Mettre à jour" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
     <div class="row">
-      <h6 class="q-mt-xs q-mb-lg">Group Edit</h6>
     </div>
-    <div class="row">
+    <div class="row q-mt-md q-mb-md">
       <div class="col">
-        <q-form
-          @submit="onSubmit"
-          @reset="onReset"
-          class="q-gutter-md"
-        >
-          <q-input
-            filled
-            type="number"
-            v-model="score"
-            label="Score *"
-            lazy-rules
-            :rules="[ val => val && val.length > 0 || 'Please type something']"
-          />
-          <q-input
-            filled
-            v-model="name"
-            label="Nom *"
-            lazy-rules
-            :rules="[ val => val && val.length > 0 || 'Please type something']"
-          />
-          <q-separator />
-          <div>Lieu de répète : {{ this.commune }} ({{ this.codeDepartement }})</div>
-          <q-separator />
-          <div v-if="image" class="relative-position">
-            <q-img
-              :src="image.url"
-              spinner-color="white"
-            />
-            <q-btn round color="red" icon="close" size="xs" @click="image = undefined" style="position: absolute; right: 5px; top: 5px" />
-          </div>
-          <q-uploader v-else
-          hide-upload-btn
-          @added="fileIsAdded"
-          :multiple="false"
-          :factory="upload"
-          accept=".jpg, image/*"
-          @rejected="onRejected"
-          />
-          <q-separator />
-            <div>
-              <h6 class="q-mb-xs q-mt-xs text-subtitle1">Users</h6>
-              <q-list bordered separator class="rounded-borders">
-                <div v-for="user in users" :key="user.id">
-                  <q-item tag="label">
-                    <q-item-section>
-                      <q-item-label>{{ user.username }}</q-item-label>
-                    </q-item-section>
-                    <q-item-section side >
-                      <q-btn round color="red" icon="close" size="xs" />
-                    </q-item-section>
-                  </q-item>
-              </div>
-              </q-list>
-              <q-btn class="q-mt-sm" label="Ajouter un membre" @click="addMember" color="primary"/>
-
-              <q-dialog
-                v-model="newMember"
-              >
-                <q-card style="width: 700px; max-width: 80vw;">
-                  <q-card-section>
-                    <div class="text-h6">Selectionner un utilisateur</div>
-                  </q-card-section>
-
-                  <q-card-section class="q-pt-none">
-                    <q-list bordered separator class="rounded-borders">
-                      <q-item v-for="user in usersList" :key="user.id" tag="label">
-                        <q-item-section>
-                          <q-item-label>{{ user.pseudo }}</q-item-label>
-                        </q-item-section>
-                        <q-item-section v-if="user.instruments">
-                          <q-item-label>{{ user.instruments[0].nom }}</q-item-label>
-                        </q-item-section>
-                        <q-item-section side >
-                          <q-btn flat color="primary" icon="ion-md-add-circle" size="md" />
-                        </q-item-section>
-                      </q-item>
-                    </q-list>
-                  </q-card-section>
-
-                  <q-card-actions align="right" class="bg-white text-teal">
-                    <q-btn flat label="Cancel" v-close-popup />
-                  </q-card-actions>
-                </q-card>
-              </q-dialog>
-            </div>
-          <q-separator />
-          <div>
-            <q-btn label="Change" type="submit" color="primary"/>
-            <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
-          </div>
-        </q-form>
+        <q-list class="bg-white">
+          <q-item>
+            <q-item-section>
+              <q-item-label caption>Nom :</q-item-label>
+              <q-item-label>{{ currentGroup.name }}</q-item-label>
+            </q-item-section>
+            <q-item-section side top>
+              <q-btn icon="eva-edit" flat no-caps caption @click="edit.name = true" />
+            </q-item-section>
+          </q-item>
+          <q-separator spaced />
+          <q-item>
+            <q-item-section>
+              <q-item-label caption>Ville / lieu de répète :</q-item-label>
+              <q-item-label>
+                {{ currentGroup.locality && currentGroup.area_level_2 ? `${currentGroup.locality} - ${currentGroup.area_level_2}` : '' }}
+              </q-item-label>
+            </q-item-section>
+            <q-item-section side top>
+              <q-btn icon="eva-edit" flat no-caps caption @click="edit.location = true" />
+            </q-item-section>
+          </q-item>
+          <q-separator spaced />
+          <q-item>
+            <q-item-section>
+              <q-item-label caption>Image</q-item-label>
+              <q-item-section thumbnail>
+                <!-- <q-avatar size="150px" v-if="currentGroup.image">
+                  <img :src="currentGroup.image.url">
+                </q-avatar> -->
+                <img style="width: 300px; height: auto" v-if="currentGroup.image" class="q-mt-md bg-grey-9" :src="currentGroup.image.url" />
+              </q-item-section>
+            </q-item-section>
+            <q-item-section side top>
+              <q-btn icon="eva-edit" flat no-caps caption @click="edit.avatar = true" />
+            </q-item-section>
+          </q-item>
+          <q-separator spaced />
+        </q-list>
       </div>
     </div>
-  </q-page>
+</q-page>
 </template>
 
 <script>
 import { mapState } from 'vuex'
+import SearchCity from 'src/components/SearchCity.vue'
 
 export default {
+  components: { SearchCity },
   name: 'group-edit',
   data: () => ({
+    edit: {
+      location: false,
+      name: false,
+      avatar: false
+    },
+    city: undefined,
+    location: {
+      place_id: '',
+      name: '',
+      type: '',
+      country: ''
+    },
+    cityError: false,
+    currentGroup: undefined,
+    currentGroupCopy: undefined,
     newMember: false,
     name: '',
     file: '',
     score: 0,
     image: undefined,
-    codeRegion: '',
-    commune: '',
-    codeDepartement: '',
     users: undefined,
     usersList: undefined
   }),
   computed: {
-    ...mapState('main', ['profile', 'user', 'token'])
+    ...mapState('main', ['profile', 'user'])
   },
   methods: {
+    editLocation () {
+      this.$store.dispatch('main/changeLoadingState', true)
+      this.$axios.put(`groups/location/${this.$route.params.groupId}`, {
+        place_id: this.location.place_id
+      })
+        .then(() => {
+          this.$store.dispatch('main/changeLoadingState', false)
+          this.getGroupData()
+        })
+        .catch(() => {
+          this.$store.dispatch('main/changeLoadingState', false)
+          this.$q.notify({
+            type: 'negative',
+            message: 'server error'
+          })
+        })
+    },
+    selectCity (val) {
+      this.cityError = false
+      this.location = {
+        name: val.structured_formatting.main_text,
+        country: val.structured_formatting.secondary_text,
+        place_id: val.place_id
+      }
+    },
+    clearLocation () {
+      this.location = {
+        name: '',
+        place_id: '',
+        country: ''
+      }
+    },
+    editImage () {
+      this.$store.dispatch('main/changeLoadingState', true)
+      const formData = new FormData()
+      formData.append('files', this.file)
+      this.$axios.post('https://cover-mobile.herokuapp.com/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+        .then(r => {
+          this.$axios.put(`groups/${this.$route.params.groupId}`, {
+            image: r.data[0].id
+          })
+            .then(() => { this.getGroupData() })
+        })
+        .catch(() => {
+          this.$store.dispatch('main/changeLoadingState', false)
+          this.$q.notify({
+            type: 'negative',
+            message: 'server error'
+          })
+        })
+    },
+    editName () {
+      this.$store.dispatch('main/changeLoadingState', true)
+      this.$axios.put(`groups/${this.$route.params.groupId}`, {
+        name: this.currentGroupCopy.name
+      })
+        .then(() => {
+          this.$store.dispatch('main/changeLoadingState', false)
+          this.getGroupData()
+        })
+        .catch(() => {
+          this.$q.notify({
+            type: 'negative',
+            message: 'server error'
+          })
+          this.$store.dispatch('main/changeLoadingState', false)
+        })
+    },
     addMember () {
       this.$store.dispatch('main/getProfiles')
         .then(r => {
@@ -147,22 +236,22 @@ export default {
       })
     },
     getGroupData () {
-      this.$store.dispatch('main/getGroup', {
-        groupId: this.$route.params.groupId
-      })
-        .then(r => {
-          console.log('GROUP ===> ', r)
-          const d = r.data
-          this.commune = d.commune
-          this.codeRegion = d.codeRegion
-          this.codeDepartement = d.codeDepartement
-          this.image = d.image
-          this.name = d.name
-          this.users = d.users
-          this.score = d.score
+      this.$store.dispatch('main/changeLoadingState', true)
+      this.$axios.get(`groups/${this.$route.params.groupId}`)
+        .then(res => {
+          this.$store.dispatch('main/changeLoadingState', false)
+          this.currentGroup = res.data
+          this.currentGroupCopy = { ...res.data }
+        })
+        .catch(() => {
+          this.$q.notify({
+            type: 'negative',
+            message: 'server error'
+          })
+          this.$store.dispatch('main/changeLoadingState', false)
         })
     },
-    async onSubmit () {
+    /* async onSubmit () {
       try {
         if (this.file) {
           console.log('upload File !')
@@ -200,7 +289,7 @@ export default {
           position: 'top'
         })
       }
-    },
+    }, */
     onReset () {
       this.getGroupData()
     }

@@ -20,6 +20,8 @@
           <div style="margin: 0 auto">
             <span v-if="$route.name === 'profile'">Mon Profile</span>
             <span v-else-if="$route.name === 'group-creation'">Nouveau groupe</span>
+            <span v-else-if="$route.name === 'group-join'">Groupes</span>
+            <span v-else-if="$route.name === 'group-edit'">Edition</span>
             <span v-else></span>
           </div>
         </q-toolbar-title>

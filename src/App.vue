@@ -92,6 +92,9 @@ footer{
     padding-bottom: constant(safe-area-inset-bottom);
     padding-bottom: env(safe-area-inset-bottom);
 }
+.q-menu.q-position-engine {
+  z-index: 9999 !important;
+}
 /* .search-page .q-field--standout.q-field--focused .q-field__control {
   background-color: red !important;
 } */

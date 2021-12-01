@@ -74,17 +74,38 @@ export default {
           this.$q.cookies.set('user_id', resp.data.user.id, {
             expires: 360
           })
-          this.$q.cookies.set('profile_id', resp.data.user.profile.id, {
-            expires: 360
-          })
-          this.$store.dispatch('main/getMe')
-            .then(me => {
-              console.log('me', me)
-              /* this.$store.dispatch('main/changeLoadingState', false) */
-              this.$router.push({
-                name: 'home'
-              })
+          // creation new profile if not
+          if (!resp.data.user.profile) {
+            this.$axios.post('/profiles', {
+              user: resp.data.user.id,
+              pseudo: resp.data.user.username
             })
+              .then((res) => {
+                this.$q.cookies.set('profile_id', res.data.id, {
+                  expires: 360
+                })
+                this.$store.dispatch('main/getMe')
+                  .then(me => {
+                    console.log('me', me)
+                    /* this.$store.dispatch('main/changeLoadingState', false) */
+                    this.$router.push({
+                      name: 'home'
+                    })
+                  })
+              })
+          } else {
+            this.$q.cookies.set('profile_id', resp.data.user.profile.id, {
+              expires: 360
+            })
+            this.$store.dispatch('main/getMe')
+              .then(me => {
+                console.log('me', me)
+                /* this.$store.dispatch('main/changeLoadingState', false) */
+                this.$router.push({
+                  name: 'home'
+                })
+              })
+          }
         })
         .catch(error => {
           this.submitting = false
