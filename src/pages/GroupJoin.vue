@@ -1,5 +1,22 @@
 <template>
-<q-page padding>
+<q-page padding class="search-page">
+  <div class="row q-mb-md">
+    <div class="col">
+        <q-form
+          @submit="onSubmit"
+          class="q-gutter-md"
+        >
+        <div class="row flex items-center">
+          <div class="col">
+            <q-input v-model="search.name" color="brand" class="bg-white q-pl-sm" label="Rechercher" dense />
+          </div>
+          <div class="col col-auto">
+            <q-btn type="submit" unelevated color="brand" icon="search" style="height: 39px; border-radius: 0px;"/>
+          </div>
+        </div>
+        </q-form>
+    </div>
+  </div>
   <q-dialog v-model="askInvitationDialog">
       <q-card v-if="groupSelected" class="my-card" style="width: 70vw">
         <q-card-section>
@@ -22,51 +39,71 @@
         <q-separator />
 
         <q-card-actions align="right">
-          <q-btn flat color="primary" label="Envoyer ma demande" @click="askInvitation" />
+          <q-btn flat color="brand" no-caps label="Envoyer ma demande" @click="askInvitation" />
         </q-card-actions>
       </q-card>
     </q-dialog>
 
   <div class="row">
     <div class="col">
-    <q-card flat v-for="group in groups" class="q-mb-md" :key="group.id">
-      <q-card-section class="q-pa-none">
-        <div class="row items-center bg-white">
-          <div class="col col-3 col-md-6">
-            <q-img
-              :ratio="4/3" contain
-              :src="group.image.url"
-              class="bg-grey-9"
-              style="max-height: 100px;"
-              spinner-color="white"
-            />
-            <!-- <img style="max-width: 100%; display: block" :src="group.image.url" alt=""> -->
-          </div>
-          <div class="col q-pr-sm" style="line-height: 1.2rem">
-            <div class="text-grey-9 q-title q-ml-sm">{{ group.name }}</div>
-            <div class="text-grey-7 q-subheading q-ml-sm q-mt-sm">{{ group.city }}</div>
-          </div>
-          <div class="col col-auto">
-            <q-btn color="grey-7" size="lg" label="" flat icon-right="fas fa-caret-right" />
-          </div>
-        </div>
-      </q-card-section>
-      <!-- <q-card-section>
-        <q-chip v-for="profile in group.profiles" :key="profile.id">
-          <q-avatar v-if="profile.avatar">
-            <img :src="profile.avatar.url" alt="avatar">
-          </q-avatar>
-          {{ profile.pseudo }}
-        </q-chip>
-      </q-card-section> -->
-      <!-- <q-card-actions align="right" v-if="isAlreadyMember(group.id)">
-        <div><q-chip color="green" text-color="white" icon="fas fa-guitar" label="Déjà membre" /></div>
-      </q-card-actions>
-      <q-card-actions align="right" v-else>
-        <q-btn v-if="!alreadyAsk(group.id)" @click="askInvitationDialog = true, groupSelected = group" color="primary" label="rejoindre" icon-right="fas fa-caret-right" />
-        <div v-else><q-chip color="red" text-color="white" icon="fas fa-clock" label="Demande en attente" /></div>
-      </q-card-actions> -->
-    </q-card>
+      <q-expansion-item v-for="group in groups" :key="group.id" class="shadow-1 q-mb-md bg-white">
+        <template v-slot:header>
+          <q-item-section avatar>
+            <q-avatar square size="80px">
+              <q-img :ratio="4/4" :src="group.image.url" contain alt="" class="bg-grey-9" />
+            </q-avatar>
+            <div class="absolute q-item-letter">
+              Rock
+            </div>
+          </q-item-section>
+
+          <q-item-section>
+            <q-item-label class="text-weight-medium text-subtitle1">{{group.name}}</q-item-label>
+            <q-item-label>{{group.locality}}</q-item-label>
+            <q-chip style="width:140px" size="sm" v-if="alreadyAsk(group.id)" icon="fas fa-clock" label="Demande en attente" />
+            <q-chip style="width:80px" size="sm" v-if="isAlreadyMember(group.profiles)" icon="eva-music-outline" label="Membre" />
+          </q-item-section>
+        </template>
+
+        <q-card class="bg-white">
+          <q-card-section>
+            <q-list bordered class="q-px-md rounded-borders">
+              <q-item-label header>Membres</q-item-label>
+              <q-item v-for="profile in group.profiles" :key="profile.id">
+                <q-item-section avatar>
+                  <q-avatar rounded>
+                    <img v-if="profile.avatar" :src="profile.avatar.url" alt="avatar">
+                    <q-icon v-else name="eva-person-outline" />
+                  </q-avatar>
+                </q-item-section>
+                <q-item-section>{{ profile.pseudo }}</q-item-section>
+                <q-item-section side>
+                  Guitare
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-card-section>
+        <q-separator />
+        <q-card-actions align="around">
+          <q-item-section v-if="isAlreadyMember(group.profiles)">
+            <q-chip style="width:130px" color="brand" text-color="white" label="Déjà membre" />
+          </q-item-section>
+          <q-item-section  v-else>
+            <q-btn v-if="!alreadyAsk(group.id)" @click="askInvitationDialog = true, groupSelected = group" color="brand" no-caps label="Rejoindre" unelevated icon-right="fas fa-caret-right" />
+            <div v-else>
+              <q-chip color="red" text-color="white" icon="fas fa-clock" label="Demande en attente" />
+            </div>
+          </q-item-section>
+          <q-separator vertical inset class="q-ml-sm"/>
+            <q-btn color="grey-7" round flat icon="more_vert">
+              <q-menu cover auto-close>
+                <q-list>
+                </q-list>
+              </q-menu>
+            </q-btn>
+        </q-card-actions>
+      </q-card>
+    </q-expansion-item>
     </div>
   </div>
 </q-page>
@@ -78,16 +115,32 @@ import { mapState } from 'vuex'
 export default {
   name: 'group-join',
   data: () => ({
+    search: {
+      name: ''
+    },
     pseudo: '',
     askInvitationDialog: false,
     groupSelected: undefined,
+    groups: undefined,
     message: '',
     myAskingInvitations: undefined
   }),
   computed: {
-    ...mapState('main', ['groups', 'user'])
+    ...mapState('main', ['user'])
   },
   methods: {
+    onSubmit () {
+      this.$axios.get(`/groups?name_contains=${this.search.name}`)
+        .then((res) => {
+          this.groups = res.data
+        })
+    },
+    getGroups () {
+      this.$axios.get('/groups')
+        .then((res) => {
+          this.groups = res.data
+        })
+    },
     getBestFormatImage (formats) {
       if (formats.medium) {
         return formats.medium.url
@@ -97,17 +150,18 @@ export default {
         return formats.thumbnail.url
       }
     },
-    isAlreadyMember (groupId) {
-      return this.user.groups.find(g => g === groupId)
+    isAlreadyMember (profiles) {
+      return profiles.find(p => p.id === this.user.profile)
     },
     alreadyAsk (groupId) {
       return this.myAskingInvitations.find(a => a.group.id === groupId)
     },
     askInvitation () {
       this.$store.dispatch('main/changeLoadingState', true)
-      this.$store.dispatch('main/askInvitation', {
+      this.$axios.post('/invitations', {
         group: this.groupSelected.id,
         to: this.groupSelected.admin.user,
+        from: this.$q.cookies.get('profile_id'),
         message: this.message
       })
         .then(() => {
@@ -116,8 +170,9 @@ export default {
             message: 'Votre demande a été envoyé',
             position: 'top'
           })
-          this.$store.dispatch('main/getMyAskingInvitation')
-            .then(() => {
+          this.$axios.get('/invitations?from=' + this.$q.cookies.get('profile_id'))
+            .then(res => {
+              this.myAskingInvitations = res.data
               this.askInvitationDialog = false
               this.$store.dispatch('main/changeLoadingState', false)
             })
@@ -130,8 +185,10 @@ export default {
         })
     }
   },
+  created () {
+    this.getGroups()
+  },
   beforeCreate () {
-    this.$store.dispatch('main/getGroups')
     this.$axios.get('/invitations?from=' + this.$q.cookies.get('profile_id'))
       .then(res => {
         this.myAskingInvitations = res.data
