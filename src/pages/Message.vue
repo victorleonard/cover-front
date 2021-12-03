@@ -1,27 +1,29 @@
 <template>
   <q-page class="flex column" v-if="currentMessage">
-    <div class="row full-width justify-center q-mt-md">
+    <div class="row full-width justify-center q-mt-md q-mb-xl">
         <div class="col col-8 col-sm-10 col-xs-11 col-lg-8 col-xl-8">
           <q-chat-message v-for="message in currentMessage.messages" :key="message.id"
           :sent="message.profile_id === $q.cookies.get('profile_id')"
           :text="[message.content]"
           :name="getMessageName(message)"
           :stamp="getFormatDate(message)"
-      />
+        />
+      </div>
     </div>
-  </div>
   <q-footer id="footer">
-      <q-toolbar>
+      <q-toolbar style="height: 80px">
         <q-form @submit="sendMessage" class="full-width">
           <q-input
+            borderless
             ref="newMessage"
             bg-color="white"
+            color="brand"
             v-model="newMessage"
             placeholder="Message"
             class="full-width"
           >
             <template>
-              <q-btn round dense flat type="submit" icon="send" color="brand" />
+              <q-btn dense size="lg" flat type="submit" icon="send" color="brand" />
             </template>
           </q-input>
         </q-form>
@@ -69,7 +71,7 @@ export default {
     },
     scrollToBottom () {
       const target = getScrollTarget(document.querySelector('#footer'))
-      const offset = document.querySelector('#footer').offsetTop
+      const offset = 1000
       const duration = 500
       setScrollPosition(target, offset, duration)
     },
