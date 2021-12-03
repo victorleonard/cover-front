@@ -10,7 +10,7 @@
       />
     </div>
   </div>
-  <q-footer>
+  <q-footer id="footer">
       <q-toolbar>
         <q-form @submit="sendMessage" class="full-width">
           <q-input
@@ -34,12 +34,15 @@
 import io from 'socket.io-client'
 // import { date } from 'quasar'
 import moment from 'moment'
+import { scroll } from 'quasar'
+const { getScrollTarget, setScrollPosition } = scroll
 
 export default {
   name: 'Message',
   data: () => ({
     newMessage: '',
     socket: io('https://cover-mobile.herokuapp.com/'),
+    // socket: io('http://localhost:1337/'),
     currentMessage: undefined
   }),
   methods: {
@@ -58,8 +61,17 @@ export default {
       this.$axios.get('/messages/me/' + this.$route.params.id)
         .then(res => {
           this.currentMessage = res.data
-          this.$store.commit('main/SET_CURRENT_MESSAGE', res.data)
+          this.$store.commit('main/SET_CURRENT_MESSAGE', { ...res.data })
+          setTimeout(() => {
+            this.scrollToBottom()
+          }, 1000)
         })
+    },
+    scrollToBottom () {
+      const target = getScrollTarget(document.querySelector('#footer'))
+      const offset = document.querySelector('#footer').offsetTop
+      const duration = 500
+      setScrollPosition(target, offset, duration)
     },
     sendMessage () {
       this.socket.emit('SEND_MESSAGE', {
@@ -71,7 +83,6 @@ export default {
         content: this.newMessage,
         profile_id: this.$q.cookies.get('profile_id')
       })
-      window.scrollTo(0, document.body.scrollHeight)
       this.newMessage = ''
       this.$axios.put(`messages/${this.$route.params.id}`, {
         messages: messages
@@ -81,6 +92,7 @@ export default {
   mounted () {
     this.socket.on('MESSAGE', (data) => {
       this.currentMessage.messages.push(data)
+      this.scrollToBottom()
     })
   },
   created () {
