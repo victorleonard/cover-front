@@ -13,7 +13,7 @@
         /> -->
         <q-toolbar-title v-if="currentGroup" class="flex">
           <q-btn v-go-back=" '/home' " flat round dense>
-            <q-icon name="eva-chevron-left-outline" />
+            <q-icon name="fas fa-chevron-left" color="grey-7" />
           </q-btn>
           <div style="margin: 0 auto"> {{ currentGroup.name }}</div>
         </q-toolbar-title>

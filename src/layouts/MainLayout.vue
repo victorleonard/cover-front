@@ -39,7 +39,7 @@
         <q-toolbar-title class="flex">
           <q-img style="max-width: 100px" v-if="$route.name === 'home'" src="~assets/cover_logo_inline.png"/>
           <q-btn v-else v-go-back="$route.name === 'message' ? '/inbox' : '/home' " flat round dense>
-            <q-icon name="eva-chevron-left-outline" />
+            <q-icon name="fas fa-chevron-left" color="grey-7" />
           </q-btn>
           <span v-if="$route.name === 'message'">{{ currentMessageTitle }}</span>
           <div style="margin: 0 auto">
