@@ -39,7 +39,7 @@ export default {
   name: 'Message',
   data: () => ({
     newMessage: '',
-    socket: io('localhost:1337'),
+    socket: io('https://cover-mobile.herokuapp.com/'),
     currentMessage: undefined
   }),
   methods: {
@@ -71,6 +71,7 @@ export default {
         content: this.newMessage,
         profile_id: this.$q.cookies.get('profile_id')
       })
+      window.scrollTo(0, document.body.scrollHeight)
       this.newMessage = ''
       this.$axios.put(`messages/${this.$route.params.id}`, {
         messages: messages
