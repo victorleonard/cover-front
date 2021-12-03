@@ -7,6 +7,10 @@ export function CHANGE_LOADING_STATE (state, payload) {
   state.loading = payload
 }
 
+export function SET_CURRENT_MESSAGE (state, payload) {
+  state.currentMessage = payload
+}
+
 export function LOG_OUT (state) {
   state.profile = undefined
   state.user = undefined

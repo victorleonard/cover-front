@@ -74,6 +74,15 @@ const routes = [
         path: 'reset-password',
         name: 'reset-password',
         component: () => import('pages/ResetPassword.vue')
+      },
+      {
+        path: 'inbox',
+        name: 'inbox',
+        component: () => import('layouts/MyLayoutMessage.vue'),
+        children: [
+          { path: '/', name: 'inbox', component: () => import('pages/Inbox.vue') },
+          { path: '/message/:id', name: 'message', component: () => import('pages/Message.vue') }
+        ]
       }
     ]
   },

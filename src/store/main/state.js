@@ -19,5 +19,6 @@ export default {
     display: false,
     type: '',
     message: ''
-  }
+  },
+  currentMessage: undefined
 }

@@ -322,13 +322,20 @@ export async function getProfile ({ commit, state }, { profileId }) {
   return r
 }
 
+export async function getMessage ({ commit, state }, { id }) {
+  const r = await this.$axios.get('/messages/me/' + id)
+  commit('SET_CURRENT_MESSAGE', r.data)
+  return r
+}
+
 export async function getProfiles ({ commit, state }) {
   const r = await UserService.getProfiles()
   return r
 }
 
-export async function getMyProfile ({ state, commit }, { profileId }) {
-  const r = await this.$axios.get('/profiles/' + profileId)
+export async function getMyProfile ({ state, commit }) {
+  console.log('get my profile')
+  const r = await this.$axios.get('/profiles/me')
   console.log(r)
   commit('UPDATE_PROFILE', r.data)
   return r

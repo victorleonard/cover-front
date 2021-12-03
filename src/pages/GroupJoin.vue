@@ -44,6 +44,35 @@
       </q-card>
     </q-dialog>
 
+    <q-dialog full-width v-model="dialog.message">
+      <q-card v-if="groupSelected" class="my-card">
+        <q-card-section>
+          <div class="row no-wrap items-center">
+            <div class="text-h6">
+              Envoyer un message à l'admin du groupe <em>{{ groupSelected.name }}</em>
+            </div>
+          </div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <q-input
+            color="brand"
+            class="q-mt-md"
+            label="message"
+            v-model="mail.content"
+            filled
+            type="textarea"
+          />
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-actions align="right">
+          <q-btn color="brand" unelevated icon="far fa-paper-plane" no-caps label="Envoyer" @click="sendMessage" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
   <div class="row">
     <div class="col">
       <q-expansion-item v-for="group in groups" :key="group.id" class="shadow-1 q-mb-md bg-white">
@@ -85,7 +114,10 @@
           </q-card-section>
         <q-separator />
         <q-card-actions align="around">
-          <q-item-section v-if="isAlreadyMember(group.profiles)">
+          <q-item-section>
+            <q-btn color="brand" no-caps label="Envoyer un message" unelevated icon="eva-email-outline" @click="dialog.message = true, groupSelected = group" />
+          </q-item-section>
+          <!-- <q-item-section v-if="isAlreadyMember(group.profiles)">
             <q-chip style="width:130px" color="brand" text-color="white" label="Déjà membre" />
           </q-item-section>
           <q-item-section  v-else>
@@ -93,7 +125,7 @@
             <div v-else>
               <q-chip color="red" text-color="white" icon="fas fa-clock" label="Demande en attente" />
             </div>
-          </q-item-section>
+          </q-item-section> -->
           <q-separator vertical inset class="q-ml-sm"/>
             <q-btn color="grey-7" round flat icon="more_vert">
               <q-menu cover auto-close>
@@ -115,6 +147,12 @@ import { mapState } from 'vuex'
 export default {
   name: 'group-join',
   data: () => ({
+    dialog: {
+      message: false
+    },
+    mail: {
+      content: ''
+    },
     search: {
       name: ''
     },
@@ -129,6 +167,40 @@ export default {
     ...mapState('main', ['user'])
   },
   methods: {
+    sendMessage () {
+      this.$store.dispatch('main/changeLoadingState', true)
+      this.$axios.post('messages', {
+        from: this.$q.cookies.get('profile_id'),
+        to: this.groupSelected.admin.id,
+        messages: [{
+          content: this.mail.content,
+          profile_id: this.$q.cookies.get('profile_id'),
+          created: new Date()
+        }]
+      })
+        .then(() => {
+          this.mail = {
+            content: '',
+            object: ''
+          }
+          this.$store.dispatch('main/getMyProfile')
+          this.dialog.message = false
+          this.$store.dispatch('main/changeLoadingState', false)
+          this.$q.notify({
+            type: 'positive',
+            message: 'Message envoyé',
+            position: 'top'
+          })
+        })
+        .catch(() => {
+          this.$store.dispatch('main/changeLoadingState', false)
+          this.$q.notify({
+            type: 'negative',
+            message: 'Server error',
+            position: 'top'
+          })
+        })
+    },
     onSubmit () {
       this.$axios.get(`/groups?name_contains=${this.search.name}`)
         .then((res) => {

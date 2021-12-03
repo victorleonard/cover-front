@@ -1,5 +1,29 @@
 <template>
   <q-layout view="lHh Lpr lFf">
+    <q-dialog v-model="newMessage.dialog">
+      <q-card style="min-width: 350px">
+        <q-card-section>
+          <div class="text-h6">A qui ?</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <search-user @city_selected="selectCity" />
+        </q-card-section>
+        <q-card-section class="q-pt-none">
+          <p>Votre message :</p>
+          <q-input
+            v-model="newMessage.message"
+            filled
+            type="textarea"
+          />
+        </q-card-section>
+
+        <q-card-actions align="right" class="text-primary">
+          <q-btn flat label="Annuler" no-caps color="grey-8" v-close-popup />
+          <q-btn @click="sendMessage" unelevated no-caps icon="far fa-paper-plane" color="brand" label="Envoyer" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
     <q-header bordered reveal>
       <q-toolbar class="text-grey-9"  v-if="$route.name !== 'welcome' && $route.name !== 'connect' && $route.name !== 'register' && $route.name !== 'email-confirmation' && $route.name !== 'reset-password' && $route.name !== 'forgot-password'">
         <!-- <q-btn
@@ -14,9 +38,10 @@
  -->
         <q-toolbar-title class="flex">
           <q-img style="max-width: 100px" v-if="$route.name === 'home'" src="~assets/cover_logo_inline.png"/>
-          <q-btn v-else v-go-back=" '/home' " flat round dense>
+          <q-btn v-else v-go-back="$route.name === 'message' ? '/inbox' : '/home' " flat round dense>
             <q-icon name="eva-chevron-left-outline" />
           </q-btn>
+          <span v-if="$route.name === 'message'">{{ currentMessageTitle }}</span>
           <div style="margin: 0 auto">
             <span v-if="$route.name === 'profile'">Mon Profile</span>
             <span v-else-if="$route.name === 'group-creation'">Nouveau groupe</span>
@@ -25,6 +50,12 @@
             <span v-else></span>
           </div>
         </q-toolbar-title>
+        <div v-if="$route.name !== 'message'">
+        <q-btn to="/inbox" dense flat icon="eva-email-outline" class="q-mr-md">
+            <!-- <q-badge color="red" floating>1</q-badge> -->
+        </q-btn>
+        <q-btn @click="newMessage.dialog = true" dense flat icon="fas fa-feather-alt" class="q-mr-md">
+        </q-btn>
         <q-btn flat round dense>
           <q-avatar>
             <img v-if="profile && profile.avatar && profile.avatar.url" :src="profile.avatar.url">
@@ -46,6 +77,7 @@
           </q-list>
         </q-menu>
         </q-btn>
+        </div>
       </q-toolbar>
     </q-header>
 
@@ -110,7 +142,7 @@
         <router-view />
       </transition>
     </q-page-container>
-    <q-footer bordered class="bg-white text-primary" v-if="$route.name !== 'welcome' && $route.name !== 'connect' && $route.name !== 'register' && $route.name !== 'email-confirmation' && $route.name !== 'reset-password' && $route.name !== 'forgot-password'">
+    <q-footer bordered class="bg-white text-primary" v-if="$route.name !== 'message' && $route.name !== 'newMessage' && $route.name !== 'welcome' && $route.name !== 'connect' && $route.name !== 'register' && $route.name !== 'email-confirmation' && $route.name !== 'reset-password' && $route.name !== 'forgot-password'">
         <q-tabs narrow-indicator no-caps class="text-grey-8" indicator-color="transparent">
         <q-route-tab active-class="text-brand" v-if="myGroups && myGroups.length" :to="{ name: 'home' }" no-caps icon="list_alt" exact replace label="Mes Groupes"/>
         <q-route-tab active-class="text-brand" :to="{ name: 'create-or-join' }" icon="add" exact replace no-caps label="Nouveau Groupe"/>
@@ -120,19 +152,71 @@
 </template>
 
 <script>
+import SearchUser from 'src/components/SearchUser.vue'
 import { mapState } from 'vuex'
 
 export default {
   name: 'MainLayout',
+  components: { SearchUser },
   data () {
     return {
+      newMessage: {
+        dialog: false,
+        message: '',
+        to: ''
+      },
       leftDrawerOpen: false
     }
   },
   computed: {
-    ...mapState('main', ['user', 'myGroups', 'profile'])
+    ...mapState('main', ['user', 'myGroups', 'profile', 'currentMessage']),
+    currentMessageTitle () {
+      if (!this.currentMessage) return ''
+      if (this.currentMessage.from.id === this.profile.id) {
+        return this.currentMessage.to.pseudo
+      } else {
+        return this.currentMessage.from.pseudo
+      }
+    }
   },
   methods: {
+    sendMessage () {
+      this.$store.dispatch('main/changeLoadingState', true)
+      this.$axios.post('messages', {
+        from: this.profile.id,
+        to: this.newMessage.to.id,
+        message: {
+          content: this.newMessage.message,
+          profile_id: this.profile.id,
+          created: new Date()
+        }
+      })
+        .then(() => {
+          this.newMessage = {
+            dialog: false,
+            message: '',
+            to: ''
+          }
+          this.$store.dispatch('main/getMyProfile')
+          this.$store.dispatch('main/changeLoadingState', false)
+          this.$q.notify({
+            type: 'positive',
+            message: 'Message envoyé',
+            position: 'top'
+          })
+        })
+        .catch(() => {
+          this.$store.dispatch('main/changeLoadingState', false)
+          this.$q.notify({
+            type: 'negative',
+            message: 'Server error',
+            position: 'top'
+          })
+        })
+    },
+    selectCity (e) {
+      this.newMessage.to = e
+    },
     refresh () {
       location.reload(true)
       console.log('refresh')
@@ -149,9 +233,7 @@ export default {
   },
   beforeCreate () {
     this.$store.dispatch('main/getMe')
-    this.$store.dispatch('main/getMyProfile', {
-      profileId: this.$q.cookies.get('profile_id')
-    })
+    this.$store.dispatch('main/getMyProfile')
   }
 }
 </script>
