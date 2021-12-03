@@ -49,8 +49,10 @@ export default {
   }),
   methods: {
     getFormatDate (message) {
+      if (moment(moment()).diff(message.created, 'seconds') > 100) {
+        return moment(message.created).lang('fr').fromNow()
+      }
       // return date.formatDate(message.created, 'YYYY-MM-DDTHH:mm:ss.SSSZ')
-      return moment(message.created).lang('fr').fromNow()
     },
     getMessageName (message) {
       if (message.profile_id === this.$q.cookies.get('profile_id')) {
@@ -78,12 +80,14 @@ export default {
     sendMessage () {
       this.socket.emit('SEND_MESSAGE', {
         content: this.newMessage,
-        profile_id: this.$q.cookies.get('profile_id')
+        profile_id: this.$q.cookies.get('profile_id'),
+        created: new Date()
       })
       const messages = [...this.currentMessage.messages]
       messages.push({
         content: this.newMessage,
-        profile_id: this.$q.cookies.get('profile_id')
+        profile_id: this.$q.cookies.get('profile_id'),
+        created: new Date()
       })
       this.newMessage = ''
       this.$axios.put(`messages/${this.$route.params.id}`, {

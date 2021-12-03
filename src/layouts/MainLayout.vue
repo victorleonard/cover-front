@@ -41,6 +41,9 @@
           <q-btn v-else v-go-back="$route.name === 'message' ? '/inbox' : '/home' " flat round dense>
             <q-icon name="fas fa-chevron-left" color="grey-7" />
           </q-btn>
+          <q-avatar v-if="$route.name === 'message' && currentMessageAvatar">
+            <img :src="currentMessageAvatar">
+          </q-avatar>
           <span v-if="$route.name === 'message'">{{ currentMessageTitle }}</span>
           <div style="margin: 0 auto">
             <span v-if="$route.name === 'profile'">Mon Profile</span>
@@ -176,6 +179,16 @@ export default {
         return this.currentMessage.to.pseudo
       } else {
         return this.currentMessage.from.pseudo
+      }
+    },
+    currentMessageAvatar () {
+      if (!this.currentMessage) return ''
+      if (this.currentMessage.from.id === this.profile.id) {
+        if (!this.currentMessage.to.avatar) return
+        return this.currentMessage.to.avatar.url
+      } else {
+        if (!this.currentMessage.from.avatar) return
+        return this.currentMessage.from.avatar.url
       }
     }
   },
