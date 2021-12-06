@@ -6,7 +6,7 @@
   "author": "Victor-LEONARD <leonard@abvent.fr>",
   "private": true,
   "scripts": {
-    "build": "npx quasar build -m pwa",
+    "build": "quasar build",
     "lint": "eslint --ext .js,.vue ./",
     "test": "echo \"No test specified\" && exit 0",
     "start": "node server.js",
@@ -23,10 +23,10 @@
     "serve-static": "^1.14.1",
     "socket.io-client": "^4.4.0",
     "vue-i18n": "^8.0.0",
-    "vuedraggable": "^2.24.3"
+    "vuedraggable": "^2.24.3",
+    "@quasar/app": "^2.0.0"
   },
   "devDependencies": {
-    "@quasar/app": "^2.0.0",
     "babel-eslint": "^10.0.1",
     "eslint": "^6.8.0",
     "eslint-config-standard": "^14.1.0",
