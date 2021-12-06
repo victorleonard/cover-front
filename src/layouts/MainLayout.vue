@@ -175,36 +175,30 @@ export default {
     ...mapState('main', ['user', 'myGroups', 'profile', 'currentMessage']),
     currentMessageTitle () {
       if (!this.currentMessage) return ''
-      if (this.currentMessage.from.id === this.profile.id) {
-        return this.currentMessage.to.pseudo
-      } else {
-        return this.currentMessage.from.pseudo
-      }
+      const profile = this.currentMessage.profiles.find(p => p.id !== this.profile.id)
+      return profile.pseudo
     },
     currentMessageAvatar () {
       if (!this.currentMessage) return ''
-      if (this.currentMessage.from.id === this.profile.id) {
-        if (!this.currentMessage.to.avatar) return
-        return this.currentMessage.to.avatar.url
-      } else {
-        if (!this.currentMessage.from.avatar) return
-        return this.currentMessage.from.avatar.url
-      }
+      const profile = this.currentMessage.profiles.find(p => p.id !== this.profile.id)
+      console.log(profile)
+      if (!profile.avatar) return
+      return profile.avatar.url
     }
   },
   methods: {
-    sendMessage () {
+    async sendMessage () {
       this.$store.dispatch('main/changeLoadingState', true)
-      this.$axios.post('messages', {
-        from: this.profile.id,
-        to: this.newMessage.to.id,
-        message: {
-          content: this.newMessage.message,
-          profile_id: this.profile.id,
-          created: new Date()
-        }
-      })
-        .then(() => {
+      const room = await this.$axios.get(`rooms?profiles.id=${this.profile.id}&profiles.id=${this.newMessage.to.id}`)
+      if (room) {
+        if (room.data.profiles.length === '2') {
+          console.log('find conversation')
+          const messages = [...room.data.messages]
+          messages.push({
+            content: this.newMessage.message,
+            profile_id: this.profile.id,
+            created: new Date()
+          })
           this.newMessage = {
             dialog: false,
             message: '',
@@ -214,18 +208,44 @@ export default {
           this.$store.dispatch('main/changeLoadingState', false)
           this.$q.notify({
             type: 'positive',
-            message: 'Message envoyé',
+            message: 'Le message a été ajouté à la conversation existante.',
             position: 'top'
           })
+        } else {
+          console.log('find group chat room')
+        }
+      } else {
+        this.$axios.post('rooms', {
+          profiles: [this.profile.id, this.newMessage.to.id],
+          messages: [{
+            content: this.newMessage.message,
+            profile_id: this.profile.id,
+            created: new Date()
+          }]
         })
-        .catch(() => {
-          this.$store.dispatch('main/changeLoadingState', false)
-          this.$q.notify({
-            type: 'negative',
-            message: 'Server error',
-            position: 'top'
+          .then(() => {
+            this.newMessage = {
+              dialog: false,
+              message: '',
+              to: ''
+            }
+            this.$store.dispatch('main/getMyProfile')
+            this.$store.dispatch('main/changeLoadingState', false)
+            this.$q.notify({
+              type: 'positive',
+              message: 'Le message a été envoyé.',
+              position: 'top'
+            })
           })
-        })
+          .catch(() => {
+            this.$store.dispatch('main/changeLoadingState', false)
+            this.$q.notify({
+              type: 'negative',
+              message: 'Server error',
+              position: 'top'
+            })
+          })
+      }
     },
     selectCity (e) {
       this.newMessage.to = e

@@ -14,19 +14,15 @@
           <q-list v-if="chatrooms.length" separator>
             <q-item class="bg-white" @click="openRoom(room)" v-for="room in chatrooms" :key="room.id" clickable v-ripple>
             <q-item-section avatar>
-              <q-avatar round class="bg-grey-4" v-if="room.from.id !== profile.id">
-                <img v-if="room.from.avatar" :src="room.from.avatar.url">
-                <span v-else>{{ room.from.pseudo.charAt() }}</span>
-              </q-avatar>
-              <q-avatar v-else round class="bg-grey-4">
-                <img v-if="room.to.avatar" :src="room.to.avatar.url">
-                <span v-else>{{ room.to.pseudo.charAt() }}</span>
+              <q-avatar round class="bg-grey-4">
+                <img v-if="getRoomAvatar(room)" :src="getRoomAvatar(room)">
+                <span v-else>{{ getRoomInitial(room) }}</span>
               </q-avatar>
             </q-item-section>
 
             <q-item-section lines="1">
                 <q-item-label>
-                  <span class="text-weight-bold">{{ room.from.pseudo }}</span>
+                  <span class="text-weight-bold">{{ getRoomPseudo(room) }}</span>
                 </q-item-label>
                 <q-item-label>
                   <span>{{ getLastMessage(room.messages) }}</span>
@@ -34,7 +30,7 @@
               </q-item-section>
 
             <q-item-section side>
-              {{ formatDate(room.createdAt) }}
+             {{ getLastMessageDate(room.messages) }}
             </q-item-section>
           </q-item>
           <q-separator />
@@ -56,6 +52,7 @@
 
 import { mapState } from 'vuex'
 import { date } from 'quasar'
+import moment from 'moment'
 
 export default {
   name: 'Inbox',
@@ -67,9 +64,28 @@ export default {
     ...mapState('main', ['profile'])
   },
   methods: {
+    getRoomPseudo (msg) {
+      const profile = msg.profiles.find(p => p.id !== this.profile.id)
+      return profile.pseudo
+    },
+    getRoomInitial (msg) {
+      const profile = msg.profiles.find(p => p.id !== this.profile.id)
+      return profile.pseudo.charAt()
+    },
+    getRoomAvatar (msg) {
+      const profile = msg.profiles.find(p => p.id !== this.profile.id)
+      if (profile.avatar && profile.avatar.url) {
+        return profile.avatar.url
+      }
+    },
     getLastMessage (messages) {
       if (messages.length) {
         return messages[messages.length - 1].content
+      }
+    },
+    getLastMessageDate (messages) {
+      if (messages.length) {
+        return moment(messages[messages.length - 1].created).lang('fr').fromNow()
       }
     },
     formatDate (d) {
@@ -87,9 +103,11 @@ export default {
     }
   },
   created () {
-    this.$axios.get('messages/me')
+    this.$axios.get(`rooms?profiles.id=${this.$q.cookies.get('profile_id')}`)
       .then(res => {
         this.chatrooms = res.data
+        document.body.scrollTop = 0 // For Safari
+        document.documentElement.scrollTop = 0
       })
   }
 }

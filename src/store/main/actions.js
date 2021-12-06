@@ -316,6 +316,11 @@ export async function getMe ({ commit }) {
     })
 } */
 
+export async function setCurrentMessage ({ commit, state }, { message }) {
+  console.log(message)
+  commit('SET_CURRENT_MESSAGE', message)
+}
+
 export async function getProfile ({ commit, state }, { profileId }) {
   const r = await UserService.getProfile(profileId)
   // commit('UPDATE_PROFILE', r.data[0])
