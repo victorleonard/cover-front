@@ -6,10 +6,10 @@
   "author": "Victor-LEONARD <leonard@abvent.fr>",
   "private": true,
   "scripts": {
-    "build": "quasar build -m ssr",
+    "build": "quasar build -m pwa",
     "lint": "eslint --ext .js,.vue ./",
     "test": "echo \"No test specified\" && exit 0",
-    "start": "cd dist/ssr && yarn && yarn run start",
+    "start": "cd dist/pwa && yarn && yarn run start",
     "heroku-postbuild": "npm install --only=dev --no-shrinkwrap && npm run build"
   },
   "dependencies": {
