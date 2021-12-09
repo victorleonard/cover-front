@@ -98,9 +98,9 @@ footer{
 /* .search-page .q-field--standout.q-field--focused .q-field__control {
   background-color: red !important;
 } */
-.q-dialog {
+/* .q-dialog {
   z-index: 9999 !important;
-}
+} */
 .go-back {
   top: 30px;
 }
