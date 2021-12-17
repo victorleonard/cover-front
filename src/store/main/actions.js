@@ -75,7 +75,7 @@ export async function searchOnSpotify ({ commit, state }, { song, plateform }) {
   return r
 }
 
-export async function selectSong ({ commit, state }, { song, comment, groupId, userId, youtubeId }) {
+export async function selectSong ({ commit, state }, { song, comment, groupId, youtubeId }) {
   const r = await this.$axios.post('/songs', {
     spotify_data: song,
     name: song.name,
@@ -84,7 +84,6 @@ export async function selectSong ({ commit, state }, { song, comment, groupId, u
     artist: song.artists[0].name,
     album: song.album.name,
     group: groupId,
-    user: userId,
     images: song.album.images,
     comment: comment,
     spotify_preview_url: song.preview_url,
@@ -92,12 +91,11 @@ export async function selectSong ({ commit, state }, { song, comment, groupId, u
   })
   return r
 }
-export async function vote ({ commit, state }, { value, songId, groupId, userId, comment }) {
+export async function vote ({ commit, state }, { value, songId, groupId, comment }) {
   const r = await this.$axios.post('/votes', {
     vote: value,
     song: songId,
     group: groupId,
-    user: userId,
     comment: comment
   })
   return r

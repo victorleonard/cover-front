@@ -87,7 +87,6 @@ export default {
         selectSong: false,
         search: false
       },
-      currentGroupSongs: undefined,
       comment: '',
       youtubeId: '',
       songSelectDialog: false,
@@ -149,16 +148,6 @@ export default {
         .catch(e => {
           this.loading.selectSong = false
         })
-      /* if (this.currentGroupSongs.find(s => s.spotify_id === t.id)) {
-        this.$q.notify({
-          type: 'negative',
-          message: 'Ce titre a déjà été séléctioné',
-          position: 'top'
-        })
-      } else {
-        this.songSelected = t
-        this.songSelectDialog = true
-      } */
     },
     extractYoutubeID (url) {
       var ID = ''
@@ -185,33 +174,25 @@ export default {
         song: this.songSelected,
         comment: this.comment,
         groupId: this.$route.params.groupId,
-        userId: this.$q.cookies.get('user_id'),
         youtubeId: this.youtubeId ? this.extractYoutubeID(this.youtubeId) : ''
       })
         .then(song => {
-          console.log('song', song)
           this.$store.dispatch('main/vote', {
             value: this.ratingModel,
             songId: song.data.id,
-            groupId: this.$route.params.groupId,
-            userId: this.$q.cookies.get('user_id')
+            groupId: this.$route.params.groupId
           })
             .then(() => {
               this.$store.dispatch('main/changeLoadingState', false)
-              this.$store.dispatch('main/getCurrentGroupSongs', {
-                groupId: this.$route.params.groupId
+              this.songSelectDialog = false
+              this.comment = ''
+              this.ratingModel = 1
+              this.youtubeId = ''
+              this.$q.notify({
+                type: 'positive',
+                message: 'Titre séléctioné !',
+                position: 'top'
               })
-                .then((r) => {
-                  this.currentGroupSongs = r.data
-                  this.songSelectDialog = false
-                  this.comment = ''
-                  this.ratingModel = 1
-                  this.$q.notify({
-                    type: 'positive',
-                    message: 'Titre séléctioné !',
-                    position: 'top'
-                  })
-                })
             })
             .catch(error => {
               console.error('error =>', error)
@@ -247,14 +228,6 @@ export default {
           })
       }
     }
-  },
-  mounted () {
-    this.$store.dispatch('main/getCurrentGroupSongs', {
-      groupId: this.$route.params.groupId
-    })
-      .then((r) => {
-        this.currentGroupSongs = r.data
-      })
   }
 }
 </script>
