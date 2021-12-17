@@ -44,7 +44,7 @@
         </template>
       </q-input>
     <div class="q-mt-md">
-      <q-spinner-puff class="spinner" v-if="search.length && loading" color="secondary" :size="50" />
+      <q-spinner-puff class="spinner" v-if="search.length && loading.search" color="secondary" :size="50" />
       <q-list v-if="searchResult.length">
         <q-expansion-item v-for="res in searchResult" :key="res.id" class="shadow-1 q-mb-md">
         <template v-slot:header style="padding: 0">
@@ -66,7 +66,7 @@
             <q-btn flat icon="fab fa-spotify" @click="launchSpotify(res.uri)" size="md" color="positive"></q-btn>
             <q-btn class="btn-audio btn-audio-play" :id="'btn-audio-play-'+res.id" v-if="res.preview_url" flat color="primary" label="" icon="ion-md-play" size="md" @click="play(res.id)" />
             <q-btn class="btn-audio btn-audio-pause" :id="'btn-audio-pause-'+res.id" v-if="res.preview_url" flat color="primary" label="" icon="ion-md-pause" size="md" @click="pause(res.id)" />
-            <q-btn flat color="primary" label="Choisir" icon="ion-md-add-circle" size="md" @click="displaySelectDialog(res)" />
+            <q-btn color="brand" :loading="loading.selectSong" unelevated label="Choisir" no-caps icon="eva-checkmark-outline" @click="displaySelectDialog(res)" />
             <audio :src="res.preview_url" :id="'audio-' + res.id" type="audio/mpeg"></audio>
           </q-card-actions>
           </q-card-section>
@@ -83,6 +83,10 @@ export default {
   name: 'search',
   data () {
     return {
+      loading: {
+        selectSong: false,
+        search: false
+      },
       currentGroupSongs: undefined,
       comment: '',
       youtubeId: '',
@@ -91,8 +95,7 @@ export default {
       search: '',
       ratingModel: 1,
       searchResult: [],
-      token: '',
-      loading: false
+      token: ''
     }
   },
   methods: {
@@ -128,7 +131,25 @@ export default {
       audioToPlay.pause()
     },
     displaySelectDialog (t) {
-      if (this.currentGroupSongs.find(s => s.spotify_id === t.id)) {
+      this.loading.selectSong = true
+      this.$axios.get(`songs/present/${this.$route.params.groupId}/${t.id}`)
+        .then(res => {
+          this.loading.selectSong = false
+          if (res.data) {
+            this.$q.notify({
+              type: 'negative',
+              message: 'Ce titre a déjà été séléctioné',
+              position: 'top'
+            })
+          } else {
+            this.songSelected = t
+            this.songSelectDialog = true
+          }
+        })
+        .catch(e => {
+          this.loading.selectSong = false
+        })
+      /* if (this.currentGroupSongs.find(s => s.spotify_id === t.id)) {
         this.$q.notify({
           type: 'negative',
           message: 'Ce titre a déjà été séléctioné',
@@ -137,7 +158,7 @@ export default {
       } else {
         this.songSelected = t
         this.songSelectDialog = true
-      }
+      } */
     },
     extractYoutubeID (url) {
       var ID = ''
@@ -214,14 +235,14 @@ export default {
     },
     searchSpotify () {
       this.searchResult = []
-      this.loading = true
+      this.loading.search = true
       if (this.search.length) {
         this.$store.dispatch('main/searchOnSpotify', {
           song: this.search,
           plateform: 'spotify'
         })
           .then(r => {
-            this.loading = false
+            this.loading.search = false
             this.searchResult = r.data.tracks.items
           })
       }

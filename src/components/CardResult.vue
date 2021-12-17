@@ -28,7 +28,7 @@
   <q-card class="bg-white">
     <q-card-section>
       <q-list>
-          <q-item-label v-if="song.votes.length">
+          <q-item-label v-if="song.votes && song.votes.length">
             <div class="row q-ma-sm justify-between" v-for="vote in song.votes" :key="vote._id">
               <div class="col text-grey-8">{{ getUserPseudoFromVote(vote.user) }}</div>
               <div class="col col-auto q-mr-xl" >

@@ -36,6 +36,11 @@ const routes = [
         component: () => import('pages/Profile.vue')
       },
       {
+        path: 'new-profile',
+        name: 'newProfile',
+        component: () => import('pages/NewProfile.vue')
+      },
+      {
         path: 'home',
         name: 'home',
         component: () => import('pages/Home.vue')

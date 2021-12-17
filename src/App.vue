@@ -73,9 +73,9 @@ export default {
         color: 'grey-7'
       })
     }
-    setInterval(() => {
+    /* setInterval(() => {
       this.checkNewVersion()
-    }, 60000)
+    }, 60000) */
   }
 }
 </script>

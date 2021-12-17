@@ -237,7 +237,7 @@ export default {
       this.instruments = []
       this.$store.dispatch('main/changeLoadingState', true)
       this.$store.dispatch('main/getMyProfile', {
-        profileId: this.$q.cookies.get('profile_id')
+        profileId: this.$q.cookies.get('profile_id') || this.$q.localStorage.get('profile_id')
       })
         .then(r => {
           this.profileCopy = { ...r.data }

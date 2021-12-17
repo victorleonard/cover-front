@@ -128,12 +128,11 @@ export default {
     return {
       profiles: undefined,
       currentGroupSongs: undefined,
-      currentGroup: undefined,
       leftDrawerOpen: false
     }
   },
   computed: {
-    ...mapState('main', ['user', 'currentGroupProfile', 'version']),
+    ...mapState('main', ['user', 'currentGroup', 'currentGroupProfile', 'version']),
     awaitingVote () {
       const userId = this.$q.cookies.get('user_id')
       if (this.profiles && this.currentGroupSongs) {
@@ -159,13 +158,13 @@ export default {
       .then(r => {
         this.profiles = r.data
       })
-    this.$store.dispatch('main/getCurrentGroupSongs', {
+    /* this.$store.dispatch('main/getCurrentGroupSongs', {
       groupId: this.$route.params.groupId
     })
       .then(r => {
         this.$store.dispatch('main/changeLoadingState', false)
         this.currentGroupSongs = r.data
-      })
+      }) */
   },
   beforeCreate () {
     this.$store.dispatch('main/changeLoadingState', true)
@@ -175,7 +174,6 @@ export default {
           groupId: this.$route.params.groupId
         })
           .then((r) => {
-            this.currentGroup = r.data
             this.$store.dispatch('main/changeLoadingState', false)
           })
       })

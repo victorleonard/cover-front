@@ -71,7 +71,7 @@ export async function setIosDeviceToken ({ commit, state }, { token }) {
 }
 
 export async function searchOnSpotify ({ commit, state }, { song, plateform }) {
-  const r = await this.$axios.get(`/searches?song=${song}&plateform=${plateform}`)
+  const r = await this.$axios.get(`/songs/search/${song}/${plateform}`)
   return r
 }
 
@@ -116,17 +116,9 @@ export async function updateLevel ({ commit, state }, { voteId, value, comment }
   return r
 }
 
-export async function getCurrentGroup ({ commit, dispatch }, { groupId }) {
-  const r = await this.$axios.get(`/groups/${groupId}`)
-  /* const groupProfilesTemp = []
-  const res = r.data.users.map(async (u) => {
-    const p = await dispatch('getProfile', {
-      profileId: u.profile
-    })
-    groupProfilesTemp.push(p.data)
-  })
-  await Promise.all(res)
-  r.data.profiles = groupProfilesTemp */
+export async function getCurrentGroup ({ commit }, { groupId }) {
+  const r = await this.$axios.get(`/groups/me/${groupId}`)
+  console.log(r.data)
   commit('UPDATE_CURRENT_GROUP', r.data)
   return r
 }
@@ -146,11 +138,11 @@ export async function getCurrentRefuseGroupSongs ({ commit, state }, { groupId }
 export async function resetCurrentGroup ({ commit }) {
   commit('RESET_CURRENT_GROUP')
 }
-export async function getMyGroups ({ commit, state }, { profileId }) {
-  console.log('userId =>', profileId)
+export async function getMyGroups ({ commit, state }) {
+  // console.log('userId =>', profileId)
   // const userId = state.user.profile
   // const r = await GroupService.getMyGroups(userId)
-  const r = await this.$axios.get(`/groups?profiles=${profileId}`)
+  const r = await this.$axios.get('/groups/me')
   console.log('my groups =>', r.data)
   commit('UPDATE_MY_GROUPS', r.data)
   return r.data
@@ -295,6 +287,7 @@ export async function connectUser ({ commit, dispatch }, { email, password }) {
 export async function getMe ({ commit }) {
   const r = await this.$axios.get('users/me')
   commit('UPDATE_USER', r.data)
+  return r
 }
 
 /* export async function getUser ({ commit, dispatch }, { userId }) {
@@ -340,10 +333,13 @@ export async function getProfiles ({ commit, state }) {
 
 export async function getMyProfile ({ state, commit }) {
   console.log('get my profile')
-  const r = await this.$axios.get('/profiles/me')
-  console.log(r)
-  commit('UPDATE_PROFILE', r.data)
-  return r
+  try {
+    const r = await this.$axios.get('/profiles/me')
+    console.log(r)
+    commit('UPDATE_PROFILE', r.data)
+  } catch (error) {
+    throw (error.response)
+  }
 }
 
 export async function createProfile ({ state, commit }, { pseudo }) {

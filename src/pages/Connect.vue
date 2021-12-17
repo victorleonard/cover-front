@@ -55,9 +55,15 @@ export default {
   },
   methods: {
     connect () {
+      if (process.env.MODE === 'ssr') {
       this.$q.cookies.remove('token')
       this.$q.cookies.remove('user_id')
       this.$q.cookies.remove('profile_id')
+      } else {
+        this.$q.localStorage.remove('token')
+        this.$q.localStorage.remove('user_id')
+        this.$q.localStorage.remove('profile_id')
+      }
       this.submitting = true
       /* this.$store.dispatch('main/changeLoadingState', true) */
       // localStorage.removeItem('token')
@@ -66,17 +72,24 @@ export default {
           email: this.form.email,
           password: this.form.password
         })
-        .then(resp => {
+        .then(res => {
           this.submitting = false
-          this.$q.cookies.set('token', resp.data.jwt, {
-            expires: 360
-          })
-          this.$q.cookies.set('user_id', resp.data.user.id, {
-            expires: 360
-          })
+          if (process.env.MODE === 'ssr') {
+            this.$q.cookies.set('token', res.data.jwt, {
+              expires: 360
+            })
+            this.$q.cookies.set('user_id', res.data.user.id, {
+              expires: 360
+            })
+          } else {
+            this.$q.localStorage.set('token', res.data.jwt)
+            this.$q.localStorage.set('user_id', res.data.user.id)
+          }
           // creation new profile if not
-          if (!resp.data.user.profile) {
-            this.$axios.post('/profiles', {
+          if (!res.data.user.profile) {
+            console.log('got to profile')
+            this.$router.push({ name: 'newProfile' })
+            /* this.$axios.post('/profiles', {
               user: resp.data.user.id,
               pseudo: resp.data.user.username
             })
@@ -92,11 +105,16 @@ export default {
                       name: 'home'
                     })
                   })
-              })
+              }) */
           } else {
-            this.$q.cookies.set('profile_id', resp.data.user.profile.id, {
-              expires: 360
-            })
+            if (process.env.MODE === 'ssr') {
+              this.$q.cookies.set('profile_id', res.data.user.profile.id, {
+                expires: 360
+              })
+            } else {
+              this.$q.localStorage.set('profile_id', res.data.user.id)
+            }
+
             this.$store.dispatch('main/getMe')
               .then(me => {
                 console.log('me', me)
@@ -123,7 +141,7 @@ export default {
     }
   },
   mounted () {
-    this.$axios.get('/version')
+    // this.$axios.get('/version')
     // this.$store.dispatch('main/getVersion')
     /* Api().get('users')
       .then(resp => {

@@ -1,23 +1,25 @@
 <template>
   <q-page padding>
     <div class="row q-pt-md q-pl-sm q-pr-sm">
-      <q-card v-for="group in myGroupsOrder" :key="group.id" class="my-card q-mb-lg" style="width: 100%">
+      <q-card flat bordered v-for="group in myGroupsOrder" :key="group.id" class="my-card q-mb-lg" style="width: 100%">
+        <router-link :to="{ name: 'group', params: { groupId: group.id } }">
         <q-img class="bg-grey-9" :ratio="16/9" contain :src="group.image.url">
           <div class="text-h6 absolute-top text-left">
             {{ group.name }}
           </div>
         </q-img>
+        </router-link>
         <q-card-section class="q-pr-xl">
         <q-chip v-for="profile in group.profiles" :key="profile.id">
-          <q-avatar v-if="profile.avatar">
-            <img :src="profile.avatar.url" alt="avatar">
+          <q-avatar class="bg-brand text-white">
+            <img v-if="profile.avatar" :src="profile.avatar.url" alt="avatar">
+            <q-icon v-else name="fas fa-user-ninja" />
           </q-avatar>
-          {{ profile.pseudo }}
+          <span>{{ profile.pseudo }}</span>
         </q-chip>
       </q-card-section>
 
       <q-separator inset v-if="hasInvitation(group.id)"/>
-
         <q-card-section v-if="hasInvitation(group.id)">
           <q-item>
             <q-item-section>Des musiciens souhaitent rejoindre ton groupe 😃</q-item-section>
@@ -57,17 +59,12 @@
 
 <script>
 import { mapState } from 'vuex'
-import { Plugins } from '@capacitor/core'
-const { PushNotifications } = Plugins
 import orderBy from 'lodash/orderBy'
 
 export default {
   name: 'home',
-  data: () => ({
-    myGroups: undefined
-  }),
   computed: {
-    ...mapState('main', ['profile', 'user', 'myDemandInvitations']),
+    ...mapState('main', ['myGroups', 'profile', 'user', 'myDemandInvitations']),
     myGroupsOrder () {
       return orderBy(this.myGroups, ['name'], ['desc'])
     },
@@ -91,49 +88,8 @@ export default {
       if (!this.myDemandInvitations) return
       return this.myPendingDemandInvitations.find(el => el.group.id === groupId)
     },
-    pushRequestPermission () {
-      PushNotifications.requestPermission().then(result => {
-        if (result.granted) {
-          // Register with Apple / Google to receive push via APNS/FCM
-          PushNotifications.register()
-        } else {
-        // Show some error
-        }
-      })
-
-      // On success, we should be able to receive notifications
-      PushNotifications.addListener('registration',
-        (token) => {
-          this.$store.dispatch('main/setIosDeviceToken', {
-            token: token.value
-          })
-          // alert('Push registration success, token: ' + token.value)
-        }
-      )
-
-      // Some issue with our setup and push will not work
-      PushNotifications.addListener('registrationError',
-        (error) => {
-          alert('Error on registration: ' + JSON.stringify(error))
-        }
-      )
-
-      // Show us the notification payload if the app is open on our device
-      PushNotifications.addListener('pushNotificationReceived',
-        (notification) => {
-          // alert('Push received: ' + JSON.stringify(notification))
-        }
-      )
-
-      // Method called when tapping on a notification
-      PushNotifications.addListener('pushNotificationActionPerformed',
-        (notification) => {
-          // alert('Push action performed: ' + JSON.stringify(notification))
-        }
-      )
-    },
     isAdmin (admin) {
-      return admin.id === this.user.profile
+      return admin.id === this.profile.id
     },
     getMe () {
       this.$store.dispatch('main/getMe')
@@ -170,13 +126,11 @@ export default {
         })
     }
   },
-  mounted () {
+  created () {
     this.$store.dispatch('main/changeLoadingState', true)
-    this.$store.dispatch('main/getMyGroups', {
-      profileId: this.$q.cookies.get('profile_id')
-    })
+    this.$store.dispatch('main/getMyGroups')
       .then(r => {
-        this.myGroups = r
+        // this.myGroups = r
         this.$store.dispatch('main/changeLoadingState', false)
         if (!r.length) {
           this.$router.push({ name: 'create-or-join' })
@@ -188,9 +142,10 @@ export default {
       })
   },
   beforeCreate () {
-    this.$store.dispatch('main/getMyDemandInvitation', {
+    // this.$store.dispatch('main/getMyGroups')
+    /* this.$store.dispatch('main/getMyDemandInvitation', {
       userId: this.$q.cookies.get('user_id')
-    })
+    }) */
   }
 }
 </script>

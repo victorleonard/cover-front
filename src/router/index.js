@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import { Cookies } from 'quasar'
+import { Cookies, LocalStorage } from 'quasar'
 
 import routes from './routes'
 
@@ -34,7 +34,13 @@ export default function ({ store, ssrContext }) {
 
   Router.afterEach((to, from) => {
     if (!publicRouter.find(el => el === to.name)) {
-      if (!cookies.has('token')) {
+      let token
+      if (process.env.MODE === 'ssr') {
+        token = cookies.get('token')
+      } else {
+        token = LocalStorage.getItem('token')
+      }
+      if (!token) {
         Router.push({
           name: 'connect'
         })

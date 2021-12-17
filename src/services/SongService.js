@@ -11,7 +11,7 @@ export default {
     return Api().get('/songs?group=' + groupId + '&status=refuse')
   },
   searchOnSpotify (song, plateform) {
-    return Api().get('/searches?song=' + song + '&plateform=' + plateform)
+    return Api().get(`/songs/${song}/${plateform}`)
   },
   vote (value, songId, groupId, userId, comment) {
     return Api().post('/votes', {

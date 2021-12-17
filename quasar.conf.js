@@ -101,6 +101,7 @@ module.exports = function (/* ctx */) {
       // Quasar plugins
       plugins: [
         'Cookies',
+        'LocalStorage',
         'Notify',
         'BottomSheet',
         'Loading',

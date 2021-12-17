@@ -1,6 +1,6 @@
 <template>
 <q-pull-to-refresh @refresh="refresh">
-  <q-page v-if="songAccepted" padding class="search-page q-pl-md q-pr-md">
+  <q-page v-if="songAccepted && currentGroup" padding class="search-page q-pl-md q-pr-md">
     <!-- set or update level -->
     <q-dialog class="modal" minimized v-model="levelModal">
       <q-card>
@@ -113,7 +113,7 @@
     <CardResult
       :level="true"
       coverSize="80px"
-      :profiles="profiles"
+      :profiles="currentGroup.profiles"
       @showLevelModal="showLevelModal"
       @showUpdateModal="displayVoteDialog"
       @loadSongs="loadAcceptedSong"
@@ -140,7 +140,7 @@
         coverSize="64px"
         @showLevelModal="showLevelModal"
         @showUpdateModal="displayVoteDialog"
-        :profiles="profiles"
+        :profiles="currentGroup.profiles"
         :song="s"
         v-for="s in songRefused"
         :key="s.id"
@@ -164,7 +164,6 @@ export default {
       voteDialogUpdate: false,
       songRefused: undefined,
       songAccepted: undefined,
-      profiles: undefined,
       levelModal: undefined,
       levelModel: undefined,
       ratingModel: undefined,
@@ -193,11 +192,15 @@ export default {
     },
     loadAcceptedSong () {
       this.$store.dispatch('main/changeLoadingState', true)
-      this.$axios.get(`/songs?group=${this.$route.params.groupId}&status=accepted`)
+      this.$axios.get(`/songs/accepted/${this.$route.params.groupId}`)
+        .then(r => {
+          this.songAccepted = r.data
+        })
+      /* this.$axios.get(`/songs?group=${this.$route.params.groupId}&status=accepted`)
         .then(r => {
           this.$store.dispatch('main/changeLoadingState', false)
           this.songAccepted = orderBy(r.data, ['total'], ['desc'])
-        })
+        }) */
     },
     loadRefuseSong () {
       this.$store.dispatch('main/changeLoadingState', true)
@@ -288,10 +291,10 @@ export default {
   },
   created () {
     this.loadAcceptedSong()
-    this.$axios.get(`/profiles?groups.id=${this.$route.params.groupId}`)
+    /* this.$axios.get(`/profiles?groups.id=${this.$route.params.groupId}`)
       .then(r => {
         this.profiles = r.data
-      })
+      }) */
   }
 }
 </script>

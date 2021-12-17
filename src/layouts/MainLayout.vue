@@ -37,7 +37,7 @@
         />
  -->
         <q-toolbar-title class="flex">
-          <q-img style="max-width: 100px" v-if="$route.name === 'home'" src="~assets/cover_logo_inline.png"/>
+          <q-img style="max-width: 100px" v-if="$route.name === 'home' || $route.name === 'newProfile'" src="~assets/cover_logo_inline.png"/>
           <q-btn v-else v-go-back="$route.name === 'message' ? '/inbox' : '/home' " flat round dense>
             <q-icon name="fas fa-chevron-left" color="grey-7" />
           </q-btn>
@@ -54,11 +54,13 @@
           </div>
         </q-toolbar-title>
         <div v-if="$route.name !== 'message'">
+          <span v-if="$route.name !== 'newProfile'">
         <q-btn to="/inbox" dense flat icon="eva-email-outline" class="q-mr-md">
             <!-- <q-badge color="red" floating>1</q-badge> -->
         </q-btn>
         <q-btn @click="newMessage.dialog = true" dense flat icon="fas fa-feather-alt" class="q-mr-md">
         </q-btn>
+        </span>
         <q-btn flat round dense>
           <q-avatar>
             <img v-if="profile && profile.avatar && profile.avatar.url" :src="profile.avatar.url">
@@ -66,11 +68,11 @@
           </q-avatar>
           <q-menu>
           <q-list style="min-width: 150px">
-            <q-item clickable v-close-popup :to="{ name: 'profile' }">
+            <q-item v-if="$route.name !== 'newProfile'" clickable v-close-popup :to="{ name: 'profile' }">
               <q-item-section>Mon compte</q-item-section>
             </q-item>
             <q-separator />
-            <q-item @click="refresh" clickable v-close-popup>
+            <q-item v-if="$route.name !== 'newProfile'" @click="refresh" clickable v-close-popup>
               <q-item-section>Actualiser</q-item-section>
             </q-item>
             <q-separator />
@@ -145,7 +147,7 @@
         <router-view />
       </transition>
     </q-page-container>
-    <q-footer bordered class="bg-white text-primary" v-if="$route.name !== 'message' && $route.name !== 'newMessage' && $route.name !== 'welcome' && $route.name !== 'connect' && $route.name !== 'register' && $route.name !== 'email-confirmation' && $route.name !== 'reset-password' && $route.name !== 'forgot-password'">
+    <q-footer bordered class="bg-white text-primary" v-if="$route.name !== 'message' && $route.name !== 'newMessage' && $route.name !== 'welcome' && $route.name !== 'connect' && $route.name !== 'register' && $route.name !== 'email-confirmation' && $route.name !== 'reset-password' && $route.name !== 'forgot-password' && $route.name !== 'newProfile'">
         <q-tabs narrow-indicator no-caps class="text-grey-8" indicator-color="transparent">
         <q-route-tab active-class="text-brand" v-if="myGroups && myGroups.length" :to="{ name: 'home' }" no-caps icon="list_alt" exact replace label="Mes Groupes"/>
         <q-route-tab active-class="text-brand" :to="{ name: 'create-or-join' }" icon="add" exact replace no-caps label="Nouveau Groupe"/>
@@ -257,9 +259,9 @@ export default {
     logout () {
       this.$store.dispatch('main/logout')
         .then(() => {
-          this.$q.cookies.remove('token')
-          this.$q.cookies.remove('user_id')
-          this.$q.cookies.remove('profile_id')
+          this.$q.localStorage.remove('token')
+          this.$q.localStorage.remove('user_id')
+          this.$q.localStorage.remove('profile_id')
           this.$router.push({ name: 'welcome' })
         })
     }
@@ -267,6 +269,11 @@ export default {
   beforeCreate () {
     this.$store.dispatch('main/getMe')
     this.$store.dispatch('main/getMyProfile')
+      .catch((e) => {
+        if (e.data.error.message === 'no profile') {
+          this.$router.push({ name: 'newProfile' })
+        }
+      })
   }
 }
 </script>
