@@ -7,12 +7,6 @@
       style="width: 500px; max-width: 90vw;"
       >
         <q-input
-          v-model="form.userName"
-          label="Pseudo"
-          :rules="[ val => val && val.length > 0 || 'Veuillez saisir un pseudo']"
-        />
-
-        <q-input
           v-model="form.email"
           type="email"
           label="Email"
@@ -43,7 +37,6 @@ export default {
   data () {
     return {
       form: {
-        userName: '',
         email: '',
         password: '',
         passwordConf: ''
@@ -66,7 +59,6 @@ export default {
         this.$store.dispatch('main/changeLoadingState', true)
         this.$store
           .dispatch('main/register', {
-            username: this.form.userName,
             email: this.form.email,
             password: this.form.password
           })

@@ -43,8 +43,8 @@ export default {
     return {
       submitting: false,
       form: {
-        email: '',
-        password: ''
+        email: 'vicleonard@yahoo.fr',
+        password: 'vicleonard'
       },
       tempUser: undefined,
       modal: false,
@@ -56,9 +56,9 @@ export default {
   methods: {
     connect () {
       if (process.env.MODE === 'ssr') {
-      this.$q.cookies.remove('token')
-      this.$q.cookies.remove('user_id')
-      this.$q.cookies.remove('profile_id')
+        this.$q.cookies.remove('token')
+        this.$q.cookies.remove('user_id')
+        this.$q.cookies.remove('profile_id')
       } else {
         this.$q.localStorage.remove('token')
         this.$q.localStorage.remove('user_id')
@@ -100,7 +100,6 @@ export default {
                 this.$store.dispatch('main/getMe')
                   .then(me => {
                     console.log('me', me)
-                    /* this.$store.dispatch('main/changeLoadingState', false) */
                     this.$router.push({
                       name: 'home'
                     })

@@ -250,8 +250,11 @@ export async function loadMyCreatorGroups ({ commit, state }) {
     })
 }
 
-export async function register ({ commit, dispatch }, { username, email, password }) {
-  const response = await UserService.register(username, email, password)
+export async function register ({ commit, dispatch }, { email, password }) {
+  const response = await this.$axios.post('/auth/local/register', {
+    email: email,
+    password: password
+  })
   if (response) {
     return response.data
   } else {
