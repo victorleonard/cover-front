@@ -12,7 +12,7 @@
         <img :src="song.images[0].url" alt="">
       </q-avatar>
       <div class="absolute q-item-letter">
-        {{ getTotal(song.votes) }}
+        {{ song.score }}
         <q-icon name="eva-star-outline" color="grey-4" style="margin-bottom: .1rem"/>
       </div>
     </q-item-section>
@@ -29,8 +29,8 @@
     <q-card-section>
       <q-list>
           <q-item-label v-if="song.votes && song.votes.length">
-            <div class="row q-ma-sm justify-between" v-for="vote in song.votes" :key="vote._id">
-              <div class="col text-grey-8">{{ getUserPseudoFromVote(vote.user) }}</div>
+            <div class="row q-ma-sm justify-between" v-for="vote in song.votes" :key="vote.id">
+              <div class="col text-grey-8">{{ vote.profile.pseudo }}</div>
               <div class="col col-auto q-mr-xl" >
                 <q-rating v-if="level" slot="subtitle" icon="eva-music-outline" color="light-blue-8" :value="vote.level ? vote.level : 0" readonly :max="3" />
               </div>
@@ -50,15 +50,15 @@
 <q-separator />
     <q-card-actions align="around">
       <q-item-section avatar style="margin-right: -8px;">
-        <q-avatar v-if="getUserAvatar(song.created_user_id)" color="grey-7" text-color="white">
-          <img :src="getUserAvatar(song.created_user_id)" alt="">
+        <q-avatar v-if="song.creator.avatar" color="grey-7" text-color="white">
+          <img :src="song.creator.avatar.url" alt="">
         </q-avatar>
         <q-avatar v-else color="grey-9" text-color="white" icon="eva-person-outline">
         </q-avatar>
       </q-item-section>
 
       <q-item-section>
-        <q-item-label>{{ getUserPseudo(song.created_profile_id) }}</q-item-label>
+        <q-item-label>{{ song.creator.pseudo }}</q-item-label>
       </q-item-section>
       <!-- <div v-if="song.spotify_preview_url">
         <audio :id="'audio-'+song._id" :src="song.spotify_preview_url"></audio>
@@ -179,17 +179,6 @@ export default {
         avatar: this.getUserAvatar(vote.user)
       })
     },
-    getUserAvatar (id) {
-      const profile = this.profiles.find(p => p.user.id === id)
-      if (profile && profile.avatar) {
-        return profile.avatar.url
-      }
-    },
-    getUserPseudo (id) {
-      if (this.profiles.find(p => p.id === id)) {
-        return this.profiles.find(p => p.id === id).pseudo
-      }
-    },
     getUserPseudoFromVote (id) {
       if (this.profiles.find(p => p.user.id === id)) {
         return this.profiles.find(p => p.user.id === id).pseudo
@@ -236,13 +225,6 @@ export default {
             })
           }
         })
-    },
-    getTotal (votes) {
-      let total = 0
-      votes.forEach(vote => {
-        total += vote.vote
-      })
-      return total
     },
     getLevelAverage (votes) {
       const maxTotal = votes.length * 3
