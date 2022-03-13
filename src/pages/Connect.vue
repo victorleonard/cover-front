@@ -85,44 +85,26 @@ export default {
             this.$q.localStorage.set('token', res.data.jwt)
             this.$q.localStorage.set('user_id', res.data.user.id)
           }
-          // creation new profile if not
-          if (!res.data.user.profile) {
-            console.log('got to profile')
-            this.$router.push({ name: 'newProfile' })
-            /* this.$axios.post('/profiles', {
-              user: resp.data.user.id,
-              pseudo: resp.data.user.username
-            })
-              .then((res) => {
+          this.$axios.get('profiles/me')
+            .then((res) => {
+              if (process.env.MODE === 'ssr') {
                 this.$q.cookies.set('profile_id', res.data.id, {
                   expires: 360
                 })
-                this.$store.dispatch('main/getMe')
-                  .then(me => {
-                    console.log('me', me)
-                    this.$router.push({
-                      name: 'home'
-                    })
+              } else {
+                this.$q.localStorage.set('profile_id', res.data.id)
+              }
+              this.$store.dispatch('main/getMe')
+                .then(me => {
+                  this.$router.push({
+                    name: 'home'
                   })
-              }) */
-          } else {
-            if (process.env.MODE === 'ssr') {
-              this.$q.cookies.set('profile_id', res.data.user.profile.id, {
-                expires: 360
-              })
-            } else {
-              this.$q.localStorage.set('profile_id', res.data.user.id)
-            }
-
-            this.$store.dispatch('main/getMe')
-              .then(me => {
-                console.log('me', me)
-                /* this.$store.dispatch('main/changeLoadingState', false) */
-                this.$router.push({
-                  name: 'home'
                 })
-              })
-          }
+            })
+            .catch((e) => {
+              console.log('error', e)
+              this.$router.push({ name: 'newProfile' })
+            })
         })
         .catch(error => {
           this.submitting = false
