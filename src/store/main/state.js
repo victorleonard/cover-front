@@ -20,5 +20,6 @@ export default {
     type: '',
     message: ''
   },
-  currentMessage: undefined
+  currentMessage: undefined,
+  messageToRead: undefined
 }

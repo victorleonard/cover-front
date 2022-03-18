@@ -11,6 +11,11 @@ export function SET_CURRENT_MESSAGE (state, payload) {
   state.currentMessage = payload
 }
 
+export function UPDATE_MESSAGE_TO_READ (state, payload) {
+  console.log(payload)
+  state.messageToRead = payload
+}
+
 export function LOG_OUT (state) {
   state.profile = undefined
   state.user = undefined

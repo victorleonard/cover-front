@@ -7,8 +7,12 @@
           :text="[message.content]"
           :name="getMessageName(message)"
           :stamp="getFormatDate(message)"
+          :data-open="message.open"
+          :data-id="message.id"
+          :data-profile="message.profile_id"
           :bg-color="isSent(message) ? 'blue-2' : 'grey-7'"
           :text-color="isSent(message) ? 'grey-9' : 'white'"
+          v-intersection="onIntersection"
         />
         <q-chat-message
         v-if="is_typing"
@@ -54,26 +58,51 @@ export default {
   data: () => ({
     is_typing: false,
     newMessage: '',
-    socket: io('https://cover-mobile.herokuapp.com/'),
-    // socket: io('http://localhost:1337/'),
+    // socket: io('https://cover-mobile.herokuapp.com/'),
+    socket: io('http://localhost:1337/'),
     currentMessage: undefined
   }),
+  computed: {
+    profile_id () {
+      return this.$q.cookies.get('profile_id') || this.$q.localStorage.getItem('profile_id')
+    }
+  },
   methods: {
+    onIntersection (entry) {
+      const isOpen = entry.target.dataset.open
+      const profileId = entry.target.dataset.profile
+      const id = parseInt(entry.target.dataset.id)
+      if (!isOpen && this.$q.cookies.get('profile_id') !== profileId) {
+        const messages = [...this.currentMessage.messages]
+        const messageToChange = messages.find(el => el.id === id)
+        if (messageToChange) {
+          messageToChange.open = true
+          this.$axios.put(`chatrooms/${this.$route.params.id}`, {
+            data: {
+              messages: messages
+            }
+          })
+            .then(() => {
+              this.$store.dispatch('main/getMessageToRead')
+            })
+        }
+      }
+    },
     typing (e) {
       if (!e) {
         this.socket.emit('IS_TYPING', {
           typing: false,
-          profile_id: this.$q.cookies.get('profile_id')
+          profile_id: this.profile_id
         })
       } else {
         this.socket.emit('IS_TYPING', {
           typing: true,
-          profile_id: this.$q.cookies.get('profile_id')
+          profile_id: this.profile_id
         })
       }
     },
     isSent (message) {
-      return message.profile_id === this.$q.cookies.get('profile_id')
+      return message.profile_id !== this.profile_id
     },
     getFormatDate (message) {
       if (moment(moment()).diff(message.created, 'seconds') > 100) {
@@ -82,23 +111,23 @@ export default {
       // return date.formatDate(message.created, 'YYYY-MM-DDTHH:mm:ss.SSSZ')
     },
     getMessageName (message) {
-      if (message.profile_id === this.$q.cookies.get('profile_id')) {
+      if (message.profile_id === this.profile_id) {
         return 'moi'
       } else {
-        const profile = this.currentMessage.profiles.find(p => p.id === message.profile_id)
+        const profile = this.currentMessage.profiles.data.find(p => p.id === message.profile_id)
         return profile.pseudo
       }
     },
     getCurrentMessage () {
-      this.$axios.get('/rooms/' + this.$route.params.id)
+      this.$axios.get('/chatrooms/' + this.$route.params.id + '?populate=messages,profiles')
         .then(res => {
-          this.currentMessage = res.data
+          this.currentMessage = res.data.data.attributes
           /* this.$store.dispatch('main/setCurrentMessage', {
             message: { ...res.data }
           }) */
           // this.$store.commit('main/SET_CURRENT_MESSAGE', { ...res.data })
           setTimeout(() => {
-            this.scrollToBottom()
+            // this.scrollToBottom()
           }, 1000)
         })
     },
@@ -111,22 +140,24 @@ export default {
     sendMessage () {
       this.socket.emit('SEND_MESSAGE', {
         content: this.newMessage,
-        profile_id: this.$q.cookies.get('profile_id'),
+        profile_id: this.profile_id,
         created: new Date()
       })
       this.socket.emit('IS_TYPING', {
         typing: false,
-        profile_id: this.$q.cookies.get('profile_id')
+        profile_id: this.profile_id
       })
       const messages = [...this.currentMessage.messages]
       messages.push({
         content: this.newMessage,
-        profile_id: this.$q.cookies.get('profile_id'),
+        profile_id: this.profile_id,
         created: new Date()
       })
       this.newMessage = ''
-      this.$axios.put(`rooms/${this.$route.params.id}`, {
-        messages: messages
+      this.$axios.put(`chatrooms/${this.$route.params.id}`, {
+        data: {
+          messages: messages
+        }
       })
     }
   },
@@ -136,7 +167,7 @@ export default {
       this.scrollToBottom()
     })
     this.socket.on('TYPING', (data) => {
-      if (data.typing && data.profile_id !== this.$q.cookies.get('profile_id')) {
+      if (data.typing && data.profile_id !== this.profile_id) {
         this.is_typing = true
       } else {
         this.is_typing = false

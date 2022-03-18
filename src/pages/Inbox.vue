@@ -89,7 +89,6 @@ export default {
       }
     },
     formatDate (d) {
-      console.log(d)
       return date.formatDate(d, 'DD-MM-YYYY HH:mm')
     },
     openRoom (room) {
@@ -103,11 +102,9 @@ export default {
     }
   },
   created () {
-    this.$axios.get(`rooms?profiles.id=${this.$q.cookies.get('profile_id')}`)
+    this.$axios.get('chatrooms/me/list')
       .then(res => {
         this.chatrooms = res.data
-        document.body.scrollTop = 0 // For Safari
-        document.documentElement.scrollTop = 0
       })
   }
 }

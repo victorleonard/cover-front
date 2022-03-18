@@ -336,8 +336,18 @@ export async function getMyProfile ({ state, commit }) {
   console.log('get my profile')
   try {
     const r = await this.$axios.get('/profiles/me')
-    console.log(r)
     commit('UPDATE_PROFILE', r.data)
+    return r
+  } catch (error) {
+    throw (error.response)
+  }
+}
+
+export async function getMessageToRead ({ state, commit }) {
+  try {
+    const r = await this.$axios.get('/chatrooms/me/to-read')
+    commit('UPDATE_MESSAGE_TO_READ', r.data)
+    return r
   } catch (error) {
     throw (error.response)
   }
