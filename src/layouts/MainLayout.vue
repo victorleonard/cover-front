@@ -268,6 +268,18 @@ export default {
   },
   beforeCreate () {
     this.$store.dispatch('main/getMe')
+      .catch((e) => {
+        console.log('ERROR', e.response)
+        if (e.response.data.error.status === 401) {
+          this.$store.dispatch('main/logout')
+          this.$q.localStorage.remove('token')
+          this.$q.localStorage.remove('user_id')
+          this.$q.localStorage.remove('profile_id')
+          this.$router.push({
+            name: 'connect'
+          })
+        }
+      })
     this.$store.dispatch('main/getMyProfile')
       .catch((e) => {
         if (e.data.error.message === 'no profile') {
