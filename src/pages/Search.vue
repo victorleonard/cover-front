@@ -29,7 +29,7 @@
         <q-separator />
 
         <q-card-actions align="right">
-          <q-btn flat color="primary" label="Choisir" @click="select" />
+          <q-btn flat color="primary" no-caps label="Choisir" @click="select" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -66,7 +66,7 @@
             <q-btn flat icon="fab fa-spotify" @click="launchSpotify(res.uri)" size="md" color="positive"></q-btn>
             <q-btn class="btn-audio btn-audio-play" :id="'btn-audio-play-'+res.id" v-if="res.preview_url" flat color="primary" label="" icon="ion-md-play" size="md" @click="play(res.id)" />
             <q-btn class="btn-audio btn-audio-pause" :id="'btn-audio-pause-'+res.id" v-if="res.preview_url" flat color="primary" label="" icon="ion-md-pause" size="md" @click="pause(res.id)" />
-            <q-btn flat color="primary" label="Choisir" icon="ion-md-add-circle" size="md" @click="displaySelectDialog(res)" />
+            <q-btn flat color="primary" label="Choisir" no-caps icon="add" size="md" @click="displaySelectDialog(res)" />
             <audio :src="res.preview_url" :id="'audio-' + res.id" type="audio/mpeg"></audio>
           </q-card-actions>
           </q-card-section>
@@ -128,15 +128,19 @@ export default {
       audioToPlay.pause()
     },
     displaySelectDialog (t) {
-      if (this.currentGroupSongs.find(s => s.spotify_id === t.id)) {
-        this.$q.notify({
-          type: 'negative',
-          message: 'Ce titre a déjà été séléctioné',
-          position: 'top'
-        })
+      if (this.$route.name === 'setlist') {
+        this.$emit('addSong', t)
       } else {
-        this.songSelected = t
-        this.songSelectDialog = true
+        if (this.currentGroupSongs.find(s => s.spotify_id === t.id)) {
+          this.$q.notify({
+            type: 'negative',
+            message: 'Ce titre a déjà été séléctioné',
+            position: 'top'
+          })
+        } else {
+          this.songSelected = t
+          this.songSelectDialog = true
+        }
       }
     },
     extractYoutubeID (url) {
