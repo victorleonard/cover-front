@@ -104,7 +104,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('main', ['currentGroup'])
+    ...mapState('main', ['currentGroup', 'frontHost'])
   },
   methods: {
     millisecondsToMinutesSeconds (ms) {
@@ -169,7 +169,7 @@ export default {
         ]
       }).onOk(action => {
         if (action.id === 'share') {
-          copyToClipboard(`http://app.victorleonard.fr/cover3/#/share/${this.$route.params.id}`)
+          copyToClipboard(`${this.frontHost}/#/share/${this.$route.params.id}`)
             .then(() => {
               this.$q.notify({
                 message: 'Le lien a été copié',
@@ -182,7 +182,7 @@ export default {
             })
         }
         if (action.id === 'wa') {
-          location.href = `whatsapp://send?text=Setlist du groupe ${this.currentGroup.name} : http://app.victorleonard.fr/cover3/#/share/${this.$route.params.id}`
+          location.href = `whatsapp://send?text=Setlist du groupe ${this.currentGroup.name} : ${this.frontHost}/#/share/${this.$route.params.id}`
         }
         // console.log('Action chosen:', action.id)
       }).onCancel(() => {
