@@ -1,6 +1,6 @@
 const routes = [
   {
-    path: '/share/:groupId',
+    path: '/share/:id',
     name: 'share',
     component: () => import('pages/Share.vue')
   },

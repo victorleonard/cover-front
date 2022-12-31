@@ -6,7 +6,7 @@
           <div class="col">
             <q-img
               class="bg-grey-9"
-              :src="d.group.logo"
+              :src="d.group.image.url"
             >
               <div class="text-h4" style="width: 100%">
                 <div class="row">
@@ -23,11 +23,11 @@
       </div>
     </q-card-section>
   <q-card-section>
-    <q-card v-for="song in d.setlist" class="q-mb-md" :key="song.id">
+    <q-card v-for="song in d.songs" class="q-mb-md" :key="song.id">
             <q-card-section class="q-pa-none">
               <div class="row items-center bg-grey-1">
                 <div class="col col-3 col-md-6">
-                  <img style="max-width: 100%; display: block" :src="song.img" alt="">
+                  <img style="max-width: 100%; display: block" :src="song.image_url" alt="">
                 </div>
                 <div class="col q-pr-sm" style="line-height: 1.2rem">
                     <div class="text-grey-9 q-title q-ml-sm">{{ song.name }}</div>
@@ -54,11 +54,17 @@ export default {
   methods: {
     loadSetList () {
       this.$store.dispatch('main/changeLoadingState', true)
-      this.$axios.get(`/songs/share/${this.$route.params.groupId}`)
+      this.$axios.get(`/setlists/${this.$route.params.id}`)
         .then(r => {
+          console.log(r.data)
           this.$store.dispatch('main/changeLoadingState', false)
           this.d = r.data
         })
+      /* this.$axios.get(`/songs/share/${this.$route.params.groupId}`)
+        .then(r => {
+          this.$store.dispatch('main/changeLoadingState', false)
+          this.d = r.data
+        }) */
     },
     refresh (done) {
       this.$axios.get(`/songs/share/${this.$route.params.groupId}`)
