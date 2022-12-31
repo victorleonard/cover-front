@@ -53,7 +53,6 @@
       <q-btn outline class="q-mr-sm" no-caps color="primary" icon="eva-plus" label="Ajouter un titre" @click="addSong" />
       <q-btn outline no-caps icon="eva-share" color="primary" label="Partager" @click="share" />
     </q-toolbar>
-      <div>
         <div class="row">
           <draggable v-model="setlist.songs" group="people" :options="{handle:'.move'}" @end="sortSetList">
             <q-card v-for="song in setlist.songs" class="q-mb-md" :key="song.id">
@@ -68,6 +67,7 @@
                 <div class="col q-pr-sm" style="line-height: 1.2rem">
                     <div class="text-grey-9 q-title q-ml-sm">{{ song.name }}</div>
                     <div class="text-grey-7 q-subheading q-ml-sm q-mt-sm">{{ song.artist }}</div>
+                    <div class="text-grey-7 text-caption q-ml-sm q-mt-sm">{{ millisecondsToMinutesSeconds(song.duration_ms) }}</div>
                 </div>
                 <q-btn flat icon="eva-trash-2-outline" label="" @click="removeToSetList(song.id)" />
               </div>
@@ -75,7 +75,6 @@
           </q-card>
           </draggable>
         </div>
-      </div>
     </div>
   </q-page>
   </div>
@@ -87,6 +86,7 @@ import { copyToClipboard } from 'quasar'
 import orderBy from 'lodash/orderBy'
 import draggable from 'vuedraggable'
 import search from './Search.vue'
+import moment from 'moment'
 
 export default {
   name: 'SetList',
@@ -103,6 +103,14 @@ export default {
     ...mapState('main', ['currentGroup'])
   },
   methods: {
+    millisecondsToMinutesSeconds (ms) {
+      const duration = moment.duration(ms, 'milliseconds')
+      const fromMinutes = Math.floor(duration.asMinutes())
+      const fromSeconds = Math.floor(duration.asSeconds() - fromMinutes * 60)
+
+      return Math.floor(duration.asSeconds()) >= 60 ? (fromMinutes <= 9 ? '0' + fromMinutes : fromMinutes) + ':' + (fromSeconds <= 9 ? '0' + fromSeconds : fromSeconds)
+        : '00:' + (fromSeconds <= 9 ? '0' + fromSeconds : fromSeconds)
+    },
     sortSetList () {
       this.$axios.put(`setlists/${this.$route.params.id}`, {
         songs: this.setlist.songs
@@ -114,7 +122,8 @@ export default {
         song_id: t.id,
         name: t.name,
         artist: t.artists[0].name,
-        image_url: t.album.images[1].url
+        image_url: t.album.images[1].url,
+        duration_ms: t.duration_ms
       })
       this.$axios.put(`setlists/${this.$route.params.id}`, {
         songs: this.setlist.songs
