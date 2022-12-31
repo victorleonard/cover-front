@@ -50,9 +50,13 @@
         </q-btn>
         {{ setlist.name }}
       </q-toolbar-title>
+    </q-toolbar>
+    <div class="row">
+      <div class="q-mb-md q-ml-auto">
       <q-btn outline class="q-mr-sm" no-caps color="primary" icon="eva-plus" label="Ajouter un titre" @click="addSong" />
       <q-btn outline no-caps icon="eva-share" color="primary" label="Partager" @click="share" />
-    </q-toolbar>
+      </div>
+    </div>
         <div class="row">
           <draggable v-model="setlist.songs" group="people" :options="{handle:'.move'}" @end="sortSetList">
             <q-card v-for="song in setlist.songs" class="q-mb-md" :key="song.id">
