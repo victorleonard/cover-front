@@ -7,7 +7,7 @@
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <q-select
+       <!--  <q-select
         filled
           v-model="songSelected"
           :options="songs"
@@ -30,13 +30,14 @@
             </q-item-section>
           </q-item>
           </template>
-        </q-select>
+        </q-select> -->
+        <search @addSong="addSongToSetlist" />
       </q-card-section>
 
-      <q-card-actions align="right" class="text-primary">
+      <!-- <q-card-actions align="right" class="text-primary">
         <q-btn flat no-caps label="Annuler" v-close-popup />
         <q-btn flat no-caps label="Ajouter le titre à la playlist" @click="addSongToSetlist" v-close-popup />
-      </q-card-actions>
+      </q-card-actions> -->
     </q-card>
   </q-dialog>
   <q-page v-if="setlist" padding class="search-page q-pl-md q-pr-md">
@@ -49,8 +50,8 @@
         </q-btn>
         {{ setlist.name }}
       </q-toolbar-title>
-      <q-btn flat round dense icon="eva-plus" @click="addSong" />
-      <!-- <q-btn flat round dense icon="eva-share" @click="share" /> -->
+      <q-btn outline class="q-mr-sm" no-caps color="primary" icon="eva-plus" label="Ajouter un titre" @click="addSong" />
+      <q-btn outline no-caps icon="eva-share" color="primary" label="Partager" @click="share" />
     </q-toolbar>
       <div>
         <div class="row">
@@ -59,7 +60,7 @@
             <q-card-section class="q-pa-none">
               <div class="row items-center bg-grey-1">
                 <div class="col col-auto">
-                  <q-btn class="move" flat icon="fas fa-grip-vertical" label=""/>
+                  <q-btn class="move" flat color="primary" icon="fas fa-grip-vertical" label=""/>
                 </div>
                 <div class="col col-3 col-md-6">
                   <img style="max-width: 100%; display: block" :src="song.image_url" alt="">
@@ -85,10 +86,11 @@ import { mapState } from 'vuex'
 import { copyToClipboard } from 'quasar'
 import orderBy from 'lodash/orderBy'
 import draggable from 'vuedraggable'
+import search from './Search.vue'
 
 export default {
   name: 'SetList',
-  components: { draggable },
+  components: { draggable, search },
   data () {
     return {
       setlist: undefined,
@@ -106,19 +108,20 @@ export default {
         songs: this.setlist.songs
       })
     },
-    addSongToSetlist () {
+    addSongToSetlist (t) {
       this.$store.dispatch('main/changeLoadingState', true)
-      this.setlist.songs.push({
-        song_id: this.songSelected.id,
-        name: this.songSelected.name,
-        artist: this.songSelected.artist,
-        image_url: this.songSelected.images[0].url
+      this.setlist.songs.unshift({
+        song_id: t.id,
+        name: t.name,
+        artist: t.artists[0].name,
+        image_url: t.album.images[1].url
       })
       this.$axios.put(`setlists/${this.$route.params.id}`, {
         songs: this.setlist.songs
       })
         .then(() => {
           this.loadSetList()
+          this.dialogAddSong = false
         })
     },
     addSong () {
@@ -153,7 +156,7 @@ export default {
         ]
       }).onOk(action => {
         if (action.id === 'share') {
-          copyToClipboard(`http://app.victorleonard.fr/cover3/#/share/${this.$route.params.groupId}`)
+          copyToClipboard(`http://app.victorleonard.fr/cover3/#/share/${this.$route.params.id}`)
             .then(() => {
               this.$q.notify({
                 message: 'Le lien a été copié',
@@ -166,7 +169,7 @@ export default {
             })
         }
         if (action.id === 'wa') {
-          location.href = `whatsapp://send?text=Setlist du groupe ${this.currentGroup.name} : http://app.victorleonard.fr/cover3/#/share/${this.$route.params.groupId}`
+          location.href = `whatsapp://send?text=Setlist du groupe ${this.currentGroup.name} : http://app.victorleonard.fr/cover3/#/share/${this.$route.params.id}`
         }
         // console.log('Action chosen:', action.id)
       }).onCancel(() => {
