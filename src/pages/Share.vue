@@ -4,7 +4,6 @@
     <q-video v-if="songSelected" :src="`https://www.youtube.com/embed/${songSelected.youtube_id}?rel=0`" :ratio="16/9" />
   </q-dialog>
 
-<q-pull-to-refresh @refresh="refresh" v-if="d">
   <q-card style="min-height: 100vh; max-width: 400px; margin: 0 auto">
     <q-card-section>
       <div class="row">
@@ -51,7 +50,6 @@
       </q-card>
     </q-card-section>
   </q-card>
-</q-pull-to-refresh>
 </div>
 </template>
 
