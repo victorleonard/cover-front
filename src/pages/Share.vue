@@ -12,6 +12,8 @@
             <q-img
               class="bg-grey-9"
               :src="d.group.image.url"
+              :ratio="16/9"
+              contain
             >
               <div class="text-h4" style="width: 100%">
                 <div class="row">
