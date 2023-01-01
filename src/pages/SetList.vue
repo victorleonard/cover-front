@@ -78,7 +78,7 @@
       </div>
     </div>
         <div class="row">
-          <draggable v-model="setlist.songs" group="people" :options="{handle:'.move'}" @end="sortSetList">
+          <draggable class="full-width" v-model="setlist.songs" group="people" :options="{handle:'.move'}" @end="sortSetList">
             <q-card v-for="song in setlist.songs" class="q-mb-md" :key="song.id">
             <q-card-section class="q-pa-none">
               <div class="row items-center bg-grey-1">
