@@ -11,7 +11,8 @@
               <div class="text-h4" style="width: 100%">
                 <div class="row">
                   <div class="col">
-                    {{ d.group.name }}
+                    {{ d.group.name }}<br>
+                  <div class="text-caption">Durée : {{ duration }}</div>
                   </div>
                   <div class="col col-auto">
                     <q-btn flat round dense icon="eva-share" @click="show()" />
@@ -44,6 +45,7 @@
 <script>
 import { copyToClipboard } from 'quasar'
 import { mapState } from 'vuex'
+import moment from 'moment'
 
 export default {
   name: 'SetList',
@@ -53,9 +55,26 @@ export default {
     }
   },
   computed: {
-    ...mapState('main', ['frontHost'])
+    ...mapState('main', ['frontHost']),
+    duration () {
+      if (!this.d.songs.length) return
+      let total = 0
+      this.d.songs.forEach(s => {
+        total += parseInt(s.duration_ms)
+      })
+
+      return this.millisecondsToMinutesSeconds(total)
+    }
   },
   methods: {
+    millisecondsToMinutesSeconds (ms) {
+      const duration = moment.duration(ms, 'milliseconds')
+      const fromMinutes = Math.floor(duration.asMinutes())
+      const fromSeconds = Math.floor(duration.asSeconds() - fromMinutes * 60)
+
+      return Math.floor(duration.asSeconds()) >= 60 ? (fromMinutes <= 9 ? '0' + fromMinutes : fromMinutes) + ':' + (fromSeconds <= 9 ? '0' + fromSeconds : fromSeconds)
+        : '00:' + (fromSeconds <= 9 ? '0' + fromSeconds : fromSeconds)
+    },
     loadSetList () {
       this.$store.dispatch('main/changeLoadingState', true)
       this.$axios.get(`/setlists/${this.$route.params.id}`)
