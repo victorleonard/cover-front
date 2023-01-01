@@ -48,7 +48,7 @@
         <q-btn :to="{ name: 'setlists' }" flat round dense>
           <q-icon name="eva-chevron-left-outline" />
         </q-btn>
-        {{ setlist.name }}
+        {{ setlist.name }} <span class="text-caption">(durée : {{ duration }})</span>
       </q-toolbar-title>
     </q-toolbar>
     <div class="row">
@@ -104,7 +104,16 @@ export default {
     }
   },
   computed: {
-    ...mapState('main', ['currentGroup', 'frontHost'])
+    ...mapState('main', ['currentGroup', 'frontHost']),
+    duration () {
+      if (!this.setlist.songs.length) return
+      let total = 0
+      this.setlist.songs.forEach(s => {
+        total += parseInt(s.duration_ms)
+      })
+
+      return this.millisecondsToMinutesSeconds(total)
+    }
   },
   methods: {
     millisecondsToMinutesSeconds (ms) {
