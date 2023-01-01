@@ -1,4 +1,9 @@
 <template>
+<div>
+  <q-dialog v-model="dialogVideo" full-width>
+    <q-video v-if="songSelected" :src="`https://www.youtube.com/embed/${songSelected.youtube_id}?rel=0`" :ratio="16/9" />
+  </q-dialog>
+
 <q-pull-to-refresh @refresh="refresh" v-if="d">
   <q-card style="min-height: 100vh; max-width: 400px; margin: 0 auto">
     <q-card-section>
@@ -23,23 +28,29 @@
           </div>
       </div>
     </q-card-section>
-  <q-card-section>
-    <q-card v-for="song in d.songs" class="q-mb-md" :key="song.id">
-            <q-card-section class="q-pa-none">
-              <div class="row items-center bg-grey-1">
-                <div class="col col-3 col-md-6">
-                  <img style="max-width: 100%; display: block" :src="song.image_url" alt="">
-                </div>
-                <div class="col q-pr-sm" style="line-height: 1.2rem">
-                    <div class="text-grey-9 q-title q-ml-sm">{{ song.name }}</div>
-                    <div class="text-grey-7 q-subheading q-ml-sm q-mt-sm">{{ song.artist }}</div>
-                </div>
-              </div>
-            </q-card-section>
-          </q-card>
-  </q-card-section>
+    <q-card-section>
+      <q-card v-for="song in d.songs" class="q-mb-md" :key="song.id">
+        <q-card-section class="q-pa-none">
+          <div class="row items-center bg-grey-1">
+            <div class="col col-3 col-md-6">
+              <q-img :src="song.image_url" alt="" />
+            </div>
+            <div class="col q-pr-sm" style="line-height: 1.2rem">
+              <div class="text-grey-9 q-title q-ml-sm">{{ song.name }}</div>
+              <div class="text-grey-7 q-subheading q-ml-sm q-mt-sm">{{ song.artist }}</div>
+            </div>
+            <div  v-if="song.youtube_id" class="col col-3">
+              <q-btn flat @click="songSelected = song; dialogVideo = true" class="q-ml-sm" size="lg" color="negative"
+              no-caps icon="fab fa-youtube" />
+            </div>
+
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-card-section>
   </q-card>
 </q-pull-to-refresh>
+</div>
 </template>
 
 <script>
@@ -51,6 +62,8 @@ export default {
   name: 'SetList',
   data () {
     return {
+      dialogVideo: false,
+      songSelected: undefined,
       d: undefined
     }
   },

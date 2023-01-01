@@ -1,5 +1,25 @@
 <template>
   <div>
+  <q-dialog v-model="dialogVideoAdd">
+    <q-card style="min-width: 350px">
+      <q-card-section>
+        <div class="text-h6">Modifier l'url youtube</div>
+      </q-card-section>
+
+      <q-card-section class="q-pt-none">
+        <q-input dense v-model="songSelected.youtube_id" autofocus />
+      </q-card-section>
+
+      <q-card-actions align="right" class="text-primary">
+        <q-btn flat label="Annuler" no-caps v-close-popup />
+        <q-btn flat label="Mettre à jour" no-caps v-close-popup @click="updateVideo" />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
+  <q-dialog v-model="dialogVideo" full-width>
+    <q-video :src="`https://www.youtube.com/embed/${songSelected.youtube_id}?rel=0`" :ratio="16/9"/>
+  </q-dialog>
+
   <q-dialog v-model="dialogAddSong">
     <q-card style="min-width: 350px">
       <q-card-section>
@@ -62,18 +82,39 @@
             <q-card v-for="song in setlist.songs" class="q-mb-md" :key="song.id">
             <q-card-section class="q-pa-none">
               <div class="row items-center bg-grey-1">
-                <div class="col col-auto">
+                <div class="col col-2 col-auto">
                   <q-btn class="move" flat color="primary" icon="fas fa-grip-vertical" label=""/>
                 </div>
                 <div class="col col-3 col-md-6">
-                  <img style="max-width: 100%; display: block" :src="song.image_url" alt="">
+                  <q-img :src="song.image_url" alt="" />
                 </div>
                 <div class="col q-pr-sm" style="line-height: 1.2rem">
                     <div class="text-grey-9 q-title q-ml-sm">{{ song.name }}</div>
                     <div class="text-grey-7 q-subheading q-ml-sm q-mt-sm">{{ song.artist }}</div>
                     <div class="text-grey-7 text-caption q-ml-sm q-mt-sm">{{ millisecondsToMinutesSeconds(song.duration_ms) }}</div>
                 </div>
-                <q-btn flat icon="eva-trash-2-outline" label="" @click="removeToSetList(song.id)" />
+                <div class="co col-1">
+                <q-btn class="absolute-top-right" color="grey-7" flat icon="more_vert">
+                  <q-menu cover auto-close>
+                    <q-list>
+                      <q-item clickable @click="removeToSetList(song.id)">
+                        <q-item-section avatar>
+                          <q-icon color="red-8" name="eva-trash-2-outline" />
+                        </q-item-section>
+                        <q-item-section>Supprimer</q-item-section>
+                      </q-item>
+                      <q-item clickable @click="songSelected = song; dialogVideoAdd = true">
+                        <q-item-section avatar>
+                          <q-icon color="red-8" name="fab fa-youtube" />
+                        </q-item-section>
+                        <q-item-section>Ajouter un lien youtube</q-item-section>
+                      </q-item>
+                    </q-list>
+                  </q-menu>
+                </q-btn>
+                <q-btn class="absolute-bottom-right" v-if="song.youtube_id" outline @click="dialogVideo = true" size="md" color="red-8" flat icon="fab fa-youtube" />
+                  </div>
+                <!-- <q-btn flat icon="eva-trash-2-outline" label="" @click="removeToSetList(song.id)" /> -->
               </div>
             </q-card-section>
           </q-card>
@@ -100,7 +141,9 @@ export default {
       setlist: undefined,
       dialogAddSong: false,
       songs: [],
-      songSelected: ''
+      songSelected: '',
+      dialogVideo: false,
+      dialogVideoAdd: false
     }
   },
   computed: {
@@ -116,6 +159,30 @@ export default {
     }
   },
   methods: {
+    extractYoutubeID (url) {
+      var ID = ''
+      url = url.replace(/(>|<)/gi, '').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/)
+      if (url[2] !== undefined) {
+        ID = url[2].split(/[^0-9a-z_-]/i)
+        ID = ID[0]
+      } else {
+        return ''
+      }
+      return ID
+    },
+    updateVideo () {
+      console.log('lk ')
+      const setListcopy = { ...this.setlist }
+      const findSong = setListcopy.songs.find(s => s.id === this.songSelected.id)
+      findSong.youtube_id = this.extractYoutubeID(this.songSelected.youtube_id)
+      this.$axios.put(`setlists/${this.$route.params.id}`, {
+        songs: setListcopy.songs
+      })
+        .then(() => {
+          this.loadSetList()
+          this.dialogAddSong = false
+        })
+    },
     millisecondsToMinutesSeconds (ms) {
       const duration = moment.duration(ms, 'milliseconds')
       const fromMinutes = Math.floor(duration.asMinutes())
