@@ -2,6 +2,7 @@
 <div>
   <q-dialog v-model="video" v-if="song.youtube_id" full-width>
       <q-video
+      :ratio="16/9"
       :src="`https://www.youtube.com/embed/${song.youtube_id}?rel=0`"
     />
   </q-dialog>
