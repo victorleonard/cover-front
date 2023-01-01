@@ -61,7 +61,6 @@
     </q-card>
   </q-dialog>
   <q-page v-if="setlist" padding class="search-page q-pl-md q-pr-md">
-    <!-- Morceaux selectionnés -->
     <div class="q-ml-sm q-mr-sm q-pb-md">
       <q-toolbar class="q-mb-sm">
       <q-toolbar-title>
@@ -82,8 +81,8 @@
             <q-card v-for="song in setlist.songs" class="q-mb-md" :key="song.id">
             <q-card-section class="q-pa-none">
               <div class="row items-center bg-grey-1">
-                <div class="col col-2 col-auto">
-                  <q-btn class="move" flat color="primary" icon="fas fa-grip-vertical" label=""/>
+                <div class="col col-1 col-auto" style="width: 40px">
+                  <q-btn class="move" flat color="primary" size="xs" icon="fas fa-grip-vertical" label=""/>
                 </div>
                 <div class="col col-3 col-md-6">
                   <q-img :src="song.image_url" alt="" />
