@@ -30,9 +30,9 @@
       </div>
     </q-card-section>
     <q-card-section>
-      <q-card v-for="song in d.songs" class="q-mb-md" :key="song.id">
+      <q-card v-for="song in d.songs" class="q-mb-md" flat :key="song.id">
         <q-card-section class="q-pa-none">
-          <div class="row items-center bg-grey-1">
+          <div class="row items-center bg-grey-3">
             <div class="col col-3 col-md-6">
               <q-img :src="song.image_url" alt="" />
             </div>
