@@ -17,7 +17,7 @@
               <div class="text-h4" style="width: 100%">
                 <div class="row">
                   <div class="col">
-                    {{ d.group.name }}<br>
+                    {{ d.name }}<br>
                   <div class="text-caption">Durée : {{ duration }}</div>
                   </div>
                   <div class="col col-auto">
